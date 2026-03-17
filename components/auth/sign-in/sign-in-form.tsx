@@ -1,0 +1,31 @@
+import { AuthField } from "@/components/auth/shared/auth-field";
+import { SocialAuthButtons } from "@/components/auth/shared/social-auth-buttons";
+
+export function SignInForm() {
+  return (
+    <form className="space-y-5">
+      <div>
+        <p className="text-xs font-semibold uppercase tracking-[0.3em] text-black/45">Sign In</p>
+        <h2 className="mt-2 text-2xl font-semibold tracking-tight">Access your account</h2>
+      </div>
+      <SocialAuthButtons />
+      <div className="flex items-center gap-3 text-xs uppercase tracking-[0.25em] text-black/35">
+        <span className="h-px flex-1 bg-border-soft" />
+        or
+        <span className="h-px flex-1 bg-border-soft" />
+      </div>
+      <AuthField label="Email address" type="email" name="email" placeholder="you@example.com" />
+      <AuthField label="Password" type="password" name="password" placeholder="Enter your password" />
+      <div className="flex items-center justify-between gap-3 text-sm text-black/60">
+        <label className="flex items-center gap-2">
+          <input type="checkbox" className="rounded border-border-soft" />
+          Remember me
+        </label>
+        <a href="#" className="font-medium text-accent">Forgot password?</a>
+      </div>
+      <button className="w-full rounded-full bg-accent px-4 py-3 text-sm font-semibold text-white transition hover:opacity-90">
+        Sign in
+      </button>
+    </form>
+  );
+}
