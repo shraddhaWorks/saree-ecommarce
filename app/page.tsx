@@ -1,44 +1,45 @@
-import { FrontendBlueprintPage } from "@/features/storefront/frontend-blueprint-page";
 import Carousel from "@/components/common/Carousel";
+import { StorefrontNavbar } from "@/components/navbar/storefront-navbar";
+import { FrontendBlueprintPage } from "@/features/storefront/frontend-blueprint-page";
 
 export default function Home() {
   const slides = [
-    <div className="relative w-full aspect-video overflow-hidden rounded-2xl bg-black" key="1">
+    <div className="relative h-[420px] w-full overflow-hidden bg-[#8f171f] sm:h-[520px] lg:h-[700px]" key="1">
       <img
-        src="	https://kalanjali.com/cdn/shop/files/5_1.png?v=1772695660&width=2000"
+        src="https://kalanjali.com/cdn/shop/files/5_1.png?v=1772695660&width=2000"
         alt="Saree shopping 1"
-        className="h-full w-full object-contain object-center"
+        className="h-full w-full object-cover object-center"
         loading="lazy"
       />
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/10 via-black/0 to-black/40" />
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/5 via-black/0 to-black/25" />
     </div>,
-    <div className="relative w-full aspect-video overflow-hidden rounded-2xl bg-black" key="2">
+    <div className="relative h-[420px] w-full overflow-hidden bg-[#8f171f] sm:h-[520px] lg:h-[700px]" key="2">
       <img
-        src="	https://kalanjali.com/cdn/shop/files/5_1.png?v=1772695660&width=2000"
+        src="https://kalanjali.com/cdn/shop/files/5_1.png?v=1772695660&width=2000"
         alt="Saree shopping 2"
-        className="h-full w-full object-contain object-center"
+        className="h-full w-full object-cover object-center"
         loading="lazy"
       />
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/10 via-black/0 to-black/40" />
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/5 via-black/0 to-black/25" />
     </div>,
-    <div className="relative w-full aspect-video overflow-hidden rounded-2xl bg-black" key="3">
+    <div className="relative h-[420px] w-full overflow-hidden bg-[#8f171f] sm:h-[520px] lg:h-[700px]" key="3">
       <img
-        src="	https://kalanjali.com/cdn/shop/files/5_1.png?v=1772695660&width=2000"
+        src="https://kalanjali.com/cdn/shop/files/5_1.png?v=1772695660&width=2000"
         alt="Saree shopping 3"
-        className="h-full w-full object-contain object-center"
+        className="h-full w-full object-cover object-center"
         loading="lazy"
       />
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/10 via-black/0 to-black/40" />
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/5 via-black/0 to-black/25" />
     </div>,
   ];
 
   return (
-    <div className="space-y-16 pt-[180px] lg:pt-[196px]">
-      <div className="mx-auto w-[90vw] max-w-[100vw] px-4">
-        <Carousel slides={slides} />
-      </div>
-      <FrontendBlueprintPage />
-
-    </div>
+    <main className="min-h-screen bg-[#f7f0e7] text-[#201815]">
+      <StorefrontNavbar />
+      <section className="w-full pt-[138px] sm:pt-[146px] lg:pt-[154px]">
+        <Carousel slides={slides} className="w-full" />
+      </section>
+      <FrontendBlueprintPage showNavbar={false} />
+    </main>
   );
 }

@@ -3,178 +3,155 @@
 import React, { ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 export interface CarouselProps {
-    /** Items to render in the carousel (preferred). */
-    slides?: ReactNode[];
-    /** Alternative to slides: any children will be treated as slides. */
-    children?: ReactNode;
-    /** Add custom className to the outer wrapper. */
-    className?: string;
-    /** Show navigation arrows (prev/next). */
-    showArrows?: boolean;
-    /** Show slide indicators (dots). */
-    showIndicators?: boolean;
-    /** Automatically advance slides. */
-    autoPlay?: boolean;
-    /** Pause auto-play when hovering over the carousel. */
-    pauseOnHover?: boolean;
-    /** Auto play interval in milliseconds. */
-    autoPlayInterval?: number;
-    /** Loop slides when reaching the end. */
-    loop?: boolean;
+  slides?: ReactNode[];
+  children?: ReactNode;
+  className?: string;
+  showArrows?: boolean;
+  showIndicators?: boolean;
+  autoPlay?: boolean;
+  pauseOnHover?: boolean;
+  autoPlayInterval?: number;
+  loop?: boolean;
 }
 
 export default function Carousel({
-    slides,
-    children,
-    className = "",
-    showArrows = true,
-    showIndicators = true,
-    autoPlay = true,
-    pauseOnHover = false,
-    autoPlayInterval = 5000,
-    loop = true,
+  slides,
+  children,
+  className = "",
+  showArrows = true,
+  showIndicators = true,
+  autoPlay = true,
+  pauseOnHover = false,
+  autoPlayInterval = 5000,
+  loop = true,
 }: CarouselProps) {
-    const slideChildren = useMemo<ReactNode[]>(() => {
-        if (slides && slides.length > 0) return slides;
+  const slideChildren = useMemo<ReactNode[]>(() => {
+    if (slides && slides.length > 0) return slides;
+    const childrenArray = React.Children.toArray(children);
+    return childrenArray.length > 0 ? childrenArray : [];
+  }, [children, slides]);
 
-        // Normalize children into an array of nodes
-        const childrenArray = React.Children.toArray(children);
-        return childrenArray.length > 0 ? childrenArray : [];
-    }, [children, slides]);
+  const slideCount = slideChildren.length;
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
+  const trackRef = useRef<HTMLDivElement | null>(null);
+  const itemRefs = useRef<Array<HTMLDivElement | null>>([]);
+  const currentIndex = slideCount > 0 ? Math.min(activeIndex, slideCount - 1) : 0;
 
-    const slideCount = slideChildren.length;
-    const [activeIndex, setActiveIndex] = useState(0);
-    const [isPaused, setIsPaused] = useState(false);
-    const trackRef = useRef<HTMLDivElement | null>(null);
-    const itemRefs = useRef<Array<HTMLDivElement | null>>([]);
+  const goToIndex = useCallback(
+    (index: number) => {
+      if (!trackRef.current || slideCount === 0) return;
+      const normalized =
+        index < 0 ? (loop ? slideCount - 1 : 0) : index >= slideCount ? (loop ? 0 : slideCount - 1) : index;
+      setActiveIndex(normalized);
 
-    const goToIndex = useCallback(
-        (index: number) => {
-            if (!trackRef.current || slideCount === 0) return;
-            const normalized =
-                index < 0 ? (loop ? slideCount - 1 : 0) : index >= slideCount ? (loop ? 0 : slideCount - 1) : index;
-            setActiveIndex(normalized);
+      const target = itemRefs.current[normalized];
+      if (target) {
+        target.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "start" });
+      }
+    },
+    [loop, slideCount],
+  );
 
-            const target = itemRefs.current[normalized];
-            if (target) {
-                target.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
-            }
-        },
-        [loop, slideCount]
-    );
+  const next = useCallback(() => {
+    goToIndex(currentIndex + 1);
+  }, [currentIndex, goToIndex]);
 
-    const next = useCallback(() => {
-        goToIndex(activeIndex + 1);
-    }, [activeIndex, goToIndex]);
+  const prev = useCallback(() => {
+    goToIndex(currentIndex - 1);
+  }, [currentIndex, goToIndex]);
 
-    const prev = useCallback(() => {
-        goToIndex(activeIndex - 1);
-    }, [activeIndex, goToIndex]);
+  useEffect(() => {
+    if (!autoPlay || slideCount <= 1 || isPaused) return;
 
-    useEffect(() => {
-        if (!autoPlay || slideCount <= 1) return;
-        if (isPaused) return;
-
-        const interval = window.setInterval(() => {
-            setActiveIndex((prev) => {
-                const nextIndex = prev + 1;
-                const normalized =
-                    nextIndex < 0
-                        ? loop
-                            ? slideCount - 1
-                            : 0
-                        : nextIndex >= slideCount
-                            ? loop
-                                ? 0
-                                : slideCount - 1
-                            : nextIndex;
-
-                return normalized;
-            });
-        }, autoPlayInterval);
-
-        return () => window.clearInterval(interval);
-    }, [autoPlay, autoPlayInterval, loop, isPaused, slideCount]);
-
-    // Ensure scroll position stays in sync when activeIndex changes externally.
-    useEffect(() => {
-        const target = itemRefs.current[activeIndex];
-        if (target) {
-            target.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "start" });
+    const interval = window.setInterval(() => {
+      setActiveIndex((prevIndex) => {
+        const safeIndex = Math.min(prevIndex, slideCount - 1);
+        const nextIndex = safeIndex + 1;
+        if (nextIndex >= slideCount) {
+          return loop ? 0 : slideCount - 1;
         }
-    }, [activeIndex]);
+        return nextIndex;
+      });
+    }, autoPlayInterval);
 
-    // Sync activeIndex if slideCount changes (e.g., dynamic slides)
-    useEffect(() => {
-        if (activeIndex >= slideCount) {
-            setActiveIndex(slideCount - 1);
-        }
-    }, [activeIndex, slideCount]);
+    return () => window.clearInterval(interval);
+  }, [autoPlay, autoPlayInterval, isPaused, loop, slideCount]);
 
-    if (slideCount === 0) {
-        return null;
+  useEffect(() => {
+    const target = itemRefs.current[currentIndex];
+    if (target) {
+      target.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "start" });
     }
+  }, [currentIndex]);
 
-    return (
-        <div
-            className={`relative w-full ${className}`.trim()}
-            onMouseEnter={() => (pauseOnHover ? setIsPaused(true) : undefined)}
-            onMouseLeave={() => (pauseOnHover ? setIsPaused(false) : undefined)}
-        >
-            <div
-                ref={trackRef}
-                className="relative flex w-full gap-4 overflow-x-auto scroll-smooth snap-x snap-mandatory touch-pan-x scrollbar-hide"
-                role="list"
-            >
-                {slideChildren.map((slide, idx) => (
-                    <div
-                        key={idx}
-                        ref={(el) => {
-                            itemRefs.current[idx] = el;
-                        }}
-                        className="snap-start shrink-0 w-full"
-                        role="listitem"
-                    >
-                        {slide}
-                    </div>
-                ))}
-            </div>
+  if (slideCount === 0) {
+    return null;
+  }
 
-            {showArrows && slideCount > 1 ? (
-                <>
-                    <button
-                        type="button"
-                        onClick={prev}
-                        className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full bg-white/80 px-3 py-2 text-gray-700 shadow transition hover:bg-white focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
-                        aria-label="Previous slide"
-                    >
-                        ‹
-                    </button>
-                    <button
-                        type="button"
-                        onClick={next}
-                        className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-white/80 px-3 py-2 text-gray-700 shadow transition hover:bg-white focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
-                        aria-label="Next slide"
-                    >
-                        ›
-                    </button>
-                </>
-            ) : null}
+  return (
+    <div
+      className={`relative w-full overflow-hidden ${className}`.trim()}
+      onMouseEnter={() => (pauseOnHover ? setIsPaused(true) : undefined)}
+      onMouseLeave={() => (pauseOnHover ? setIsPaused(false) : undefined)}
+    >
+      <div
+        ref={trackRef}
+        className="relative flex w-full overflow-x-auto scroll-smooth snap-x snap-mandatory touch-pan-x [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+        role="list"
+      >
+        {slideChildren.map((slide, idx) => (
+          <div
+            key={idx}
+            ref={(el) => {
+              itemRefs.current[idx] = el;
+            }}
+            className="w-full shrink-0 snap-start"
+            role="listitem"
+          >
+            {slide}
+          </div>
+        ))}
+      </div>
 
-            {showIndicators && slideCount > 1 ? (
-                <div className="mt-4 flex justify-center gap-2">
-                    {slideChildren.map((_, idx) => (
-                        <button
-                            key={idx}
-                            type="button"
-                            onClick={() => goToIndex(idx)}
-                            aria-label={`Go to slide ${idx + 1}`}
-                            className={`h-2 w-2 rounded-full transition-colors ${idx === activeIndex ? "bg-indigo-600" : "bg-gray-300"
-                                }`}
-                        />
-                    ))}
-                </div>
-            ) : null}
+      {showArrows && slideCount > 1 ? (
+        <>
+          <button
+            type="button"
+            onClick={prev}
+            className="absolute left-4 top-1/2 z-10 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-white/92 text-[28px] leading-none text-black shadow-[0_10px_24px_rgba(0,0,0,0.12)] transition hover:bg-white"
+            aria-label="Previous slide"
+          >
+            &lt;
+          </button>
+          <button
+            type="button"
+            onClick={next}
+            className="absolute right-4 top-1/2 z-10 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-white/92 text-[28px] leading-none text-black shadow-[0_10px_24px_rgba(0,0,0,0.12)] transition hover:bg-white"
+            aria-label="Next slide"
+          >
+            &gt;
+          </button>
+        </>
+      ) : null}
+
+      {showIndicators && slideCount > 1 ? (
+        <div className="absolute bottom-5 left-1/2 z-10 flex -translate-x-1/2 items-center gap-3">
+          {slideChildren.map((_, idx) => (
+            <button
+              key={idx}
+              type="button"
+              onClick={() => goToIndex(idx)}
+              aria-label={`Go to slide ${idx + 1}`}
+              className={`rounded-full transition-all ${
+                idx === currentIndex
+                  ? "h-4 w-4 border-2 border-white bg-transparent"
+                  : "h-3 w-3 bg-white/95"
+              }`}
+            />
+          ))}
         </div>
-    );
+      ) : null}
+    </div>
+  );
 }

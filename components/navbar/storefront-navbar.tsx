@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type MouseEvent, type ReactNode } from "react";
 
 type MenuKey = "sarees" | "apparel" | "handicrafts";
 type PanelKey = "bag" | "search" | "profile" | null;
@@ -200,6 +200,15 @@ export function StorefrontNavbar() {
     };
   }, [hasOverlay]);
 
+  const closeAll = () => {
+    setActiveMenu(null);
+    setActivePanel(null);
+  };
+
+  const stopEvent = (event: MouseEvent<HTMLElement>) => {
+    event.stopPropagation();
+  };
+
   const openPanel = (panel: Exclude<PanelKey, null>) => {
     setActiveMenu(null);
     setActivePanel(panel);
@@ -216,13 +225,13 @@ export function StorefrontNavbar() {
     <>
       <div className="fixed inset-x-0 top-0 z-50 bg-[#fdfbf7] shadow-[0_10px_34px_rgba(44,25,17,0.08)]">
         <div className="h-[6px] bg-[#822733]" />
-        <header className="border-b border-black/10 bg-[#fdfbf7]">
+        <header className="border-b border-black/10 bg-[#fdfbf7]" onClick={closeAll}>
           <div className="mx-auto flex max-w-[1880px] items-center justify-between gap-8 px-4 py-5 lg:px-10">
-            <Link href="/" className="shrink-0">
+            <Link href="/" className="shrink-0" onClick={closeAll}>
               <RangamLogo />
             </Link>
 
-            <div className="hidden min-w-0 flex-1 lg:block">
+            <div className="hidden min-w-0 flex-1 lg:block" onClick={stopEvent}>
               <nav
                 aria-label="Primary"
                 className="flex flex-col items-center justify-center gap-8"
@@ -249,6 +258,7 @@ export function StorefrontNavbar() {
                       <Link
                         key={item.label}
                         href={item.href}
+                        onClick={closeAll}
                         className={`font-[Georgia,'Times New Roman',serif] text-[16px] tracking-[0.02em] transition ${
                           item.accent
                             ? "text-[#9d2936]"
@@ -263,7 +273,7 @@ export function StorefrontNavbar() {
               </nav>
             </div>
 
-            <div className="flex items-center gap-3 sm:gap-5">
+            <div className="flex items-center gap-3 sm:gap-5" onClick={stopEvent}>
               <IconButton label="Search" onClick={() => openPanel("search")}>
                 <SearchIcon />
               </IconButton>
@@ -276,7 +286,7 @@ export function StorefrontNavbar() {
             </div>
           </div>
 
-          <div className="border-t border-black/8 px-4 py-3 lg:hidden">
+          <div className="border-t border-black/8 px-4 py-3 lg:hidden" onClick={stopEvent}>
             <div className="flex gap-3 overflow-x-auto pb-1">
               {primaryLinks.map((item) =>
                 item.menu ? (
@@ -296,6 +306,7 @@ export function StorefrontNavbar() {
                   <button
                     key={item.label}
                     type="button"
+                    onClick={closeAll}
                     className="rounded-full border border-black/10 bg-white px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-black/70"
                   >
                     {item.label}
@@ -306,7 +317,7 @@ export function StorefrontNavbar() {
           </div>
         </header>
 
-        {currentMenu ? <MegaMenu menu={currentMenu} /> : null}
+        {currentMenu ? <MegaMenu menu={currentMenu} onItemClick={closeAll} /> : null}
       </div>
 
       {hasOverlay ? (
@@ -314,10 +325,7 @@ export function StorefrontNavbar() {
           type="button"
           aria-label="Close overlay"
           className="fixed inset-0 z-40 bg-black/25 backdrop-blur-[1px]"
-          onClick={() => {
-            setActiveMenu(null);
-            setActivePanel(null);
-          }}
+          onClick={closeAll}
         />
       ) : null}
 
@@ -444,7 +452,7 @@ export function StorefrontNavbar() {
   );
 }
 
-function MegaMenu({ menu }: { menu: MenuData }) {
+function MegaMenu({ menu, onItemClick }: { menu: MenuData; onItemClick: () => void }) {
   const columnsClass =
     menu.showcase === "handicrafts"
       ? "grid-cols-1 lg:grid-cols-[1.25fr_1fr_1fr_1.8fr]"
@@ -461,7 +469,7 @@ function MegaMenu({ menu }: { menu: MenuData }) {
             <ul className="mt-7 space-y-4">
               {section.items.map((item) => (
                 <li key={item} className="text-[18px] leading-none text-black/90">
-                  <Link href="#" className="transition hover:text-[#9d2936]">
+                  <Link href="#" onClick={onItemClick} className="transition hover:text-[#9d2936]">
                     {item}
                   </Link>
                 </li>
@@ -562,7 +570,7 @@ function Drawer({
   title: string;
   count?: string;
   onClose: () => void;
-  children: React.ReactNode;
+  children: ReactNode;
 }) {
   return (
     <aside
@@ -595,7 +603,7 @@ function IconButton({
   onClick,
 }: {
   label: string;
-  children: React.ReactNode;
+  children: ReactNode;
   onClick: () => void;
 }) {
   return (
@@ -763,5 +771,3 @@ function SadBagIcon() {
     </svg>
   );
 }
-
-
