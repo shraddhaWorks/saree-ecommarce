@@ -35,3 +35,18 @@ a {
 * {
   box-sizing: border-box;
 }
+
+html {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+body {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  display: none;
+}

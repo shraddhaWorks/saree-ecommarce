@@ -1,89 +1,70 @@
-import Link from "next/link";
-
-import { AnalysisCard } from "@/components/planning/analysis-card";
-import { FolderTree } from "@/components/planning/folder-tree";
-import {
-  componentStructure,
-  homepageAnalysis,
-  pageTemplates,
-  projectStructure,
-} from "@/features/storefront/blueprint-data";
+import { StorefrontNavbar } from "@/components/navbar/storefront-navbar";
 
 export function FrontendBlueprintPage() {
   return (
-    <main className="min-h-screen bg-background px-6 py-8 text-foreground">
-      <div className="mx-auto max-w-7xl">
-        <section className="rounded-[2rem] border border-border-soft bg-[linear-gradient(135deg,rgba(255,255,255,0.94),rgba(243,235,224,0.95))] p-8 shadow-sm md:p-12">
-          <p className="text-sm font-semibold uppercase tracking-[0.35em] text-accent">
-            Kalanjali Frontend Analysis
-          </p>
-          <h1 className="mt-4 max-w-4xl text-4xl font-semibold tracking-tight md:text-6xl">
-            Clean frontend structure for a Kalanjali-inspired clone with room
-            for your custom modifications.
-          </h1>
-          <p className="mt-6 max-w-3xl text-base leading-7 text-black/70 md:text-lg">
-            This blueprint is based on the current public storefront patterns on
-            kalanjali.com: premium retail shell, editorial homepage sections,
-            collection filters, rich product pages, store information, and dense
-            footer content.
-          </p>
-        </section>
-
-        <section className="mt-8 grid gap-5 lg:grid-cols-3">
-          <AnalysisCard title="Site Shell" items={homepageAnalysis.shell} />
-          <AnalysisCard title="Homepage Blocks" items={homepageAnalysis.homepage} />
-          <AnalysisCard title="Commerce Templates" items={homepageAnalysis.commerce} />
-        </section>
-
-        <section className="mt-8 grid gap-5 xl:grid-cols-2">
-          <FolderTree title="Recommended Project Structure" lines={projectStructure} />
-          <FolderTree title="Recommended Component Structure" lines={componentStructure} />
-        </section>
-
-        <section className="mt-8 rounded-[2rem] border border-border-soft bg-surface p-8 shadow-sm">
-          <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
-            <div>
-              <p className="text-sm font-semibold uppercase tracking-[0.3em] text-accent">
-                Main templates
-              </p>
-              <h2 className="mt-2 text-3xl font-semibold tracking-tight">
-                Start building from repeatable storefront page types
-              </h2>
-            </div>
-            <p className="max-w-xl text-sm leading-6 text-black/65">
-              These routes are scaffolded so we can build the UI template by
-              template instead of mixing all sections into one file.
+    <main className="min-h-screen bg-[#f7f0e7] text-[#201815]">
+      <StorefrontNavbar />
+      <div className="mx-auto max-w-[1880px] px-4 pb-20 pt-[180px] lg:px-10 lg:pt-[196px]">
+        <section className="grid gap-8 lg:grid-cols-[1.35fr_0.85fr]">
+          <article className="overflow-hidden rounded-[34px] border border-[#ddcfbd] bg-[linear-gradient(135deg,#5f1f2b,#a24a43_40%,#e2bf8d)] p-8 text-white shadow-[0_18px_50px_rgba(44,25,17,0.12)] sm:p-12">
+            <p className="text-sm font-semibold uppercase tracking-[0.35em] text-white/75">
+              New Season Edit
             </p>
-          </div>
-          <div className="mt-6 grid gap-4 lg:grid-cols-3">
-            {pageTemplates.map((template) => (
-              <article
-                key={template.href}
-                className="rounded-3xl border border-border-soft bg-white/85 p-6"
-              >
-                <p className="text-xs font-semibold uppercase tracking-[0.3em] text-black/45">
-                  {template.label}
-                </p>
-                <h3 className="mt-3 text-2xl font-semibold">{template.title}</h3>
-                <p className="mt-3 text-sm leading-6 text-black/70">
-                  {template.description}
-                </p>
-                <ul className="mt-4 space-y-2 text-sm leading-6 text-black/70">
-                  {template.sections.map((section) => (
-                    <li key={section} className="border-l-2 border-accent/30 pl-3">
-                      {section}
-                    </li>
-                  ))}
-                </ul>
-                <Link
-                  href={template.href}
-                  className="mt-6 inline-flex rounded-full border border-border-soft px-4 py-2 text-sm transition hover:border-accent hover:text-accent"
-                >
-                  Open template
-                </Link>
-              </article>
-            ))}
-          </div>
+            <h1 className="mt-5 max-w-2xl font-[Georgia,'Times New Roman',serif] text-4xl leading-tight sm:text-6xl">
+              Premium ethnic fashion with a cleaner luxury storefront feel.
+            </h1>
+            <p className="mt-6 max-w-xl text-base leading-7 text-white/85 sm:text-lg">
+              The header now stays fixed, the collection menus open on click, and
+              the right-side search and bag panels follow the same polished visual
+              language as your references.
+            </p>
+            <div className="mt-8 flex flex-wrap gap-4">
+              <button className="rounded-full bg-white px-6 py-3 text-sm font-semibold uppercase tracking-[0.18em] text-[#8f2333]">
+                Shop Sarees
+              </button>
+              <button className="rounded-full border border-white/40 px-6 py-3 text-sm font-semibold uppercase tracking-[0.18em] text-white">
+                Explore Apparel
+              </button>
+            </div>
+          </article>
+
+          <article className="rounded-[34px] border border-[#ddcfbd] bg-[linear-gradient(160deg,#fffdfa,#f4e9da)] p-8 shadow-[0_18px_50px_rgba(44,25,17,0.08)]">
+            <p className="text-sm font-semibold uppercase tracking-[0.32em] text-[#8f2333]">
+              Storefront Notes
+            </p>
+            <div className="mt-6 space-y-5 text-[17px] leading-7 text-black/75">
+              <p>Click `Sarees`, `Apparel`, or `Handicrafts` to open the full-width mega menu.</p>
+              <p>Click the search icon or bag icon to open the panel from the right side.</p>
+              <p>Click the profile icon to open the customer login view styled like your sample.</p>
+            </div>
+          </article>
+        </section>
+
+        <section className="mt-8 grid gap-6 md:grid-cols-3">
+          {[
+            {
+              title: "Sarees",
+              copy: "Fabric-first navigation with bridal, woven, printed, and natural dye groupings.",
+            },
+            {
+              title: "Apparel",
+              copy: "Clothing, add-ons, craft-based edits, and curated collections in one panel.",
+            },
+            {
+              title: "Handicrafts",
+              copy: "A broader gifting and home decor menu with a visual product collage area.",
+            },
+          ].map((item) => (
+            <article
+              key={item.title}
+              className="rounded-[28px] border border-[#ddcfbd] bg-white/90 p-6 shadow-[0_12px_30px_rgba(44,25,17,0.06)]"
+            >
+              <h2 className="font-[Georgia,'Times New Roman',serif] text-3xl text-black">
+                {item.title}
+              </h2>
+              <p className="mt-4 text-base leading-7 text-black/70">{item.copy}</p>
+            </article>
+          ))}
         </section>
       </div>
     </main>
