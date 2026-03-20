@@ -3,7 +3,7 @@
 import Link from "next/link";
 import React from "react";
 import { Facebook, Instagram, MessageCircle } from "lucide-react";
-import { RangamLogo } from "../navbar/storefront-navbar";
+import { RangamLogo } from "../navbar/ui";
 
 const SocialIcon = ({
   href,
