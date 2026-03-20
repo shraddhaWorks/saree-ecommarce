@@ -12,6 +12,7 @@ import {
   UserIcon,
   SadBagIcon,
 } from "./icons";
+import { getCart, type Cart } from "@/lib/cart";
 
 type PanelKey = "bag" | "search" | "profile" | null;
 
@@ -19,6 +20,8 @@ export function StorefrontNavbar() {
   const [activeMenu, setActiveMenu] = useState<MenuKey | null>(null);
   const [activePanel, setActivePanel] = useState<PanelKey>(null);
   const hasOverlay = activeMenu !== null || activePanel !== null;
+
+  const [cart, setCart] = useState<Cart>({ items: [] });
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
@@ -30,6 +33,21 @@ export function StorefrontNavbar() {
 
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
+  }, []);
+
+  useEffect(() => {
+    const syncCart = () => setCart(getCart());
+    syncCart();
+
+    const openBag = () => setActivePanel("bag");
+
+    window.addEventListener("cart:updated", syncCart);
+    window.addEventListener("cart:open", openBag);
+
+    return () => {
+      window.removeEventListener("cart:updated", syncCart);
+      window.removeEventListener("cart:open", openBag);
+    };
   }, []);
 
   useEffect(() => {
@@ -59,6 +77,8 @@ export function StorefrontNavbar() {
   };
 
   const currentMenu = activeMenu ? menuData[activeMenu] : null;
+  const cartCount = cart.items.reduce((sum, item) => sum + item.qty, 0);
+  const cartTotal = cart.items.reduce((sum, item) => sum + item.qty * item.price, 0);
 
   return (
     <>
@@ -168,24 +188,78 @@ export function StorefrontNavbar() {
       <Drawer
         isOpen={activePanel === "bag"}
         title="Your bag"
-        count="(0)"
+        count={`(${cartCount})`}
         onClose={() => setActivePanel(null)}
       >
-        <div className="flex flex-1 flex-col items-center justify-center px-6 text-center">
-          <div className="mb-7 flex h-16 w-16 items-center justify-center rounded-full border-2 border-black text-black">
-            <SadBagIcon />
+        {cart.items.length === 0 ? (
+          <div className="flex flex-1 flex-col items-center justify-center px-6 text-center">
+            <div className="mb-7 flex h-16 w-16 items-center justify-center rounded-full border-2 border-black text-black">
+              <SadBagIcon />
+            </div>
+            <h3 className="font-[Georgia,'Times New Roman',serif] text-4xl tracking-[0.02em] text-black">
+              Your cart is empty
+            </h3>
+            <button
+              type="button"
+              onClick={() => setActivePanel(null)}
+              className="mt-8 border-b border-black pb-1 text-lg text-black/80"
+            >
+              Continue Shopping
+            </button>
           </div>
-          <h3 className="font-[Georgia,'Times New Roman',serif] text-4xl tracking-[0.02em] text-black">
-            Your cart is empty
-          </h3>
-          <button
-            type="button"
-            onClick={() => setActivePanel(null)}
-            className="mt-8 border-b border-black pb-1 text-lg text-black/80"
-          >
-            Continue Shopping
-          </button>
-        </div>
+        ) : (
+          <div className="flex flex-1 flex-col">
+            <ul className="flex-1 space-y-3 overflow-auto px-8 py-6">
+              {cart.items.map((item) => (
+                <li
+                  key={item.productId}
+                  className="rounded-2xl border border-black/10 bg-white p-4"
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-semibold text-black/80">
+                        {item.name}
+                      </p>
+                      <p className="mt-1 text-xs text-black/55">
+                        Qty {item.qty}
+                      </p>
+                    </div>
+                    <p className="text-sm font-semibold text-accent">
+                      Rs. {item.price * item.qty}
+                    </p>
+                  </div>
+                </li>
+              ))}
+            </ul>
+
+            <div className="border-t border-black/10 px-8 py-6">
+              <div className="flex items-center justify-between gap-3">
+                <span className="text-sm font-semibold text-black/70">Total</span>
+                <span className="text-sm font-semibold text-black">
+                  Rs. {cartTotal}
+                </span>
+              </div>
+
+              <div className="mt-5">
+                <Link
+                  href="/checkout"
+                  onClick={() => setActivePanel(null)}
+                  className="block w-full rounded-full bg-accent px-4 py-3 text-sm font-semibold text-white transition hover:opacity-90 text-center"
+                >
+                  Checkout
+                </Link>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setActivePanel(null)}
+                className="mt-3 block w-full rounded-full border border-black/15 bg-white px-4 py-3 text-sm font-semibold text-black/80 transition hover:border-[#9d2936] hover:text-[#9d2936]"
+              >
+                Continue Shopping
+              </button>
+            </div>
+          </div>
+        )}
       </Drawer>
 
       <Drawer

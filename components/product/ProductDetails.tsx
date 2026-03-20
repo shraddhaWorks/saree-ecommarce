@@ -2,6 +2,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Product } from "./product";
 import RelatedProducts from "./RelatedProducts";
 import {
@@ -11,6 +12,8 @@ import {
     Send,
     Mail,
 } from "lucide-react";
+
+import { addToCart } from "@/lib/cart";
 
 interface Props {
     product: Product;
@@ -23,6 +26,32 @@ export default function ProductDetails({
 }: Props) {
     const [selectedImage, setSelectedImage] = useState(product.images[0]);
     const [qty, setQty] = useState(1);
+
+    const router = useRouter();
+    const safeQty = Math.max(1, Math.min(qty, product.stock));
+    const isOutOfStock = product.stock <= 0;
+
+    const handleAddToCart = () => {
+        if (isOutOfStock) return;
+
+        addToCart({
+            productId: product.id,
+            name: product.name,
+            price: product.price,
+            qty: safeQty,
+            image: selectedImage,
+        });
+
+        // Notify any cart UI (navbar drawer) to refresh.
+        window.dispatchEvent(new Event("cart:updated"));
+        window.dispatchEvent(new Event("cart:open"));
+    };
+
+    const handleBuyNow = () => {
+        if (isOutOfStock) return;
+        handleAddToCart();
+        router.push("/checkout");
+    };
 
     return (
         <div>
@@ -99,7 +128,7 @@ export default function ProductDetails({
                             <span className="px-4">{qty}</span>
                             <button
                                 className="px-4 py-2"
-                                onClick={() => setQty(qty + 1)}
+                                onClick={() => qty < product.stock && setQty(qty + 1)}
                             >
                                 +
                             </button>
@@ -108,10 +137,24 @@ export default function ProductDetails({
 
                     {/* Buttons */}
                     <div className="flex gap-4 mb-6">
-                        <button className="bg-black text-white px-8 py-3 rounded-lg w-full">
+                        <button
+                            type="button"
+                            onClick={handleAddToCart}
+                            disabled={isOutOfStock}
+                            className={`bg-black text-white px-8 py-3 rounded-lg w-full transition ${
+                                isOutOfStock ? "cursor-not-allowed opacity-60" : "hover:opacity-90"
+                            }`}
+                        >
                             Add to cart
                         </button>
-                        <button className="bg-black text-white px-8 py-3 rounded-lg w-full">
+                        <button
+                            type="button"
+                            onClick={handleBuyNow}
+                            disabled={isOutOfStock}
+                            className={`bg-black text-white px-8 py-3 rounded-lg w-full transition ${
+                                isOutOfStock ? "cursor-not-allowed opacity-60" : "hover:opacity-90"
+                            }`}
+                        >
                             Buy it now
                         </button>
                     </div>
