@@ -618,7 +618,7 @@ function IconButton({
   );
 }
 
-function RangamLogo() {
+export function RangamLogo() {
   return (
     <div className="flex items-center">
       <Image

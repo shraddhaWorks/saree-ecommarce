@@ -1,3 +1,4 @@
+import Footer from "@/components/footer/Footer";
 import { StorefrontNavbar } from "@/components/navbar/storefront-navbar";
 
 type FrontendBlueprintPageProps = {
@@ -38,6 +39,7 @@ export function FrontendBlueprintPage({
           ))}
         </section>
       </div>
+      <Footer/>
     </main>
   );
 }
