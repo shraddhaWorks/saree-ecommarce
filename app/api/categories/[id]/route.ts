@@ -3,15 +3,16 @@ import prisma from "@/lib/db";
 import { getUserFromRequest } from "@/lib/auth";
 
 type Params = {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 };
 
 export async function GET(_req: NextRequest, { params }: Params) {
   try {
+    const { id } = await params;
     const category = await prisma.category.findUnique({
-      where: { id: params.id },
+      where: { id },
     });
 
     if (!category) {
@@ -35,6 +36,7 @@ export async function PUT(req: NextRequest, { params }: Params) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
+    const { id } = await params;
     const body = (await req.json()) as {
       name?: string;
       slug?: string;
@@ -42,7 +44,7 @@ export async function PUT(req: NextRequest, { params }: Params) {
     };
 
     const category = await prisma.category.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         name: body.name,
         slug: body.slug?.toLowerCase(),
@@ -67,8 +69,9 @@ export async function DELETE(_req: NextRequest, { params }: Params) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
+    const { id } = await params;
     await prisma.category.delete({
-      where: { id: params.id },
+      where: { id },
     });
 
     return NextResponse.json({ success: true }, { status: 200 });

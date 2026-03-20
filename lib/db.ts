@@ -1,5 +1,6 @@
 
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient } from "@/lib/generated/prisma/client";
+import { PrismaPg } from "@prisma/adapter-pg";
 
 // Prefer DATABASE_URL (port 6543, transaction pooler) for runtime - better for serverless and avoids
 // connection resets. Use DIRECT_URL only for migrations (schema directUrl).
@@ -29,10 +30,15 @@ const prismaClientSingleton = () => {
   if (!connectionString) {
     throw new Error("Database connection string is not configured");
   }
+
+  // The generated Prisma client reads its datasource from `DATABASE_URL`.
+  // We rewrite it to include pooling/timeout parameters.
+  process.env.DATABASE_URL = connectionString;
+
   return new PrismaClient({
-    datasourceUrl: connectionString,
+    adapter: new PrismaPg({ connectionString }),
     log: process.env.NODE_ENV === "development" ? ["error", "warn"] : ["error"],
-  });
+  } as any);
 };
 
 declare const globalThis: {

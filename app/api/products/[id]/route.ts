@@ -1,18 +1,42 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/db";
-import { ClothType, Occasion } from "@prisma/client";
 import { getUserFromRequest } from "@/lib/auth";
 
+const ALLOWED_CLOTH_TYPES = [
+  "SILK",
+  "COTTON",
+  "LINEN",
+  "GEORGETTE",
+  "CHIFFON",
+  "KANJIVARAM",
+  "BANARASI",
+  "TUSSAR",
+  "ORGANZA",
+  "OTHER",
+] as const;
+
+const ALLOWED_OCCASIONS = [
+  "WEDDING",
+  "FESTIVE",
+  "CASUAL",
+  "OFFICE",
+  "BRIDAL",
+  "PARTY",
+  "GIFTING",
+  "OTHER",
+] as const;
+
 type Params = {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 };
 
 export async function GET(_req: NextRequest, { params }: Params) {
   try {
+    const { id } = await params;
     const product = await prisma.product.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         category: true,
         images: {
@@ -42,14 +66,15 @@ export async function PUT(req: NextRequest, { params }: Params) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
+    const { id } = await params;
     const body = (await req.json()) as {
       name?: string;
       slug?: string;
       description?: string;
       priceInPaise?: number;
       inStock?: boolean;
-      clothType?: ClothType;
-      occasion?: Occasion;
+      clothType?: string;
+      occasion?: string;
       isSpecial?: boolean;
       mainImageUrl?: string;
       thumbnailUrl?: string;
@@ -60,16 +85,23 @@ export async function PUT(req: NextRequest, { params }: Params) {
       images?: { url: string; altText?: string; position?: number }[];
     };
 
+    if (body.clothType && !(ALLOWED_CLOTH_TYPES as readonly string[]).includes(body.clothType)) {
+      return NextResponse.json({ error: "Invalid clothType" }, { status: 400 });
+    }
+    if (body.occasion && !(ALLOWED_OCCASIONS as readonly string[]).includes(body.occasion)) {
+      return NextResponse.json({ error: "Invalid occasion" }, { status: 400 });
+    }
+
     await prisma.product.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         name: body.name,
         slug: body.slug?.toLowerCase(),
         description: body.description,
         priceInPaise: body.priceInPaise,
         inStock: body.inStock,
-        clothType: body.clothType,
-        occasion: body.occasion,
+        clothType: body.clothType as (typeof ALLOWED_CLOTH_TYPES)[number] | undefined,
+        occasion: body.occasion as (typeof ALLOWED_OCCASIONS)[number] | undefined,
         isSpecial: body.isSpecial,
         mainImageUrl: body.mainImageUrl,
         thumbnailUrl: body.thumbnailUrl,
@@ -82,12 +114,12 @@ export async function PUT(req: NextRequest, { params }: Params) {
 
     if (body.images) {
       await prisma.productImage.deleteMany({
-        where: { productId: params.id },
+        where: { productId: id },
       });
 
       await prisma.productImage.createMany({
         data: body.images.map((img) => ({
-          productId: params.id,
+          productId: id,
           url: img.url,
           altText: img.altText,
           position: img.position ?? 0,
@@ -96,7 +128,7 @@ export async function PUT(req: NextRequest, { params }: Params) {
     }
 
     const updated = await prisma.product.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         category: true,
         images: {
@@ -122,12 +154,13 @@ export async function DELETE(_req: NextRequest, { params }: Params) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
+    const { id } = await params;
     await prisma.productImage.deleteMany({
-      where: { productId: params.id },
+      where: { productId: id },
     });
 
     await prisma.product.delete({
-      where: { id: params.id },
+      where: { id },
     });
 
     return NextResponse.json({ success: true }, { status: 200 });
