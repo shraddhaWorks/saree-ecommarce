@@ -1,10 +1,12 @@
 "use client";
 
 import Link from "next/link";
+import { useCart, useWishlist } from "@/components/cart";
 
 type Product = {
   id: string;
   name: string;
+  priceValue: number;
   price: string;
   originalPrice: string;
   image: string;
@@ -17,6 +19,7 @@ const products: Product[] = [
   {
     id: "purple",
     name: "Chanderi Silk Cotton Purple Saree",
+    priceValue: 12640,
     price: "Rs. 12,640.00",
     originalPrice: "Rs. 15,800.00",
     image:
@@ -28,6 +31,7 @@ const products: Product[] = [
   {
     id: "teal",
     name: "Chanderi Silk Cotton Teal Green Saree",
+    priceValue: 11980,
     price: "Rs. 11,980.00",
     originalPrice: "Rs. 14,975.00",
     image:
@@ -39,6 +43,7 @@ const products: Product[] = [
   {
     id: "maroon",
     name: "Chanderi Silk Cotton Maroon Saree",
+    priceValue: 12360,
     price: "Rs. 12,360.00",
     originalPrice: "Rs. 15,450.00",
     image:
@@ -50,6 +55,7 @@ const products: Product[] = [
   {
     id: "black",
     name: "Chanderi Silk Cotton Black Saree",
+    priceValue: 11840,
     price: "Rs. 11,840.00",
     originalPrice: "Rs. 14,800.00",
     image:
@@ -96,6 +102,33 @@ function EyeIcon() {
 }
 
 export function ProductRail() {
+  const { addItem } = useCart();
+  const { toggleItem, isWishlisted } = useWishlist();
+
+  const handleAddToCart = (product: Product) => {
+    addItem({
+      id: product.id,
+      name: product.name,
+      price: product.priceValue,
+      image: product.image,
+      quantity: 1,
+    });
+
+    window.dispatchEvent(new Event("cart:open"));
+  };
+
+  const handleToggleWishlist = (product: Product) => {
+    toggleItem({
+      id: product.id,
+      name: product.name,
+      price: product.priceValue,
+      image: product.image,
+      href: product.href,
+    });
+
+    window.dispatchEvent(new Event("wishlist:open"));
+  };
+
   return (
     <section className="mx-auto w-full max-w-[1680px] px-4 py-12 sm:py-16 lg:px-8 lg:py-20">
       <div className="flex items-start justify-between gap-6">
@@ -163,50 +196,84 @@ export function ProductRail() {
                   </span>
                 </div>
 
-                <span
-                  aria-hidden="true"
-                  className="absolute right-4 top-4 z-20 grid h-12 w-12 place-items-center rounded-full bg-black text-white shadow-lg transition duration-300 group-hover:scale-105"
-                >
-                  <EyeIcon />
-                </span>
+                <div className="absolute right-4 top-4 z-20 flex items-center gap-2">
+                  <button
+                    type="button"
+                    aria-label={isWishlisted(product.id) ? `Remove ${product.name} from wishlist` : `Add ${product.name} to wishlist`}
+                    onClick={(event) => {
+                      event.preventDefault();
+                      event.stopPropagation();
+                      handleToggleWishlist(product);
+                    }}
+                    className={`grid h-12 w-12 place-items-center rounded-full shadow-lg transition duration-300 group-hover:scale-105 ${isWishlisted(product.id)
+                      ? "bg-[#9d2936] text-white"
+                      : "bg-white/92 text-[#201815]"
+                      }`}
+                  >
+                    <svg
+                      aria-hidden="true"
+                      viewBox="0 0 24 24"
+                      className="h-5 w-5"
+                      fill={isWishlisted(product.id) ? "currentColor" : "none"}
+                      stroke="currentColor"
+                      strokeWidth="1.8"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M12 20.5 4.8 13.7a4.9 4.9 0 0 1 6.9-6.9L12 7.1l.3-.3a4.9 4.9 0 0 1 6.9 6.9L12 20.5Z" />
+                    </svg>
+                  </button>
+                  <span
+                    aria-hidden="true"
+                    className="grid h-12 w-12 place-items-center rounded-full bg-black text-white shadow-lg transition duration-300 group-hover:scale-105"
+                  >
+                    <EyeIcon />
+                  </span>
+                </div>
 
                 <div className="pointer-events-none absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-[#120d0a]/18 via-[#120d0a]/0 to-transparent" />
               </div>
+            </Link>
 
-              <div className="space-y-3 px-5 pb-6 pt-5">
-                <div className="flex items-center justify-between gap-3">
-                  <span className="rounded-full border border-[#d8c7b3] bg-[#f7efe5] px-3 py-1 text-[0.68rem] font-semibold uppercase tracking-[0.24em] text-[#7a5a48]">
-                    Chanderi Edit
-                  </span>
-                  <span className="text-xs font-medium uppercase tracking-[0.22em] text-[#8f2333]">
-                    Ready to Ship
-                  </span>
-                </div>
+            <div className="space-y-3 px-5 pb-6 pt-5">
+              <div className="flex items-center justify-between gap-3">
+                <span className="rounded-full border border-[#d8c7b3] bg-[#f7efe5] px-3 py-1 text-[0.68rem] font-semibold uppercase tracking-[0.24em] text-[#7a5a48]">
+                  Chanderi Edit
+                </span>
+                <span className="text-xs font-medium uppercase tracking-[0.22em] text-[#8f2333]">
+                  Ready to Ship
+                </span>
+              </div>
 
-                <div>
+              <div>
+                <Link href={product.href} className="block">
                   <h3 className="line-clamp-2 text-[1.35rem] leading-tight font-medium text-[#1d1512]">
                     {product.name}
                   </h3>
-                  <p className="mt-2 text-sm leading-6 text-[#5a4740]">
-                    Handwoven silk-cotton drape with a metallic border and festive sheen.
-                  </p>
-                </div>
+                </Link>
+                <p className="mt-2 text-sm leading-6 text-[#5a4740]">
+                  Handwoven silk-cotton drape with a metallic border and festive sheen.
+                </p>
+              </div>
 
-                <div className="flex items-end justify-between gap-4 border-t border-[#eadfce] pt-4">
-                  <div className="flex items-baseline gap-2">
-                    <span className="text-xl font-semibold text-[#111]">
-                      {product.price}
-                    </span>
-                    <span className="text-sm text-[#8c7a70] line-through">
-                      {product.originalPrice}
-                    </span>
-                  </div>
-                  <span className="rounded-full bg-[#201815] px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.2em] text-white">
-                    Shop
+              <div className="flex items-end justify-between gap-4 border-t border-[#eadfce] pt-4">
+                <div className="flex items-baseline gap-2">
+                  <span className="text-xl font-semibold text-[#111]">
+                    {product.price}
+                  </span>
+                  <span className="text-sm text-[#8c7a70] line-through">
+                    {product.originalPrice}
                   </span>
                 </div>
+                <button
+                  type="button"
+                  onClick={() => handleAddToCart(product)}
+                  className="rounded-full bg-[#201815] px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-white transition hover:bg-[#8f2333]"
+                >
+                  Add to Cart
+                </button>
               </div>
-            </Link>
+            </div>
           </article>
         ))}
       </div>
