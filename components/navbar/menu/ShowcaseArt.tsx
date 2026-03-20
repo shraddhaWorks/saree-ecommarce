@@ -1,0 +1,53 @@
+import { ShowcaseCard } from "./ShowcaseCard";
+import type { MenuData } from "./types";
+
+export function ShowcaseArt({
+    variant,
+}: {
+    variant: MenuData["showcase"];
+}) {
+    if (variant === "sarees") {
+        return (
+            <div className="grid gap-5 self-start">
+                <ShowcaseCard
+                    title="Artisan Silk"
+                    subtitle="Handwoven bridal drapes"
+                    className="min-h-[290px] bg-[radial-gradient(circle_at_top,#e4ad56,#b77922_50%,#5d3110)]"
+                />
+                <ShowcaseCard
+                    title="Printed Sarees"
+                    subtitle="Soft drape, bold florals"
+                    className="min-h-[290px] bg-[radial-gradient(circle_at_top,#f0d9b0,#d19d59_55%,#7c5035)]"
+                />
+            </div>
+        );
+    }
+
+    if (variant === "apparel") {
+        return (
+            <ShowcaseCard
+                title="Prints"
+                subtitle="Modern silhouettes in heritage patterns"
+                className="min-h-[300px] bg-[linear-gradient(135deg,#b7803c,#efd39b_45%,#8a5a31)]"
+            />
+        );
+    }
+
+    return (
+        <div className="rounded-[30px] border border-[#dccfbe] bg-white px-6 py-7">
+            <div className="grid grid-cols-3 gap-4 md:grid-cols-5">
+                {["Frame", "Krishna", "Ganesha", "Nataraja", "Lakshmi"].map((item, index) => (
+                    <div
+                        key={item}
+                        className={`flex min-h-[168px] items-end justify-center rounded-[22px] p-4 text-center font-[Georgia,'Times New Roman',serif] text-sm text-[#704d21] ${index % 2 === 0
+                                ? "bg-[linear-gradient(180deg,#fbf4e7,#dcc39a)]"
+                                : "bg-[linear-gradient(180deg,#f7ecd6,#cdb078)]"
+                            }`}
+                    >
+                        <span>{item}</span>
+                    </div>
+                ))}
+            </div>
+        </div>
+    );
+}
