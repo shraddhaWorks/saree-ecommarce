@@ -1,15 +1,38 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/db";
-import { ClothType, Occasion } from "@prisma/client";
 import { getUserFromRequest } from "@/lib/auth";
+
+const ALLOWED_CLOTH_TYPES = [
+  "SILK",
+  "COTTON",
+  "LINEN",
+  "GEORGETTE",
+  "CHIFFON",
+  "KANJIVARAM",
+  "BANARASI",
+  "TUSSAR",
+  "ORGANZA",
+  "OTHER",
+] as const;
+
+const ALLOWED_OCCASIONS = [
+  "WEDDING",
+  "FESTIVE",
+  "CASUAL",
+  "OFFICE",
+  "BRIDAL",
+  "PARTY",
+  "GIFTING",
+  "OTHER",
+] as const;
 
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
 
     const categorySlug = searchParams.get("category");
-    const clothType = searchParams.get("clothType") as ClothType | null;
-    const occasion = searchParams.get("occasion") as Occasion | null;
+    const clothType = searchParams.get("clothType");
+    const occasion = searchParams.get("occasion");
     const isSpecial = searchParams.get("special");
     const search = searchParams.get("search");
     const limit = Number(searchParams.get("limit") ?? "20");
@@ -17,8 +40,8 @@ export async function GET(req: NextRequest) {
 
     const where: {
       category?: { slug: string };
-      clothType?: ClothType;
-      occasion?: Occasion;
+      clothType?: (typeof ALLOWED_CLOTH_TYPES)[number];
+      occasion?: (typeof ALLOWED_OCCASIONS)[number];
       isSpecial?: boolean;
       OR?: { name?: { contains: string; mode: "insensitive" }; description?: { contains: string; mode: "insensitive" } }[];
     } = {};
@@ -27,12 +50,12 @@ export async function GET(req: NextRequest) {
       where.category = { slug: categorySlug.toLowerCase() };
     }
 
-    if (clothType && Object.values(ClothType).includes(clothType)) {
-      where.clothType = clothType;
+    if (clothType && (ALLOWED_CLOTH_TYPES as readonly string[]).includes(clothType)) {
+      where.clothType = clothType as (typeof ALLOWED_CLOTH_TYPES)[number];
     }
 
-    if (occasion && Object.values(Occasion).includes(occasion)) {
-      where.occasion = occasion;
+    if (occasion && (ALLOWED_OCCASIONS as readonly string[]).includes(occasion)) {
+      where.occasion = occasion as (typeof ALLOWED_OCCASIONS)[number];
     }
 
     if (isSpecial === "true") {
@@ -97,8 +120,8 @@ export async function POST(req: NextRequest) {
       description?: string;
       priceInPaise?: number;
       inStock?: boolean;
-      clothType?: ClothType;
-      occasion?: Occasion;
+      clothType?: string;
+      occasion?: string;
       isSpecial?: boolean;
       mainImageUrl?: string;
       thumbnailUrl?: string;
@@ -125,6 +148,13 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    if (!(ALLOWED_CLOTH_TYPES as readonly string[]).includes(body.clothType)) {
+      return NextResponse.json({ error: "Invalid clothType" }, { status: 400 });
+    }
+    if (body.occasion && !(ALLOWED_OCCASIONS as readonly string[]).includes(body.occasion)) {
+      return NextResponse.json({ error: "Invalid occasion" }, { status: 400 });
+    }
+
     const product = await prisma.product.create({
       data: {
         name: body.name,
@@ -132,8 +162,8 @@ export async function POST(req: NextRequest) {
         description: body.description,
         priceInPaise: body.priceInPaise,
         inStock: body.inStock ?? true,
-        clothType: body.clothType,
-        occasion: body.occasion,
+        clothType: body.clothType as (typeof ALLOWED_CLOTH_TYPES)[number],
+        occasion: body.occasion as (typeof ALLOWED_OCCASIONS)[number] | undefined,
         isSpecial: body.isSpecial ?? false,
         mainImageUrl: body.mainImageUrl,
         thumbnailUrl: body.thumbnailUrl,
