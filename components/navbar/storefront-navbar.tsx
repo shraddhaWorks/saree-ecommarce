@@ -2,20 +2,27 @@
 
 import Link from "next/link";
 import { useEffect, useState, type MouseEvent } from "react";
+import { useCart, useWishlist } from "@/components/cart";
 import { MegaMenu, menuData, primaryLinks, suggestedSearches, type MenuKey } from "./menu";
 import { Drawer, IconButton, RangamLogo } from "./ui";
 import {
   BagIcon,
   ChevronIcon,
   CloseIcon,
+  HeartIcon,
   SearchIcon,
   UserIcon,
   SadBagIcon,
 } from "./icons";
 
-type PanelKey = "bag" | "search" | "profile" | null;
+type PanelKey = "bag" | "search" | "profile" | "wishlist" | null;
 
 export function StorefrontNavbar() {
+  const { state, removeItem, updateQuantity } = useCart();
+  const {
+    state: wishlistState,
+    removeItem: removeWishlistItem,
+  } = useWishlist();
   const [activeMenu, setActiveMenu] = useState<MenuKey | null>(null);
   const [activePanel, setActivePanel] = useState<PanelKey>(null);
   const hasOverlay = activeMenu !== null || activePanel !== null;
@@ -39,6 +46,20 @@ export function StorefrontNavbar() {
     };
   }, [hasOverlay]);
 
+  useEffect(() => {
+    const openBag = () => setActivePanel("bag");
+    window.addEventListener("cart:open", openBag);
+
+    return () => window.removeEventListener("cart:open", openBag);
+  }, []);
+
+  useEffect(() => {
+    const openWishlist = () => setActivePanel("wishlist");
+    window.addEventListener("wishlist:open", openWishlist);
+
+    return () => window.removeEventListener("wishlist:open", openWishlist);
+  }, []);
+
   const closeAll = () => {
     setActiveMenu(null);
     setActivePanel(null);
@@ -59,6 +80,10 @@ export function StorefrontNavbar() {
   };
 
   const currentMenu = activeMenu ? menuData[activeMenu] : null;
+  const hasCartItems = state.items.length > 0;
+  const hasWishlistItems = wishlistState.items.length > 0;
+  const formatPrice = (price: number) =>
+    `Rs. ${price.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
   return (
     <>
@@ -114,12 +139,29 @@ export function StorefrontNavbar() {
               <IconButton label="Search" onClick={() => openPanel("search")}>
                 <SearchIcon />
               </IconButton>
+              <div className="relative">
+                <IconButton label="Wishlist" onClick={() => openPanel("wishlist")}>
+                  <HeartIcon />
+                </IconButton>
+                {wishlistState.itemCount > 0 ? (
+                  <span className="pointer-events-none absolute -right-1 -top-1 grid h-5 min-w-5 place-items-center rounded-full bg-[#9d2936] px-1 text-[10px] font-semibold text-white">
+                    {wishlistState.itemCount}
+                  </span>
+                ) : null}
+              </div>
               <IconButton label="Profile" onClick={() => openPanel("profile")}>
                 <UserIcon />
               </IconButton>
-              <IconButton label="Bag" onClick={() => openPanel("bag")}>
-                <BagIcon />
-              </IconButton>
+              <div className="relative">
+                <IconButton label="Bag" onClick={() => openPanel("bag")}>
+                  <BagIcon />
+                </IconButton>
+                {state.itemCount > 0 ? (
+                  <span className="pointer-events-none absolute -right-1 -top-1 grid h-5 min-w-5 place-items-center rounded-full bg-[#9d2936] px-1 text-[10px] font-semibold text-white">
+                    {state.itemCount}
+                  </span>
+                ) : null}
+              </div>
             </div>
           </div>
 
@@ -166,26 +208,184 @@ export function StorefrontNavbar() {
       ) : null}
 
       <Drawer
-        isOpen={activePanel === "bag"}
-        title="Your bag"
-        count="(0)"
+        isOpen={activePanel === "wishlist"}
+        title="Wishlist"
+        count={`(${wishlistState.itemCount})`}
         onClose={() => setActivePanel(null)}
       >
-        <div className="flex flex-1 flex-col items-center justify-center px-6 text-center">
-          <div className="mb-7 flex h-16 w-16 items-center justify-center rounded-full border-2 border-black text-black">
-            <SadBagIcon />
+        {hasWishlistItems ? (
+          <div className="flex flex-1 flex-col px-6 pb-8">
+            <div className="flex-1 space-y-4 overflow-y-auto pr-1">
+              {wishlistState.items.map((item) => (
+                <article
+                  key={item.id}
+                  className="rounded-[28px] border border-black/10 bg-white p-4 shadow-[0_12px_34px_rgba(44,25,17,0.07)]"
+                >
+                  <div className="flex gap-4">
+                    <div className="h-28 w-24 overflow-hidden rounded-2xl bg-[#f3ebe0]">
+                      <img
+                        src={item.image}
+                        alt={item.name}
+                        className="h-full w-full object-cover"
+                      />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-start justify-between gap-3">
+                        <div>
+                          <h3 className="line-clamp-2 text-base font-semibold text-black">
+                            {item.name}
+                          </h3>
+                          <p className="mt-2 text-sm font-medium text-[#9d2936]">
+                            {formatPrice(item.price)}
+                          </p>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => removeWishlistItem(item.id)}
+                          className="text-sm text-black/45 transition hover:text-[#9d2936]"
+                        >
+                          Remove
+                        </button>
+                      </div>
+                      {item.href ? (
+                        <Link
+                          href={item.href}
+                          onClick={closeAll}
+                          className="mt-4 inline-block border-b border-black pb-1 text-sm text-black/75"
+                        >
+                          View Product
+                        </Link>
+                      ) : null}
+                    </div>
+                  </div>
+                </article>
+              ))}
+            </div>
           </div>
-          <h3 className="font-[Georgia,'Times New Roman',serif] text-4xl tracking-[0.02em] text-black">
-            Your cart is empty
-          </h3>
-          <button
-            type="button"
-            onClick={() => setActivePanel(null)}
-            className="mt-8 border-b border-black pb-1 text-lg text-black/80"
-          >
-            Continue Shopping
-          </button>
-        </div>
+        ) : (
+          <div className="flex flex-1 flex-col items-center justify-center px-6 text-center">
+            <div className="mb-7 flex h-16 w-16 items-center justify-center rounded-full border-2 border-black text-black">
+              <HeartIcon />
+            </div>
+            <h3 className="font-[Georgia,'Times New Roman',serif] text-4xl tracking-[0.02em] text-black">
+              Your wishlist is empty
+            </h3>
+            <button
+              type="button"
+              onClick={() => setActivePanel(null)}
+              className="mt-8 border-b border-black pb-1 text-lg text-black/80"
+            >
+              Continue Shopping
+            </button>
+          </div>
+        )}
+      </Drawer>
+
+      <Drawer
+        isOpen={activePanel === "bag"}
+        title="Your bag"
+        count={`(${state.itemCount})`}
+        onClose={() => setActivePanel(null)}
+      >
+        {hasCartItems ? (
+          <div className="flex flex-1 flex-col px-6 pb-8">
+            <div className="flex-1 space-y-4 overflow-y-auto pr-1">
+              {state.items.map((item) => (
+                <article
+                  key={item.id}
+                  className="rounded-[28px] border border-black/10 bg-white p-4 shadow-[0_12px_34px_rgba(44,25,17,0.07)]"
+                >
+                  <div className="flex gap-4">
+                    <div className="h-28 w-24 overflow-hidden rounded-2xl bg-[#f3ebe0]">
+                      <img
+                        src={item.image}
+                        alt={item.name}
+                        className="h-full w-full object-cover"
+                      />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-start justify-between gap-3">
+                        <div>
+                          <h3 className="line-clamp-2 text-base font-semibold text-black">
+                            {item.name}
+                          </h3>
+                          <p className="mt-2 text-sm text-black/55">
+                            Qty {item.quantity}
+                          </p>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => removeItem(item.id)}
+                          className="text-sm text-black/45 transition hover:text-[#9d2936]"
+                        >
+                          Remove
+                        </button>
+                      </div>
+                      <div className="mt-4 flex items-end justify-between gap-3">
+                        <div className="inline-flex items-center rounded-full border border-black/10 bg-[#f8f2ea] p-1">
+                          <button
+                            type="button"
+                            onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                            className="grid h-8 w-8 place-items-center rounded-full text-lg text-black transition hover:bg-white"
+                          >
+                            -
+                          </button>
+                          <span className="w-10 text-center text-sm font-semibold text-black">
+                            {item.quantity}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                            className="grid h-8 w-8 place-items-center rounded-full text-lg text-black transition hover:bg-white"
+                          >
+                            +
+                          </button>
+                        </div>
+                        <p className="text-sm font-semibold text-[#9d2936]">
+                          {formatPrice(item.price * item.quantity)}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </article>
+              ))}
+            </div>
+
+            <div className="mt-6 rounded-[28px] border border-black/10 bg-white px-5 py-5 shadow-[0_12px_34px_rgba(44,25,17,0.07)]">
+              <div className="flex items-center justify-between gap-4">
+                <span className="text-sm uppercase tracking-[0.22em] text-black/45">
+                  Total
+                </span>
+                <span className="text-xl font-semibold text-black">
+                  {formatPrice(state.total)}
+                </span>
+              </div>
+              <Link
+                href="/cart"
+                onClick={closeAll}
+                className="mt-4 block rounded-full bg-[#9d2936] px-5 py-3 text-center text-sm font-semibold text-white transition hover:bg-[#7d202a]"
+              >
+                View Cart
+              </Link>
+            </div>
+          </div>
+        ) : (
+          <div className="flex flex-1 flex-col items-center justify-center px-6 text-center">
+            <div className="mb-7 flex h-16 w-16 items-center justify-center rounded-full border-2 border-black text-black">
+              <SadBagIcon />
+            </div>
+            <h3 className="font-[Georgia,'Times New Roman',serif] text-4xl tracking-[0.02em] text-black">
+              Your cart is empty
+            </h3>
+            <button
+              type="button"
+              onClick={() => setActivePanel(null)}
+              className="mt-8 border-b border-black pb-1 text-lg text-black/80"
+            >
+              Continue Shopping
+            </button>
+          </div>
+        )}
       </Drawer>
 
       <Drawer
