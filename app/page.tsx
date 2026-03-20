@@ -1,5 +1,7 @@
 import Carousel from "@/components/common/Carousel";
 import Footer from "@/components/footer/Footer";
+import ShopByOccausion from "@/components/home/shopByOccausion";
+import ShopByPrice from "@/components/home/shopByPrice";
 import WeddingEdit from "@/components/home/weddingEdit";
 import { StorefrontNavbar } from "@/components/navbar/storefront-navbar";
 
@@ -44,6 +46,8 @@ export default function Home() {
       
 
       <WeddingEdit />
+      <ShopByPrice />
+      <ShopByOccausion />
       <Footer />
     </main>
   );
