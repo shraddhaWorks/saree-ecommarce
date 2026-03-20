@@ -2,7 +2,7 @@ import Carousel from "@/components/common/Carousel";
 import Footer from "@/components/footer/Footer";
 import WeddingEdit from "@/components/home/weddingEdit";
 import { StorefrontNavbar } from "@/components/navbar/storefront-navbar";
-
+import ProductList from "@/components/product/ProductList";
 
 export default function Home() {
   const slides = [
@@ -44,6 +44,7 @@ export default function Home() {
       
 
       <WeddingEdit />
+      <ProductList/>
       <Footer />
     </main>
   );
