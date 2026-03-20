@@ -3,7 +3,7 @@
 import Image from "next/image";
 
 const collections = [
-  { title: "Handwoven Silks", img: "/Handwoven_silks.webp" },
+  { title: "Handwoven Silks", img: "/Hand.webp" },
   { title: "Zari Classics", img: "/Zari_Classics.webp" },
   { title: "Motif Heritage", img: "/Motif_Heritage.webp" },
   { title: "Contemporary", img: "/Contemporary_Weaves.webp" },
