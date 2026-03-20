@@ -1,3 +1,4 @@
+import AboutUs from "@/components/AboutUS/AboutUs";
 import Carousel from "@/components/common/Carousel";
 import Footer from "@/components/footer/Footer";
 import WeddingEdit from "@/components/home/weddingEdit";
@@ -45,6 +46,7 @@ export default function Home() {
 
       <WeddingEdit />
       <ProductList/>
+      <AboutUs/>
       <Footer />
     </main>
   );
