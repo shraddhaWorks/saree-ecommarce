@@ -42,33 +42,8 @@ export default function ProductDetails({
                         {product.images.map((img, i) => (
                             <>
                            
-                            <img
-                                key={i}
-                                src={img}
-                                onClick={() => setSelectedImage(img)}
-                                className={`h-37.5 rounded-lg cursor-pointer border ${selectedImage === img
-                                    ? "border-black"
-                                    : "border-gray-200"
-                                    }`}
-                            />
-                             <img
-                                key={i}
-                                src={img}
-                                onClick={() => setSelectedImage(img)}
-                                className={`h-37.5 rounded-lg cursor-pointer border ${selectedImage === img
-                                    ? "border-black"
-                                    : "border-gray-200"
-                                    }`}
-                            />
-                             <img
-                                key={i}
-                                src={img}
-                                onClick={() => setSelectedImage(img)}
-                                className={`h-37.5 rounded-lg cursor-pointer border ${selectedImage === img
-                                    ? "border-black"
-                                    : "border-gray-200"
-                                    }`}
-                            />
+                           
+                           
                              <img
                                 key={i}
                                 src={img}

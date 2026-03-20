@@ -36,7 +36,7 @@ export default function AboutUs() {
               presence in two southern states of India (Andhra Pradesh and Telangana).
             </p>
 
-            <button className="border border-gray-400 px-6 py-3 rounded-md hover:bg-black hover:text-white transition">
+            <button className="border border-[#8f2333] px-6 py-3 rounded-md hover:bg-[#8f2333] hover:text-white transition">
               Know More
             </button>
 
