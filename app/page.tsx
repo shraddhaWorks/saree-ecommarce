@@ -1,5 +1,6 @@
 import Carousel from "@/components/common/Carousel";
 import Footer from "@/components/footer/Footer";
+import Crafts from "@/components/home/crafts";
 import WeddingEdit from "@/components/home/weddingEdit";
 import { StorefrontNavbar } from "@/components/navbar/storefront-navbar";
 
@@ -42,8 +43,10 @@ export default function Home() {
         <Carousel slides={slides} className="w-full" />
       </section>
       
-
+     
       <WeddingEdit />
+
+      <Crafts/>
       <Footer />
     </main>
   );
