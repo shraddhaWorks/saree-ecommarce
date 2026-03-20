@@ -1,6 +1,8 @@
 import Carousel from "@/components/common/Carousel";
+import Footer from "@/components/footer/Footer";
+import WeddingEdit from "@/components/home/weddingEdit";
 import { StorefrontNavbar } from "@/components/navbar/storefront-navbar";
-import { FrontendBlueprintPage } from "@/features/storefront/frontend-blueprint-page";
+
 
 export default function Home() {
   const slides = [
@@ -39,7 +41,10 @@ export default function Home() {
       <section className="w-full pt-[138px] sm:pt-[146px] lg:pt-[154px]">
         <Carousel slides={slides} className="w-full" />
       </section>
-      <FrontendBlueprintPage showNavbar={false} />
+      
+
+      <WeddingEdit />
+      <Footer />
     </main>
   );
 }
