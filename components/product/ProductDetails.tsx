@@ -14,8 +14,6 @@ import {
     Mail,
 } from "lucide-react";
 
-import { addToCart } from "@/lib/cart";
-
 interface Props {
     product: Product;
     relatedProducts: Product[];
@@ -30,39 +28,30 @@ export default function ProductDetails({
     const { toggleItem, isWishlisted } = useWishlist();
     const [selectedImage, setSelectedImage] = useState(product.images[0]);
     const [qty, setQty] = useState(1);
-
-    const router = useRouter();
     const safeQty = Math.max(1, Math.min(qty, product.stock));
     const isOutOfStock = product.stock <= 0;
 
-    const handleAddToCart = () => {
-        if (isOutOfStock) return;
-
-        addToCart({
-            productId: product.id,
-            name: product.name,
-            price: product.price,
-            qty: safeQty,
-            image: selectedImage,
-        });
-
-        // Notify any cart UI (navbar drawer) to refresh.
-        window.dispatchEvent(new Event("cart:updated"));
-        window.dispatchEvent(new Event("cart:open"));
-    };
-
-    const handleBuyNow = () => {
-        if (isOutOfStock) return;
-        handleAddToCart();
-        router.push("/checkout");
     const addProductToCart = () => {
         addItem({
             id: String(product.id),
             name: product.name,
             price: product.price,
-            image: product.images[0],
-            quantity: qty,
+            image: selectedImage,
+            quantity: safeQty,
         });
+        // Notify any cart UI (navbar drawer) to open.
+        window.dispatchEvent(new Event("cart:open"));
+    };
+
+    const handleAddToCart = () => {
+        if (isOutOfStock) return;
+        addProductToCart();
+    };
+
+    const handleBuyNow = () => {
+        if (isOutOfStock) return;
+        addProductToCart();
+        router.push("/checkout");
     };
 
     const toggleWishlistItem = () => {
@@ -167,11 +156,6 @@ export default function ProductDetails({
                             className={`bg-black text-white px-8 py-3 rounded-lg w-full transition ${
                                 isOutOfStock ? "cursor-not-allowed opacity-60" : "hover:opacity-90"
                             }`}
-                            onClick={() => {
-                                addProductToCart();
-                                window.dispatchEvent(new Event("cart:open"));
-                            }}
-                            className="bg-black text-white px-8 py-3 rounded-lg w-full hover:bg-gray-800 transition"
                         >
                             Add to cart
                         </button>
@@ -182,11 +166,6 @@ export default function ProductDetails({
                             className={`bg-black text-white px-8 py-3 rounded-lg w-full transition ${
                                 isOutOfStock ? "cursor-not-allowed opacity-60" : "hover:opacity-90"
                             }`}
-                            onClick={() => {
-                                addProductToCart();
-                                router.push("/cart");
-                            }}
-                            className="bg-black text-white px-8 py-3 rounded-lg w-full hover:bg-gray-800 transition"
                         >
                             Buy it now
                         </button>
