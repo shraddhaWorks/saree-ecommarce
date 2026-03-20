@@ -45,10 +45,11 @@ export default function Carousel({
         index < 0 ? (loop ? slideCount - 1 : 0) : index >= slideCount ? (loop ? 0 : slideCount - 1) : index;
       setActiveIndex(normalized);
 
-      const target = itemRefs.current[normalized];
-      if (target) {
-        target.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "start" });
-      }
+      if (!trackRef.current) return;
+      const container = trackRef.current;
+      const slideWidth = container.clientWidth;
+      const newScrollLeft = normalized * slideWidth;
+      container.scrollTo({ left: newScrollLeft, behavior: "smooth" });
     },
     [loop, slideCount],
   );
@@ -79,10 +80,10 @@ export default function Carousel({
   }, [autoPlay, autoPlayInterval, isPaused, loop, slideCount]);
 
   useEffect(() => {
-    const target = itemRefs.current[currentIndex];
-    if (target) {
-      target.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "start" });
-    }
+    if (!trackRef.current) return;
+    const container = trackRef.current;
+    const slideWidth = container.clientWidth;
+    container.scrollTo({ left: currentIndex * slideWidth, behavior: "smooth" });
   }, [currentIndex]);
 
   if (slideCount === 0) {
@@ -143,11 +144,10 @@ export default function Carousel({
               type="button"
               onClick={() => goToIndex(idx)}
               aria-label={`Go to slide ${idx + 1}`}
-              className={`rounded-full transition-all ${
-                idx === currentIndex
+              className={`rounded-full transition-all ${idx === currentIndex
                   ? "h-4 w-4 border-2 border-white bg-transparent"
                   : "h-3 w-3 bg-white/95"
-              }`}
+                }`}
             />
           ))}
         </div>
