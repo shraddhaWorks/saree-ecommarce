@@ -48,11 +48,10 @@ export default function Home() {
       
      
       <WeddingEdit />
-      <ShopByPrice />
-      <ShopByOccausion />
-
-      <Crafts/>
       <ProductList/>
+      <ShopByPrice />
+      <Crafts/>
+      <ShopByOccausion />
       <AboutUs/>
       <Footer />
     </main>

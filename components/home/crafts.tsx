@@ -11,7 +11,7 @@ const collections = [
 
 export default function Crafts() {
   return (
-    <section className="w-full py-10 bg-background">
+    <section className="w-full py-10 bg-white">
       {/* Header */}
       <div className="px-6 mb-8">
         <h2 className="text-xl md:text-3xl font-semibold text-foreground text-center">

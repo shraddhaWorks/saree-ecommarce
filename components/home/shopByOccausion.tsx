@@ -49,7 +49,7 @@ export default function ShopByOccausion() {
 
             {/* Text */}
             <div className="absolute bottom-15 left-0 right-0 text-center ">
-              <h3 className="text-white text-4xl  font-semibold">
+              <h3 className="text-white text-5xl">
                 {item.title}
               </h3>
             </div>
