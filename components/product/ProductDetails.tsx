@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState } from "react";
@@ -34,7 +33,7 @@ export default function ProductDetails({
     const addProductToCart = () => {
         addItem({
             id: String(product.id),
-            name: product.name,
+            name: product.name || product.title || "",
             price: product.price,
             image: selectedImage,
             quantity: safeQty,
@@ -57,7 +56,7 @@ export default function ProductDetails({
     const toggleWishlistItem = () => {
         toggleItem({
             id: String(product.id),
-            name: product.name,
+            name: product.name || product.title || "",
             price: product.price,
             image: product.images[0],
             href: `/products/${product.id}`,
@@ -68,52 +67,53 @@ export default function ProductDetails({
     return (
         <div>
             {/* MAIN SECTION */}
-            <div className="grid grid-cols-2 gap-10 px-10 py-8">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-10 px-5 lg:px-10 py-6 lg:py-8">
                 {/* LEFT */}
-                <div className="flex gap-5">
+                <div className="flex flex-col-reverse md:flex-row gap-4 md:gap-5">
 
-                    <div className="w-[75%]">
+                    <div className="w-full md:w-[75%]">
                         <img
                             src={selectedImage}
-                            className="w-full h-162.5 object-cover rounded-xl"
+                            className="w-full h-[450px] md:h-[650px] object-cover object-top rounded-xl shadow-sm"
                         />
                     </div>
 
-                    <div className="flex flex-col gap-4 w-[25%]">
+                    <div className="flex flex-row md:flex-col gap-3 md:gap-4 w-full md:w-[25%] overflow-x-auto pb-2 md:pb-0 scrollbar-hide">
                         {product.images.map((img, i) => (
-                            <>
-
-
-
-                                <img
-                                    key={i}
-                                    src={img}
-                                    onClick={() => setSelectedImage(img)}
-                                    className={`h-37.5 rounded-lg cursor-pointer border ${selectedImage === img
-                                        ? "border-black"
-                                        : "border-gray-200"
-                                        }`}
-                                />
-                            </>
-
+                            <img
+                                key={i}
+                                src={img}
+                                onClick={() => setSelectedImage(img)}
+                                alt=""
+                                className={`h-24 min-w-[80px] object-cover md:h-[150px] md:min-w-0 md:w-full rounded-lg cursor-pointer border transition-all duration-300 ${selectedImage === img
+                                    ? "border-black shadow-md scale-100"
+                                    : "border-gray-200 blur-[2px] opacity-60 hover:blur-none hover:opacity-100"
+                                    }`}
+                            />
                         ))}
                     </div>
                 </div>
 
                 {/* RIGHT */}
-                <div className="max-w-lg">
-                    <h1 className="text-2xl font-medium mb-3">
-                        {product.name}
+                <div className="w-full lg:max-w-lg mt-4 lg:mt-0">
+                    <h1 className="text-2xl md:text-3xl font-[Georgia,'Times New Roman',serif] text-black font-semibold mb-3">
+                        {product.name || product.title}
                     </h1>
 
                     <div className="flex gap-3 mb-2">
                         <p className="text-xl font-semibold">
-                            Rs. {product.price}
+                            ₹{product.price}
                         </p>
-                        <p className="line-through text-gray-400">
-                            Rs. {product.price + 1000}
-                        </p>
+                        {product.originalPrice && (
+                            <p className="line-through text-gray-400">
+                                ₹{product.originalPrice}
+                            </p>
+                        )}
                     </div>
+
+                    <p className="text-gray-700 text-[15px] leading-relaxed mt-4 mb-5">
+                        {product.description || "No description provided."}
+                    </p>
 
                     <p className="text-sm text-gray-500 mb-3">
                         Tax included. Shipping calculated at checkout.
@@ -121,10 +121,6 @@ export default function ProductDetails({
 
                     <p className="text-red-500 text-sm mb-4">
                         • {product.stock} items available
-                    </p>
-
-                    <p className="text-gray-700 text-sm mb-6">
-                        {product.description}
                     </p>
 
                     {/* Quantity */}
@@ -209,7 +205,7 @@ export default function ProductDetails({
                                 Description
                             </summary>
                             <p className="text-sm mt-2">
-                                {product.description}
+                                {product.description || "No description provided."}
                             </p>
                         </details>
 
@@ -217,9 +213,13 @@ export default function ProductDetails({
                             <summary className="cursor-pointer font-medium">
                                 Product Specifications
                             </summary>
-                            <p className="text-sm mt-2">
-                                Fabric: Chanderi Silk Cotton
-                            </p>
+                            <div className="text-sm mt-2 space-y-1 bg-gray-50 p-3 rounded">
+                                {product.fabric && <p><span className="font-semibold">Fabric:</span> {product.fabric}</p>}
+                                {product.color && <p><span className="font-semibold">Color:</span> {product.color}</p>}
+                                {product.brand && <p><span className="font-semibold">Brand:</span> {product.brand}</p>}
+                                {product.category && <p><span className="font-semibold">Category:</span> {product.category}</p>}
+                                {product.occasion && <p><span className="font-semibold">Occasion:</span> {product.occasion}</p>}
+                            </div>
                         </details>
                     </div>
                 </div>

@@ -136,4 +136,5 @@ export const primaryLinks = [
     { label: staticNavCategories.casualWorkwearSarees.title, href: staticNavCategories.casualWorkwearSarees.href, menuKey: "casualWorkwearSarees" as const },
     { label: staticNavCategories.dhotiAndKanduva.title, href: staticNavCategories.dhotiAndKanduva.href },
     { label: staticNavCategories.stores.title, href: staticNavCategories.stores.href },
+    { label: "Add Product", href: "/vendor/add-product" },
 ];

@@ -5,31 +5,30 @@ import { useEffect, useRef, useState, type MouseEvent } from "react";
 import { useCart, useWishlist } from "@/components/cart";
 import { MegaMenu, menuData, primaryLinks, suggestedSearches, type MenuEntryKey } from "./menu";
 import { Drawer, IconButton, RangamLogo } from "./ui";
-import {
-  BagIcon,
-  CloseIcon,
-  HeartIcon,
-  SearchIcon,
-  UserIcon,
-  SadBagIcon,
-} from "./icons";
-import { getCart, type Cart } from "@/lib/cart";
+import { BagIcon, CloseIcon, HeartIcon, SearchIcon, UserIcon, SadBagIcon, MenuIcon } from "./icons";
 
-type PanelKey = "bag" | "search" | "profile" | "wishlist" | null;
+type PanelKey = "bag" | "search" | "profile" | "wishlist" | "menu" | null;
 
 export function StorefrontNavbar() {
-  const { state } = useCart();
+  const { state, removeItem } = useCart();
   const {
     state: wishlistState,
     removeItem: removeWishlistItem,
   } = useWishlist();
   const [activePanel, setActivePanel] = useState<PanelKey>(null);
   const [activeMenu, setActiveMenu] = useState<MenuEntryKey | null>(null);
+  const [isScrolled, setIsScrolled] = useState(false);
   const hasOverlay = activePanel !== null;
   const hasMenuOverlay = activeMenu !== null;
   const navbarRef = useRef<HTMLDivElement | null>(null);
 
-  const [cart, setCart] = useState<Cart>({ items: [] });
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 50);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
@@ -54,20 +53,7 @@ export function StorefrontNavbar() {
     return () => document.removeEventListener("pointerdown", onPointerDown);
   }, []);
 
-  useEffect(() => {
-    const syncCart = () => setCart(getCart());
-    syncCart();
 
-    const openBag = () => setActivePanel("bag");
-
-    window.addEventListener("cart:updated", syncCart);
-    window.addEventListener("cart:open", openBag);
-
-    return () => {
-      window.removeEventListener("cart:updated", syncCart);
-      window.removeEventListener("cart:open", openBag);
-    };
-  }, []);
 
   useEffect(() => {
     document.body.style.overflow = hasOverlay ? "hidden" : "";
@@ -104,26 +90,49 @@ export function StorefrontNavbar() {
     setActiveMenu(null);
   };
 
-  const cartCount = cart.items.reduce((sum, item) => sum + item.qty, 0);
-  const cartTotal = cart.items.reduce((sum, item) => sum + item.qty * item.price, 0);
   const hasWishlistItems = wishlistState.items.length > 0;
   const formatPrice = (price: number) =>
     `Rs. ${price.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  const isMegaMenuOpen = activeMenu !== null;
 
   return (
     <>
-      <div ref={navbarRef} className="fixed inset-x-0 top-0 z-50 bg-[#fdfbf7] shadow-[0_10px_34px_rgba(44,25,17,0.08)]">
-        <div className="h-[6px] bg-[#822733]" />
-        <header className="border-b border-black/10 bg-[#fdfbf7]" onClick={closeAll}>
+      <div 
+        ref={navbarRef} 
+        className={`fixed inset-x-0 top-0 z-50 transition-all duration-500 ${
+          isScrolled 
+            ? "bg-[#fdfbf7] shadow-[0_10px_34px_rgba(44,25,17,0.08)]" 
+            : "bg-transparent"
+        }`}
+      >
+        <div className={`h-[6px] bg-[#822733] transition-opacity duration-500 ${isScrolled ? "opacity-100" : "opacity-0"}`} />
+        <header 
+          className={`border-b border-black/10 transition-colors duration-500 ${
+            isScrolled ? "bg-[#fdfbf7]" : "bg-transparent border-transparent"
+          }`} 
+          onClick={closeAll}
+        >
           <div className="mx-auto max-w-[1880px] overflow-hidden px-3 py-3 sm:px-4 sm:py-4 lg:px-8">
             <div onClick={stopEvent}>
               <div className="flex items-center gap-[clamp(8px,1vw,24px)] whitespace-nowrap">
-                <Link href="/" className="shrink-0" onClick={closeAll}>
-                  <RangamLogo />
-                </Link>
+                {!isMegaMenuOpen ? (
+                  <div className={`flex lg:hidden shrink-0 items-center -ml-2 mr-1 transition-colors duration-500 ${isScrolled ? "text-black" : "text-white"}`}>
+                    <IconButton label="Menu" onClick={() => openPanel("menu")}>
+                      <MenuIcon />
+                    </IconButton>
+                  </div>
+                ) : null}
 
-                <nav aria-label="Primary" className="min-w-0 flex-1">
-                  <div className="flex min-w-0 items-center justify-center gap-[clamp(8px,1.1vw,28px)] py-2">
+                {!isMegaMenuOpen ? (
+                  <Link href="/" className="shrink-0" onClick={closeAll}>
+                    <div className={`transition-all duration-500 ${isScrolled ? "" : "brightness-0 invert drop-shadow-[0_2px_8px_rgba(0,0,0,0.5)]"}`}>
+                      <RangamLogo />
+                    </div>
+                  </Link>
+                ) : null}
+
+                <nav aria-label="Primary" className="flex-1 min-w-0 hidden lg:block">
+                  <div className={`flex min-w-0 items-center justify-center gap-[clamp(8px,1.1vw,28px)] py-2 ${isMegaMenuOpen ? "justify-center" : ""}`}>
                     {primaryLinks.map((item) => (
                       item.menuKey ? (
                         <button
@@ -134,7 +143,9 @@ export function StorefrontNavbar() {
                           className={
                             activeMenu === item.menuKey
                               ? "min-w-0 shrink text-center font-[Georgia,'Times_New_Roman',serif] text-[clamp(8px,0.9vw,17px)] leading-none tracking-normal text-[#9d2936] transition"
-                              : "min-w-0 shrink text-center font-[Georgia,'Times_New_Roman',serif] text-[clamp(8px,0.9vw,17px)] leading-none tracking-normal text-black transition hover:text-black/70"
+                              : `min-w-0 shrink text-center font-[Georgia,'Times_New_Roman',serif] text-[clamp(8px,0.9vw,17px)] leading-none tracking-normal transition hover:text-[#9d2936] ${
+                                  isScrolled ? "text-black" : "text-white drop-shadow-sm hover:text-white/80"
+                                }`
                           }
                         >
                           {item.label}
@@ -144,7 +155,9 @@ export function StorefrontNavbar() {
                           key={item.label}
                           href={item.href}
                           onClick={closeAll}
-                          className="min-w-0 shrink text-center font-[Georgia,'Times_New_Roman',serif] text-[clamp(8px,0.9vw,17px)] leading-none tracking-normal text-black transition hover:text-black/70"
+                          className={`min-w-0 shrink text-center font-[Georgia,'Times_New_Roman',serif] text-[clamp(8px,0.9vw,17px)] leading-none tracking-normal transition hover:text-[#9d2936] ${
+                            isScrolled ? "text-black" : "text-white drop-shadow-sm hover:text-white/80"
+                          }`}
                         >
                           {item.label}
                         </Link>
@@ -153,7 +166,7 @@ export function StorefrontNavbar() {
                   </div>
                 </nav>
 
-                <div className="ml-auto flex shrink-0 items-center gap-1 sm:gap-2 lg:gap-3">
+                <div className={`ml-auto flex shrink-0 items-center gap-1 sm:gap-2 lg:gap-3 transition-colors duration-500 ${isScrolled ? "text-black" : "text-white"}`}>
                   <IconButton label="Search" onClick={() => openPanel("search")}>
                     <SearchIcon />
                   </IconButton>
@@ -287,10 +300,10 @@ export function StorefrontNavbar() {
       <Drawer
         isOpen={activePanel === "bag"}
         title="Your bag"
-        count={`(${cartCount})`}
+        count={`(${state.itemCount})`}
         onClose={() => setActivePanel(null)}
       >
-        {cart.items.length === 0 ? (
+        {state.items.length === 0 ? (
           <div className="flex flex-1 flex-col items-center justify-center px-6 text-center">
             <div className="mb-7 flex h-16 w-16 items-center justify-center rounded-full border-2 border-black text-black">
               <SadBagIcon />
@@ -309,23 +322,47 @@ export function StorefrontNavbar() {
         ) : (
           <div className="flex flex-1 flex-col">
             <ul className="flex-1 space-y-3 overflow-auto px-8 py-6">
-              {cart.items.map((item) => (
+              {state.items.map((item) => (
                 <li
-                  key={item.productId}
+                  key={item.id}
                   className="rounded-2xl border border-black/10 bg-white p-4"
                 >
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="min-w-0">
-                      <p className="truncate text-sm font-semibold text-black/80">
-                        {item.name}
-                      </p>
-                      <p className="mt-1 text-xs text-black/55">
-                        Qty {item.qty}
+                  <div className="flex gap-4">
+                    {item.image ? (
+                      <div className="h-20 w-16 shrink-0 overflow-hidden rounded-xl bg-[#f3ebe0]">
+                        <img
+                          src={item.image}
+                          alt={item.name}
+                          className="h-full w-full object-cover"
+                        />
+                      </div>
+                    ) : (
+                      <div className="h-20 w-16 shrink-0 rounded-xl bg-[#f3ebe0]" />
+                    )}
+                    <div className="flex flex-1 items-start justify-between gap-3 min-w-0">
+                      <div className="min-w-0 flex flex-col justify-between h-full">
+                        <div>
+                          <p className="line-clamp-2 text-sm font-semibold text-black/80">
+                            {item.name}
+                          </p>
+                          <p className="mt-1 text-xs text-black/55">
+                            Qty {item.quantity}
+                            {item.size ? ` • Size: ${item.size}` : ""}
+                            {item.color ? ` • Color: ${item.color}` : ""}
+                          </p>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => removeItem(item.id)}
+                          className="mt-2 text-xs text-black/45 transition hover:text-[#9d2936] text-left"
+                        >
+                          Remove
+                        </button>
+                      </div>
+                      <p className="shrink-0 text-sm font-semibold text-accent">
+                        Rs. {item.price * item.quantity}
                       </p>
                     </div>
-                    <p className="text-sm font-semibold text-accent">
-                      Rs. {item.price * item.qty}
-                    </p>
                   </div>
                 </li>
               ))}
@@ -335,7 +372,7 @@ export function StorefrontNavbar() {
               <div className="flex items-center justify-between gap-3">
                 <span className="text-sm font-semibold text-black/70">Total</span>
                 <span className="text-sm font-semibold text-black">
-                  Rs. {cartTotal}
+                  Rs. {state.total}
                 </span>
               </div>
 
@@ -457,6 +494,28 @@ export function StorefrontNavbar() {
           </section>
         </div>
       ) : null}
+
+      <Drawer
+        isOpen={activePanel === "menu"}
+        title="Menu"
+        onClose={() => setActivePanel(null)}
+      >
+        <div className="flex flex-1 flex-col overflow-y-auto px-6 pb-8">
+          <ul className="space-y-4 pt-4">
+            {primaryLinks.map((item) => (
+              <li key={item.label} className="border-b border-black/10 pb-4 last:border-0">
+                <Link
+                  href={item.href || '#'}
+                  onClick={closeAll}
+                  className="text-xl font-[Georgia,'Times_New_Roman',serif] text-black transition hover:text-[#9d2936]"
+                >
+                  {item.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </Drawer>
     </>
   );
 }

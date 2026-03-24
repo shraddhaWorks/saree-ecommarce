@@ -5,3 +5,4 @@ export { BagIcon } from "./BagIcon";
 export { CloseIcon } from "./CloseIcon";
 export { SadBagIcon } from "./SadBagIcon";
 export { HeartIcon } from "./HeartIcon";
+export { MenuIcon } from "./MenuIcon";

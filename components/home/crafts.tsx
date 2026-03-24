@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 
 const collections = [
   { title: "Handwoven Silks", img: "/Hand.webp" },
@@ -21,8 +22,10 @@ export default function Crafts() {
 
       {/* Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 px-6">
-        {collections.map((item, index) => (
-          <div key={index} className="group cursor-pointer">
+        {collections.map((item, index) => {
+          const handle = item.title.toLowerCase().replace(/ & /g, '-').replace(/ /g, '-');
+          return (
+          <Link key={index} href={`/collections/${handle}`} className="group cursor-pointer">
             <div className="relative overflow-hidden rounded-xl bg-surface">
               
               {/* IMAGE */}
@@ -56,8 +59,9 @@ export default function Crafts() {
               </div>
 
             </div>
-          </div>
-        ))}
+          </Link>
+          )
+        })}
       </div>
     </section>
   );

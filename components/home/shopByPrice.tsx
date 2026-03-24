@@ -23,7 +23,7 @@ export default function ShopByPrice() {
         Shop by Price
       </h2>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
         {priceData.map((item, index) => (
           <div key={index} className="block group">
             <div className="overflow-hidden rounded-xl shadow-md">

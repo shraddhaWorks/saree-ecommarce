@@ -9,32 +9,49 @@ import ProductList from "@/components/product/ProductList";
 
 export default function Home() {
   const slides = [
-    <div className="relative h-[420px] w-full overflow-hidden bg-[#8f171f] sm:h-[520px] lg:h-[700px]" key="1">
+    <div className="relative h-[85vh] w-full overflow-hidden bg-[#8f171f] lg:h-[800px]" key="1">
       <img
         src="https://kalanjali.com/cdn/shop/files/5_1.png?v=1772695660&width=2000"
-        alt="Saree shopping 1"
-        className="h-full w-full object-cover object-center"
+        alt="Heritage Saree Collection"
+        className="h-full w-full object-cover object-center brightness-75 transition-transform duration-1000 hover:scale-105"
         loading="lazy"
       />
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/5 via-black/0 to-black/25" />
+      <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/30 px-6 text-center">
+        <h1 className="max-w-4xl text-4xl font-bold leading-tight text-white md:text-7xl">
+          We Brought <span className="text-[#f15a24]">Heritage</span> to <span className="text-[#f15a24]">India</span> For You
+        </h1>
+        <div className="mt-8 flex w-full max-w-3xl flex-col items-center border-t border-white/30 pt-8">
+          <p className="max-w-2xl text-lg font-medium text-white/95 md:text-2xl">
+            Exquisite Handcrafted Silks | Royal Bridal Weaves | Authentic Traditions
+          </p>
+          <button className="mt-10 flex items-center gap-3 rounded-full bg-[#f15a24] px-10 py-4 text-lg font-bold text-white shadow-2xl transition-all hover:scale-105 hover:bg-[#d94e1f]">
+            Shop Modern Traditions
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </button>
+        </div>
+      </div>
     </div>,
-    <div className="relative h-[420px] w-full overflow-hidden bg-[#8f171f] sm:h-[520px] lg:h-[700px]" key="2">
+    <div className="relative h-[85vh] w-full overflow-hidden bg-[#8f171f] lg:h-[800px]" key="2">
       <img
-        src="https://kalanjali.com/cdn/shop/files/5_1.png?v=1772695660&width=2000"
-        alt="Saree shopping 2"
-        className="h-full w-full object-cover object-center"
+        src="https://vaarahisilks.com/cdn/shop/files/1_0000_DSC07696.jpg?v=1764064129"
+        alt="Bridal Silk Collection"
+        className="h-full w-full object-cover object-center brightness-75 transition-transform duration-1000 hover:scale-105"
         loading="lazy"
       />
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/5 via-black/0 to-black/25" />
-    </div>,
-    <div className="relative h-[420px] w-full overflow-hidden bg-[#8f171f] sm:h-[520px] lg:h-[700px]" key="3">
-      <img
-        src="https://kalanjali.com/cdn/shop/files/5_1.png?v=1772695660&width=2000"
-        alt="Saree shopping 3"
-        className="h-full w-full object-cover object-center"
-        loading="lazy"
-      />
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/5 via-black/0 to-black/25" />
+      <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/40 px-6 text-center">
+        <h1 className="max-w-4xl text-4xl font-bold leading-tight text-white md:text-7xl">
+          The <span className="text-[#f15a24]">Wedding</span> Edit For <span className="text-[#f15a24]">India</span> For You
+        </h1>
+        <div className="mt-8 flex w-full max-w-3xl flex-col items-center border-t border-white/30 pt-8">
+          <p className="max-w-2xl text-lg font-medium text-white/95 md:text-2xl">
+            Kanchipuram Pattu | Banaras Brocades | Pure Silk Masterpieces
+          </p>
+          <button className="mt-10 flex items-center gap-3 rounded-full bg-[#f15a24] px-10 py-4 text-lg font-bold text-white shadow-2xl transition-all hover:scale-105 hover:bg-[#d94e1f]">
+            Discover Bridal Edit
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </button>
+        </div>
+      </div>
     </div>,
   ];
 
