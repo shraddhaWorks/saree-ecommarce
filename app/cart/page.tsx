@@ -1,7 +1,6 @@
 "use client";
 
 import { useCart } from "@/components/cart/CartContext";
-import { StorefrontNavbar } from "@/components/navbar/storefront-navbar";
 import Footer from "@/components/footer/Footer";
 import Link from "next/link";
 import { Minus, Plus, Trash2, ArrowLeft } from "lucide-react";
@@ -12,10 +11,9 @@ export default function CartPage() {
     if (state.items.length === 0) {
         return (
             <main className="min-h-screen bg-[#f7f0e7]">
-                <StorefrontNavbar />
-                <div className="pt-[154px] px-6 py-12 text-center">
+                <div className="px-6 py-12 text-center">
                     <div className="max-w-md mx-auto">
-                        <div className="text-6xl mb-6">🛒</div>
+                        <div className="text-6xl mb-6">Cart</div>
                         <h1 className="text-2xl font-bold mb-4">Your Cart is Empty</h1>
                         <p className="text-gray-600 mb-8">
                             Looks like you haven't added any sarees to your cart yet.
@@ -36,10 +34,8 @@ export default function CartPage() {
 
     return (
         <main className="min-h-screen bg-[#f7f0e7]">
-            <StorefrontNavbar />
-            <div className="pt-[154px] px-6 py-8">
+            <div className="px-6 py-8">
                 <div className="max-w-4xl mx-auto">
-                    {/* Header */}
                     <div className="flex items-center justify-between mb-8">
                         <div>
                             <h1 className="text-3xl font-bold">Shopping Cart</h1>
@@ -55,13 +51,11 @@ export default function CartPage() {
                         </button>
                     </div>
 
-                    {/* Cart Items */}
                     <div className="bg-white rounded-lg shadow-sm overflow-hidden mb-8">
                         {state.items.map((item) => (
                             <div key={item.id} className="border-b border-gray-200 last:border-b-0">
                                 <div className="p-6">
                                     <div className="flex items-center gap-6">
-                                        {/* Product Image */}
                                         <div className="w-20 h-20 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
                                             <img
                                                 src={item.image}
@@ -70,15 +64,13 @@ export default function CartPage() {
                                             />
                                         </div>
 
-                                        {/* Product Details */}
                                         <div className="flex-1">
                                             <h3 className="font-semibold text-lg">{item.name}</h3>
-                                            <p className="text-gray-600">₹{item.price.toLocaleString()}</p>
+                                            <p className="text-gray-600">Rs. {item.price.toLocaleString()}</p>
                                             {item.size && <p className="text-sm text-gray-500">Size: {item.size}</p>}
                                             {item.color && <p className="text-sm text-gray-500">Color: {item.color}</p>}
                                         </div>
 
-                                        {/* Quantity Controls */}
                                         <div className="flex items-center gap-3">
                                             <button
                                                 onClick={() => updateQuantity(item.id, item.quantity - 1)}
@@ -95,12 +87,10 @@ export default function CartPage() {
                                             </button>
                                         </div>
 
-                                        {/* Subtotal */}
                                         <div className="text-right">
-                                            <p className="font-semibold">₹{(item.price * item.quantity).toLocaleString()}</p>
+                                            <p className="font-semibold">Rs. {(item.price * item.quantity).toLocaleString()}</p>
                                         </div>
 
-                                        {/* Remove Button */}
                                         <button
                                             onClick={() => removeItem(item.id)}
                                             className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition"
@@ -113,12 +103,11 @@ export default function CartPage() {
                         ))}
                     </div>
 
-                    {/* Cart Summary */}
                     <div className="bg-white rounded-lg shadow-sm p-6">
                         <div className="flex items-center justify-between mb-6">
                             <span className="text-lg font-medium">Total:</span>
                             <span className="text-2xl font-bold text-[#9d2936]">
-                                ₹{state.total.toLocaleString()}
+                                Rs. {state.total.toLocaleString()}
                             </span>
                         </div>
 

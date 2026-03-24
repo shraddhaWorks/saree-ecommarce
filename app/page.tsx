@@ -5,7 +5,6 @@ import ShopByOccausion from "@/components/home/shopByOccausion";
 import ShopByPrice from "@/components/home/shopByPrice";
 import Crafts from "@/components/home/crafts";
 import WeddingEdit from "@/components/home/weddingEdit";
-import { StorefrontNavbar } from "@/components/navbar/storefront-navbar";
 import ProductList from "@/components/product/ProductList";
 
 export default function Home() {
@@ -41,18 +40,15 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-[#f7f0e7] text-[#201815]">
-      <StorefrontNavbar />
-      <section className="w-full pt-[138px] sm:pt-[146px] lg:pt-[154px]">
+      <section className="w-full">
         <Carousel slides={slides} className="w-full" />
       </section>
-      
-     
       <WeddingEdit />
-      <ProductList/>
+      <ProductList />
       <ShopByPrice />
-      <Crafts/>
+      <Crafts />
       <ShopByOccausion />
-      <AboutUs/>
+      <AboutUs />
       <Footer />
     </main>
   );

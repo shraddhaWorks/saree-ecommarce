@@ -102,92 +102,83 @@ export function StorefrontNavbar() {
       <div className="fixed inset-x-0 top-0 z-50 bg-[#fdfbf7] shadow-[0_10px_34px_rgba(44,25,17,0.08)]">
         <div className="h-[6px] bg-[#822733]" />
         <header className="border-b border-black/10 bg-[#fdfbf7]" onClick={closeAll}>
-          <div className={`mx-auto flex items-center gap-8 px-4 py-5 lg:px-10 ${isMegaMenuOpen ? "max-w-none justify-center" : "max-w-[1880px] justify-between"}`}>
-            {!isMegaMenuOpen ? (
-              <Link href="/" className="shrink-0" onClick={closeAll}>
-                <RangamLogo />
-              </Link>
-            ) : null}
-
-            <div className={`hidden min-w-0 lg:block ${isMegaMenuOpen ? "w-full flex-none" : "flex-1"}`} onClick={stopEvent}>
-              <nav
-                aria-label="Primary"
-                className="overflow-hidden rounded-[2px]"
-              >
-                <div className={`flex flex-wrap items-center justify-center gap-x-6 gap-y-3 py-4 ${isMegaMenuOpen ? "px-0" : "px-5"} xl:gap-x-10`}>
-                  {primaryLinks.map((item) => (
-                    item.menuKey ? (
-                      <button
-                        key={item.label}
-                        type="button"
-                        onMouseEnter={() => setActiveMenu(item.menuKey)}
-                        onClick={() => setActiveMenu((current) => (current === item.menuKey ? null : item.menuKey))}
-                        className={activeMenu === item.menuKey ? "font-[Georgia,'Times New Roman',serif] text-[17px] tracking-[0.01em] transition text-[#9d2936]" : "font-[Georgia,'Times New Roman',serif] text-[17px] tracking-[0.01em] transition text-black hover:text-black/70"}
-                      >
-                        {item.label}
-                      </button>
-                    ) : (
-                      <Link
-                        key={item.label}
-                        href={item.href}
-                        onClick={closeAll}
-                        className="font-[Georgia,'Times New Roman',serif] text-[17px] tracking-[0.01em] text-black transition hover:text-black/70"
-                      >
-                        {item.label}
-                      </Link>
-                    )
-                  ))}
-                </div>
-                {activeMenu ? (
-                  <MegaMenu menu={menuData[activeMenu]} onItemClick={closeAll} />
+          <div className={`mx-auto overflow-hidden px-3 py-3 sm:px-4 sm:py-4 lg:px-8 ${isMegaMenuOpen ? "max-w-none" : "max-w-[1880px]"}`}>
+            <div onClick={stopEvent}>
+              <div className="flex items-center gap-[clamp(8px,1vw,24px)] whitespace-nowrap">
+                {!isMegaMenuOpen ? (
+                  <Link href="/" className="shrink-0" onClick={closeAll}>
+                    <RangamLogo />
+                  </Link>
                 ) : null}
-              </nav>
-            </div>
 
-            {!isMegaMenuOpen ? (
-              <div className="flex items-center gap-3 sm:gap-5" onClick={stopEvent}>
-                <IconButton label="Search" onClick={() => openPanel("search")}>
-                  <SearchIcon />
-                </IconButton>
-                <div className="relative">
-                  <IconButton label="Wishlist" onClick={() => openPanel("wishlist")}>
-                    <HeartIcon />
-                  </IconButton>
-                  {wishlistState.itemCount > 0 ? (
-                    <span className="pointer-events-none absolute -right-1 -top-1 grid h-5 min-w-5 place-items-center rounded-full bg-[#9d2936] px-1 text-[10px] font-semibold text-white">
-                      {wishlistState.itemCount}
-                    </span>
-                  ) : null}
-                </div>
-                <IconButton label="Profile" onClick={() => openPanel("profile")}>
-                  <UserIcon />
-                </IconButton>
-                <div className="relative">
-                  <IconButton label="Bag" onClick={() => openPanel("bag")}>
-                    <BagIcon />
-                  </IconButton>
-                  {state.itemCount > 0 ? (
-                    <span className="pointer-events-none absolute -right-1 -top-1 grid h-5 min-w-5 place-items-center rounded-full bg-[#9d2936] px-1 text-[10px] font-semibold text-white">
-                      {state.itemCount}
-                    </span>
-                  ) : null}
-                </div>
+                <nav aria-label="Primary" className="flex-1 min-w-0">
+                  <div className={`flex min-w-0 items-center justify-center gap-[clamp(8px,1.1vw,28px)] py-2 ${isMegaMenuOpen ? "justify-center" : ""}`}>
+                    {primaryLinks.map((item) => (
+                      item.menuKey ? (
+                        <button
+                          key={item.label}
+                          type="button"
+                          onMouseEnter={() => setActiveMenu(item.menuKey)}
+                          onClick={() => setActiveMenu((current) => current === item.menuKey ? null : item.menuKey)}
+                          className={
+                            activeMenu === item.menuKey
+                              ? "min-w-0 shrink text-center font-[Georgia,'Times_New_Roman',serif] text-[clamp(8px,0.9vw,17px)] leading-none tracking-normal text-[#9d2936] transition"
+                              : "min-w-0 shrink text-center font-[Georgia,'Times_New_Roman',serif] text-[clamp(8px,0.9vw,17px)] leading-none tracking-normal text-black transition hover:text-black/70"
+                          }
+                        >
+                          {item.label}
+                        </button>
+                      ) : (
+                        <Link
+                          key={item.label}
+                          href={item.href}
+                          onClick={closeAll}
+                          className="min-w-0 shrink text-center font-[Georgia,'Times_New_Roman',serif] text-[clamp(8px,0.9vw,17px)] leading-none tracking-normal text-black transition hover:text-black/70"
+                        >
+                          {item.label}
+                        </Link>
+                      )
+                    ))}
+                  </div>
+                </nav>
+
+                {!isMegaMenuOpen ? (
+                  <div className="ml-auto flex shrink-0 items-center gap-1 sm:gap-2 lg:gap-3">
+                    <IconButton label="Search" onClick={() => openPanel("search")}>
+                      <SearchIcon />
+                    </IconButton>
+                    <div className="relative">
+                      <IconButton label="Wishlist" onClick={() => openPanel("wishlist")}>
+                        <HeartIcon />
+                      </IconButton>
+                      {wishlistState.itemCount > 0 ? (
+                        <span className="pointer-events-none absolute -right-1 -top-1 grid h-5 min-w-5 place-items-center rounded-full bg-[#9d2936] px-1 text-[10px] font-semibold text-white">
+                          {wishlistState.itemCount}
+                        </span>
+                      ) : null}
+                    </div>
+                    <IconButton label="Profile" onClick={() => openPanel("profile")}>
+                      <UserIcon />
+                    </IconButton>
+                    <div className="relative">
+                      <IconButton label="Bag" onClick={() => openPanel("bag")}>
+                        <BagIcon />
+                      </IconButton>
+                      {state.itemCount > 0 ? (
+                        <span className="pointer-events-none absolute -right-1 -top-1 grid h-5 min-w-5 place-items-center rounded-full bg-[#9d2936] px-1 text-[10px] font-semibold text-white">
+                          {state.itemCount}
+                        </span>
+                      ) : null}
+                    </div>
+                  </div>
+                ) : null}
               </div>
-            ) : null}
-          </div>
-          <div className="border-t border-black/8 px-4 py-3 lg:hidden" onClick={stopEvent}>
-            <div className="flex gap-3 overflow-x-auto pb-1">
-              {primaryLinks.map((item) => (
-                <Link
-                  key={item.label}
-                  href={item.href}
-                  onClick={closeAll}
-                  className="rounded-full border border-black/10 bg-white px-4 py-2 text-xs font-semibold tracking-[0.04em] text-black/70"
-                >
-                  {item.label}
-                </Link>
-              ))}
             </div>
+            {activeMenu ? (
+              <nav aria-label="Primary mega menu" onClick={stopEvent}>
+                <MegaMenu menu={menuData[activeMenu]} onItemClick={closeAll} />
+              </nav>
+            ) : null}
           </div>
         </header>
       </div>
@@ -451,14 +442,3 @@ export function StorefrontNavbar() {
     </>
   );
 }
-
-
-
-
-
-
-
-
-
-
-

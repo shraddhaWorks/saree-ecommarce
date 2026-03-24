@@ -4,7 +4,6 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Footer from "@/components/footer/Footer";
-import { StorefrontNavbar } from "@/components/navbar/storefront-navbar";
 import { clearCart, getCart, type Cart } from "@/lib/cart";
 
 export default function CheckoutPage() {
@@ -34,9 +33,7 @@ export default function CheckoutPage() {
 
   return (
     <main className="min-h-screen bg-[#f7f0e7] text-[#201815]">
-      <StorefrontNavbar />
-
-      <section className="mx-auto max-w-5xl px-6 pt-[140px] pb-12">
+      <section className="mx-auto max-w-5xl px-6 py-12">
         <h1 className="text-4xl font-semibold tracking-tight">Checkout</h1>
 
         {cart.items.length === 0 ? (
@@ -108,4 +105,3 @@ export default function CheckoutPage() {
     </main>
   );
 }
-

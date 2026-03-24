@@ -1,12 +1,9 @@
 import Link from "next/link";
-import Carousel from "@/components/common/Carousel";
 import Footer from "@/components/footer/Footer";
-import { StorefrontNavbar } from "@/components/navbar/storefront-navbar";
 import ProductDetails from "@/components/product/ProductDetails";
 import { Product } from "@/components/product/product";
 import { ChevronLeft } from "lucide-react";
 
-// Mock products data - replace with actual API call
 const allProducts: Product[] = [
   {
     id: 1,
@@ -52,18 +49,13 @@ export default async function ProductPage({
   params: Promise<{ handle: string }>
 }) {
   const { handle } = await params;
-
-  // Find product by handle (id converted to string)
   const product = allProducts.find((p) => p.id.toString() === handle);
-
-  // Get related products
   const relatedProducts = allProducts.filter((p) => p.id !== product?.id);
 
   if (!product) {
     return (
       <main className="min-h-screen bg-[#f7f0e7]">
-        <StorefrontNavbar />
-        <div className="pt-38.5 px-6 py-12 text-center">
+        <div className="px-6 py-12 text-center">
           <h1 className="text-2xl font-bold mb-4">Product Not Found</h1>
           <p className="text-gray-600 mb-6">The product you're looking for doesn't exist.</p>
           <Link
@@ -81,10 +73,7 @@ export default async function ProductPage({
 
   return (
     <main className="min-h-screen bg-[#f7f0e7]">
-      <StorefrontNavbar />
-
-      {/* Back Button */}
-      <div className="pt-38.5 px-6 py-4">
+      <div className="px-6 py-4">
         <Link
           href="/"
           className="inline-flex items-center gap-2 text-[#9d2936] hover:text-[#7c1f29] font-semibold"
@@ -94,7 +83,6 @@ export default async function ProductPage({
         </Link>
       </div>
 
-      {/* Product Details */}
       <ProductDetails
         product={product}
         relatedProducts={relatedProducts}

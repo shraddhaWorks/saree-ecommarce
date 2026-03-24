@@ -1,35 +1,12 @@
+import { staticNavCategories } from "@/lib/static-nav-data";
 import type { MenuData } from "./types";
-
-const toCollectionHref = (label: string) =>
-    `/collections/${label
-        .toLowerCase()
-        .replace(/&/g, "and")
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/^-|-$/g, "")}`;
-
-const createItems = (labels: string[]) =>
-    labels.map((label) => ({
-        label,
-        href: toCollectionHref(label),
-    }));
 
 export const menuData = {
     traditionalSarees: {
-        label: "Traditional Sarees",
+        label: staticNavCategories.traditionalSarees.title,
         sections: [
             {
-                items: createItems([
-                    "Kanchi Pattu Sarees",
-                    "Banaras Sarees",
-                    "Paithani Sarees",
-                    "Patola Sarees",
-                    "Gadwal Pattu Sarees",
-                    "Arani Pattu Sarees",
-                    "Venkatagiri Sarees",
-                    "Uppada Pattu Sarees",
-                    "Mangalagiri Pattu Sarees",
-                    "Mysore Silk Sarees",
-                ]),
+                items: staticNavCategories.traditionalSarees.items,
             },
         ],
         showcase: "sarees" as const,
@@ -37,30 +14,22 @@ export const menuData = {
             {
                 title: "Kanchi Pattu Sarees",
                 subtitle: "Timeless traditional drapes for festive and bridal moments.",
-                href: "/collections/kanchi-pattu-sarees",
                 ctaLabel: "Shop Now",
                 imageSrc: "https://vaarahisilks.com/cdn/shop/files/1_0000_DSC07696.jpg?v=1764064129",
             },
             {
                 title: "Banaras Silk Sarees",
                 subtitle: "Rich woven textures with a graceful ceremonial finish.",
-                href: "/collections/banaras-sarees",
                 ctaLabel: "Shop Now",
                 imageSrc: "https://sudathi.com/cdn/shop/files/4469S132_1.jpg?v=1765000744",
             },
         ],
     } satisfies MenuData,
     weddingSarees: {
-        label: "Wedding Sarees",
+        label: staticNavCategories.weddingSarees.title,
         sections: [
             {
-                items: createItems([
-                    "Bridal Sarees",
-                    "Reception Sarees",
-                    "Pradanam & Talambralu Sarees",
-                    "Nischayathartham/Engagement Sarees",
-                    "Mehendi & Haldi Sarees",
-                ]),
+                items: staticNavCategories.weddingSarees.items,
             },
         ],
         showcase: "sarees" as const,
@@ -80,15 +49,10 @@ export const menuData = {
         ],
     } satisfies MenuData,
     designerPartyWearSarees: {
-        label: "Designer & Party Wear Sarees",
+        label: staticNavCategories.designerPartyWearSarees.title,
         sections: [
             {
-                items: createItems([
-                    "Organza Sarees",
-                    "Zari Kota & Semi Kota Sarees",
-                    "Muslin, Dola & Mashru Sarees",
-                    "Fusion Sarees",
-                ]),
+                items: staticNavCategories.designerPartyWearSarees.items,
             },
         ],
         showcase: "sarees" as const,
@@ -108,17 +72,10 @@ export const menuData = {
         ],
     } satisfies MenuData,
     festiveWearSarees: {
-        label: "Festive Wear Sarees",
+        label: staticNavCategories.festiveWearSarees.title,
         sections: [
             {
-                items: createItems([
-                    "Pattu Pavada Set / Half Saree Set / Lehengas",
-                    "Chanderi & Bailu Silk Sarees",
-                    "Ikkat Sarees",
-                    "Bandini Sarees",
-                    "Fancy & Designer Sarees",
-                    "Soft Pattu",
-                ]),
+                items: staticNavCategories.festiveWearSarees.items,
             },
         ],
         showcase: "sarees" as const,
@@ -138,15 +95,10 @@ export const menuData = {
         ],
     } satisfies MenuData,
     casualWorkwearSarees: {
-        label: "Casual & Workwear Sarees",
+        label: staticNavCategories.casualWorkwearSarees.title,
         sections: [
             {
-                items: createItems([
-                    "Georgette, Crepe, Satin & Chiffon Silk Sarees",
-                    "Khadi, Jute, Bhagalpur & Printed Sarees",
-                    "Tissu Sarees",
-                    "Tusser Sarees",
-                ]),
+                items: staticNavCategories.casualWorkwearSarees.items,
             },
         ],
         showcase: "sarees" as const,
@@ -177,11 +129,11 @@ export const suggestedSearches = [
 ];
 
 export const primaryLinks = [
-    { label: "Traditional Sarees", href: toCollectionHref("Traditional Sarees"), menuKey: "traditionalSarees" as const },
-    { label: "Wedding Sarees", href: toCollectionHref("Wedding Sarees"), menuKey: "weddingSarees" as const },
-    { label: "Designer & Party Wear Sarees", href: toCollectionHref("Designer & Party Wear Sarees"), menuKey: "designerPartyWearSarees" as const },
-    { label: "Festive Wear Sarees", href: toCollectionHref("Festive Wear Sarees"), menuKey: "festiveWearSarees" as const },
-    { label: "Casual & Workwear Sarees", href: toCollectionHref("Casual & Workwear Sarees"), menuKey: "casualWorkwearSarees" as const },
-    { label: "Dhoti & Kanduva", href: toCollectionHref("Dhoti & Kanduva") },
-    { label: "Our Stores", href: "/stores" },
+    { label: staticNavCategories.traditionalSarees.title, href: staticNavCategories.traditionalSarees.href, menuKey: "traditionalSarees" as const },
+    { label: staticNavCategories.weddingSarees.title, href: staticNavCategories.weddingSarees.href, menuKey: "weddingSarees" as const },
+    { label: staticNavCategories.designerPartyWearSarees.title, href: staticNavCategories.designerPartyWearSarees.href, menuKey: "designerPartyWearSarees" as const },
+    { label: staticNavCategories.festiveWearSarees.title, href: staticNavCategories.festiveWearSarees.href, menuKey: "festiveWearSarees" as const },
+    { label: staticNavCategories.casualWorkwearSarees.title, href: staticNavCategories.casualWorkwearSarees.href, menuKey: "casualWorkwearSarees" as const },
+    { label: staticNavCategories.dhotiAndKanduva.title, href: staticNavCategories.dhotiAndKanduva.href },
+    { label: staticNavCategories.stores.title, href: staticNavCategories.stores.href },
 ];
