@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState, type MouseEvent } from "react";
 import { useCart, useWishlist } from "@/components/cart";
 import { MegaMenu, menuData, primaryLinks, suggestedSearches, type MenuEntryKey } from "./menu";
@@ -18,6 +19,8 @@ export function StorefrontNavbar() {
   const [activePanel, setActivePanel] = useState<PanelKey>(null);
   const [activeMenu, setActiveMenu] = useState<MenuEntryKey | null>(null);
   const [isScrolled, setIsScrolled] = useState(false);
+  const pathname = usePathname();
+  const isHomePage = pathname === "/";
   const hasOverlay = activePanel !== null;
   const hasMenuOverlay = activeMenu !== null;
   const navbarRef = useRef<HTMLDivElement | null>(null);
@@ -100,15 +103,15 @@ export function StorefrontNavbar() {
       <div 
         ref={navbarRef} 
         className={`fixed inset-x-0 top-0 z-50 transition-all duration-500 ${
-          isScrolled 
+          (isScrolled || !isHomePage) 
             ? "bg-[#fdfbf7] shadow-[0_10px_34px_rgba(44,25,17,0.08)]" 
             : "bg-transparent"
         }`}
       >
-        <div className={`h-[6px] bg-[#822733] transition-opacity duration-500 ${isScrolled ? "opacity-100" : "opacity-0"}`} />
+        <div className={`h-[6px] bg-[#822733] transition-opacity duration-500 ${(isScrolled || !isHomePage) ? "opacity-100" : "opacity-0"}`} />
         <header 
           className={`border-b border-black/10 transition-colors duration-500 ${
-            isScrolled ? "bg-[#fdfbf7]" : "bg-transparent border-transparent"
+            (isScrolled || !isHomePage) ? "bg-[#fdfbf7]" : "bg-transparent border-transparent"
           }`} 
           onClick={closeAll}
         >
@@ -116,7 +119,7 @@ export function StorefrontNavbar() {
             <div onClick={stopEvent}>
               <div className="flex items-center gap-[clamp(8px,1vw,24px)] whitespace-nowrap">
                 {!isMegaMenuOpen ? (
-                  <div className={`flex lg:hidden shrink-0 items-center -ml-2 mr-1 transition-colors duration-500 ${isScrolled ? "text-black" : "text-white"}`}>
+                  <div className={`flex lg:hidden shrink-0 items-center -ml-2 mr-1 transition-colors duration-500 ${(isScrolled || !isHomePage) ? "text-black" : "text-white"}`}>
                     <IconButton label="Menu" onClick={() => openPanel("menu")}>
                       <MenuIcon />
                     </IconButton>
@@ -125,7 +128,7 @@ export function StorefrontNavbar() {
 
                 {!isMegaMenuOpen ? (
                   <Link href="/" className="shrink-0" onClick={closeAll}>
-                    <div className={`transition-all duration-500 ${isScrolled ? "" : "brightness-0 invert drop-shadow-[0_2px_8px_rgba(0,0,0,0.5)]"}`}>
+                    <div className={`transition-all duration-500 ${(isScrolled || !isHomePage) ? "" : ""}`}>
                       <RangamLogo />
                     </div>
                   </Link>
@@ -144,7 +147,7 @@ export function StorefrontNavbar() {
                             activeMenu === item.menuKey
                               ? "min-w-0 shrink text-center font-[Georgia,'Times_New_Roman',serif] text-[clamp(8px,0.9vw,17px)] leading-none tracking-normal text-[#9d2936] transition"
                               : `min-w-0 shrink text-center font-[Georgia,'Times_New_Roman',serif] text-[clamp(8px,0.9vw,17px)] leading-none tracking-normal transition hover:text-[#9d2936] ${
-                                  isScrolled ? "text-black" : "text-white drop-shadow-sm hover:text-white/80"
+                                  (isScrolled || !isHomePage) ? "text-black" : ""
                                 }`
                           }
                         >
@@ -156,7 +159,7 @@ export function StorefrontNavbar() {
                           href={item.href}
                           onClick={closeAll}
                           className={`min-w-0 shrink text-center font-[Georgia,'Times_New_Roman',serif] text-[clamp(8px,0.9vw,17px)] leading-none tracking-normal transition hover:text-[#9d2936] ${
-                            isScrolled ? "text-black" : "text-white drop-shadow-sm hover:text-white/80"
+                            (isScrolled || !isHomePage) ? "text-black" : "text-white drop-shadow-sm hover:text-white/80"
                           }`}
                         >
                           {item.label}
@@ -166,7 +169,7 @@ export function StorefrontNavbar() {
                   </div>
                 </nav>
 
-                <div className={`ml-auto flex shrink-0 items-center gap-1 sm:gap-2 lg:gap-3 transition-colors duration-500 ${isScrolled ? "text-black" : "text-white"}`}>
+                <div className={`ml-auto flex shrink-0 items-center gap-1 sm:gap-2 lg:gap-3 transition-colors duration-500 ${(isScrolled || !isHomePage) ? "text-black" : "text-white"}`}>
                   <IconButton label="Search" onClick={() => openPanel("search")}>
                     <SearchIcon />
                   </IconButton>

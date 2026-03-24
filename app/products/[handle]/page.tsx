@@ -1,70 +1,74 @@
+"use client";
+
 import Link from "next/link";
+import { useEffect, useState, useMemo } from "react";
 import Footer from "@/components/footer/Footer";
 import ProductDetails from "@/components/product/ProductDetails";
-import { Product } from "@/components/product/product";
+import type { Product } from "@/components/product/product";
 import { ChevronLeft } from "lucide-react";
+import { products as dummyProducts } from "@/lib/dummyData";
+import { use } from "react";
 
-const allProducts: Product[] = [
-  {
-    id: 1,
-    name: "Chanderi Silk Cotton Purple Saree",
-    price: 1999,
-    discount: 20,
-    stock: 1,
-    description: "Elegant purple saree with zari stripes.",
-    images: ["https://kalanjali.com/cdn/shop/files/1212588868-HY_1.jpg?v=1773820906&width=540"],
-  },
-  {
-    id: 2,
-    name: "Chanderi Silk Cotton Teal Green",
-    price: 2199,
-    discount: 20,
-    stock: 3,
-    description: "Stylish green saree.",
-    images: ["https://kalanjali.com/cdn/shop/files/1212588861-HY_1.jpg?v=1773820899&width=540"],
-  },
-  {
-    id: 3,
-    name: "Chanderi Silk Cotton Maroon",
-    price: 1899,
-    discount: 20,
-    stock: 2,
-    description: "Traditional maroon saree.",
-    images: ["https://kalanjali.com/cdn/shop/files/1212588858-HY_1.jpg?v=1773820900&width=540"],
-  },
-  {
-    id: 4,
-    name: "Chanderi Silk Cotton Black",
-    price: 2099,
-    discount: 20,
-    stock: 5,
-    description: "Elegant black saree.",
-    images: ["https://kalanjali.com/cdn/shop/files/1212588856-HY_1.jpg?v=1773820901&width=540"],
-  },
-];
-//import { products as allProducts } from "@/lib/dummyData";
-
-export default async function ProductPage({
-  params
+export default function ProductPage({
+  params: paramsPromise
 }: {
   params: Promise<{ handle: string }>
 }) {
-  const { handle } = await params;
-  const product = allProducts.find((p) => p.id.toString() === handle);
-  const relatedProducts = allProducts.filter((p) => p.id !== product?.id);
+  const params = use(paramsPromise);
+  const { handle } = params;
+  
+  const [customProducts, setCustomProducts] = useState<Product[]>([]);
+
+  useEffect(() => {
+    const stored = localStorage.getItem("customProducts");
+    if (stored) {
+      try {
+        setCustomProducts(JSON.parse(stored));
+      } catch (e) {
+        console.error("Failed to parse custom products", e);
+      }
+    }
+  }, []);
+
+  const allAvailableProducts = useMemo(() => {
+    // Merge dummy products and custom products
+    // We cast dummy products to Product[] to be safe with types
+    return [...(dummyProducts as unknown as Product[]), ...customProducts];
+  }, [customProducts]);
+
+  const product = useMemo(() => {
+    return allAvailableProducts.find(
+      (p) => {
+        const idStr = p.id.toString();
+        if (idStr === handle) return true;
+        
+        const slug = (p.title || p.name || "").toLowerCase().replace(/\s+/g, "-").replace(/[^\w-]/g, '');
+        if (slug === handle) return true;
+        
+        return false;
+      }
+    );
+  }, [allAvailableProducts, handle]);
+
+  const relatedProducts = useMemo(() => {
+    if (!product) return [];
+    return allAvailableProducts
+      .filter((p) => p.id !== product.id && p.category === product.category)
+      .slice(0, 4);
+  }, [allAvailableProducts, product]);
 
   if (!product) {
     return (
       <main className="min-h-screen bg-[#f7f0e7]">
-        <div className="px-6 py-12 text-center">
-          <h1 className="text-2xl font-bold mb-4">Product Not Found</h1>
-          <p className="text-gray-600 mb-6">The product you're looking for doesn't exist.</p>
+        <div className="px-6 py-20 text-center">
+          <h1 className="text-4xl font-[Georgia] mb-4">Product Not Found</h1>
+          <p className="text-gray-600 mb-8 max-w-md mx-auto">We couldn't find the saree you're looking for. It might have been moved or is no longer available.</p>
           <Link
             href="/"
-            className="inline-flex items-center gap-2 px-6 py-3 bg-[#9d2936] text-white rounded-lg hover:bg-[#7c1f29]"
+            className="inline-flex items-center gap-2 px-8 py-3 bg-[#9d2936] text-white rounded-full hover:bg-[#7c1f29] transition shadow-lg"
           >
             <ChevronLeft size={18} />
-            Back to Home
+            Back to Collections
           </Link>
         </div>
         <Footer />
@@ -73,14 +77,14 @@ export default async function ProductPage({
   }
 
   return (
-    <main className="min-h-screen bg-[#f7f0e7]">
-      <div className="px-6 py-4">
+    <main className="min-h-screen bg-[#fdfbf7]">
+      <div className="max-w-[1440px] mx-auto px-6 py-6">
         <Link
           href="/"
-          className="inline-flex items-center gap-2 text-[#9d2936] hover:text-[#7c1f29] font-semibold"
+          className="inline-flex items-center gap-2 text-[#9d2936] hover:text-[#7c1f29] font-medium transition"
         >
           <ChevronLeft size={20} />
-          Back to Products
+          Back to Shop
         </Link>
       </div>
 
