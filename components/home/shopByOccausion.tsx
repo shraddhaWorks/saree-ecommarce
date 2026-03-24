@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 
 const occasionData = [
   {
@@ -34,8 +35,10 @@ export default function ShopByOccausion() {
 
       {/* Grid */}
       <div className="grid md:grid-cols-2 gap-6">
-        {occasionData.map((item, index) => (
-          <a key={index}  className="relative group overflow-hidden rounded-xl">
+        {occasionData.map((item, index) => {
+          const handle = item.title.toLowerCase().replace(/ & /g, '-').replace(/ /g, '-');
+          return (
+          <Link key={index} href={`/collections/${handle}`} className="relative group overflow-hidden rounded-xl">
             
             {/* Image */}
             <img
@@ -49,13 +52,14 @@ export default function ShopByOccausion() {
 
             {/* Text */}
             <div className="absolute bottom-15 left-0 right-0 text-center ">
-              <h3 className="text-white text-5xl">
+              <h3 className="text-white text-5xl drop-shadow-lg">
                 {item.title}
               </h3>
             </div>
 
-          </a>
-        ))}
+          </Link>
+          )
+        })}
       </div>
 
     </div>

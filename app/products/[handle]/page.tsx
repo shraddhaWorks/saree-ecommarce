@@ -42,6 +42,7 @@ const allProducts: Product[] = [
     images: ["https://kalanjali.com/cdn/shop/files/1212588856-HY_1.jpg?v=1773820901&width=540"],
   },
 ];
+//import { products as allProducts } from "@/lib/dummyData";
 
 export default async function ProductPage({
   params

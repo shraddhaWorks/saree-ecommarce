@@ -5,29 +5,17 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Footer from "@/components/footer/Footer";
 import { clearCart, getCart, type Cart } from "@/lib/cart";
+import { StorefrontNavbar } from "@/components/navbar/storefront-navbar";
+import { useCart } from "@/components/cart";
 
 export default function CheckoutPage() {
   const router = useRouter();
 
-  const [cart, setCart] = useState<Cart>({ items: [] });
-
-  useEffect(() => {
-    const syncCart = () => setCart(getCart());
-    syncCart();
-
-    window.addEventListener("cart:updated", syncCart);
-    return () => window.removeEventListener("cart:updated", syncCart);
-  }, []);
-
-  const cartTotal = useMemo(
-    () => cart.items.reduce((sum, item) => sum + item.qty * item.price, 0),
-    [cart.items],
-  );
+  const { state, clearCart, removeItem } = useCart();
 
   const handlePlaceOrder = () => {
-    if (cart.items.length === 0) return;
+    if (state.items.length === 0) return;
     clearCart();
-    setCart({ items: [] });
     router.push("/");
   };
 
@@ -36,7 +24,7 @@ export default function CheckoutPage() {
       <section className="mx-auto max-w-5xl px-6 py-12">
         <h1 className="text-4xl font-semibold tracking-tight">Checkout</h1>
 
-        {cart.items.length === 0 ? (
+        {state.items.length === 0 ? (
           <div className="mt-8 rounded-3xl border border-black/10 bg-white p-8 text-center">
             <p className="text-lg font-semibold">Your cart is empty.</p>
             <p className="mt-2 text-sm text-black/60">
@@ -54,21 +42,47 @@ export default function CheckoutPage() {
         ) : (
           <div className="mt-8">
             <ul className="space-y-4">
-              {cart.items.map((item) => (
+              {state.items.map((item) => (
                 <li
-                  key={item.productId}
+                  key={item.id}
                   className="rounded-3xl border border-black/10 bg-white p-6"
                 >
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="min-w-0">
-                      <p className="truncate text-base font-semibold text-black/80">
-                        {item.name}
+                  <div className="flex gap-5">
+                    {item.image ? (
+                      <div className="h-24 w-20 shrink-0 overflow-hidden rounded-2xl bg-[#f3ebe0]">
+                        <img
+                          src={item.image}
+                          alt={item.name}
+                          className="h-full w-full object-cover"
+                        />
+                      </div>
+                    ) : (
+                      <div className="h-24 w-20 shrink-0 rounded-2xl bg-[#f3ebe0]" />
+                    )}
+                    <div className="flex flex-1 items-start justify-between gap-3 min-w-0">
+                      <div className="min-w-0 flex flex-col justify-between h-full">
+                        <div>
+                          <p className="line-clamp-2 text-base font-semibold text-black/80">
+                            {item.name}
+                          </p>
+                          <p className="mt-1 text-sm text-black/55">
+                            Qty {item.quantity}
+                            {item.size ? ` • Size: ${item.size}` : ""}
+                            {item.color ? ` • Color: ${item.color}` : ""}
+                          </p>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => removeItem(item.id)}
+                          className="mt-2 text-sm text-black/45 transition hover:text-[#9d2936] text-left"
+                        >
+                          Remove
+                        </button>
+                      </div>
+                      <p className="shrink-0 text-base font-semibold text-accent">
+                        Rs. {item.price * item.quantity}
                       </p>
-                      <p className="mt-1 text-sm text-black/55">Qty {item.qty}</p>
                     </div>
-                    <p className="text-base font-semibold text-accent">
-                      Rs. {item.price * item.qty}
-                    </p>
                   </div>
                 </li>
               ))}
@@ -78,7 +92,7 @@ export default function CheckoutPage() {
               <div className="flex items-center justify-between gap-3">
                 <span className="text-sm font-semibold text-black/70">Total</span>
                 <span className="text-sm font-semibold text-black">
-                  Rs. {cartTotal}
+                  Rs. {state.total}
                 </span>
               </div>
 

@@ -120,36 +120,50 @@ export default function Carousel({
           <button
             type="button"
             onClick={prev}
-            className="absolute left-4 top-1/2 z-10 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-white/92 text-[28px] leading-none text-black shadow-[0_10px_24px_rgba(0,0,0,0.12)] transition hover:bg-white"
+            className="absolute left-4 top-1/2 z-20 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-black/20 text-white backdrop-blur-md transition hover:bg-black/40 md:left-8"
             aria-label="Previous slide"
           >
-            &lt;
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
           </button>
           <button
             type="button"
             onClick={next}
-            className="absolute right-4 top-1/2 z-10 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-white/92 text-[28px] leading-none text-black shadow-[0_10px_24px_rgba(0,0,0,0.12)] transition hover:bg-white"
+            className="absolute right-4 top-1/2 z-20 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-black/20 text-white backdrop-blur-md transition hover:bg-black/40 md:right-8"
             aria-label="Next slide"
           >
-            &gt;
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6"/></svg>
           </button>
         </>
       ) : null}
 
       {showIndicators && slideCount > 1 ? (
-        <div className="absolute bottom-5 left-1/2 z-10 flex -translate-x-1/2 items-center gap-3">
-          {slideChildren.map((_, idx) => (
-            <button
-              key={idx}
-              type="button"
-              onClick={() => goToIndex(idx)}
-              aria-label={`Go to slide ${idx + 1}`}
-              className={`rounded-full transition-all ${idx === currentIndex
-                  ? "h-4 w-4 border-2 border-white bg-transparent"
-                  : "h-3 w-3 bg-white/95"
-                }`}
-            />
-          ))}
+        <div className="absolute bottom-8 left-1/2 z-20 flex -translate-x-1/2 items-center gap-4 rounded-full bg-black/40 px-6 py-3 backdrop-blur-xl border border-white/10">
+          <button
+            type="button"
+            onClick={() => setIsPaused(!isPaused)}
+            className="text-white hover:text-white/80 transition"
+            aria-label={isPaused ? "Play" : "Pause"}
+          >
+            {isPaused ? (
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+            ) : (
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+            )}
+          </button>
+          <div className="flex items-center gap-2">
+            {slideChildren.map((_, idx) => (
+              <button
+                key={idx}
+                type="button"
+                onClick={() => goToIndex(idx)}
+                aria-label={`Go to slide ${idx + 1}`}
+                className={`h-2 transition-all duration-500 rounded-full ${idx === currentIndex
+                    ? "w-8 bg-white"
+                    : "w-2 bg-white/40 hover:bg-white/60"
+                  }`}
+              />
+            ))}
+          </div>
         </div>
       ) : null}
     </div>

@@ -36,7 +36,7 @@ export default function ProductCard({ product }: Props) {
                                 event.stopPropagation();
                                 toggleItem({
                                     id: String(product.id),
-                                    name: product.name,
+                                    name: product.name || product.title || "",
                                     price: product.price,
                                     image: product.images[0],
                                     href: `/products/${product.id}`,
@@ -75,7 +75,7 @@ export default function ProductCard({ product }: Props) {
                                 event.stopPropagation();
                                 addItem({
                                     id: String(product.id),
-                                    name: product.name,
+                                    name: product.name || product.title || "",
                                     price: product.price,
                                     image: product.images[0],
                                     quantity: 1,
@@ -91,7 +91,13 @@ export default function ProductCard({ product }: Props) {
                 </div>
 
                 <div className="p-3 text-center">
-                    <p className="text-sm font-medium">{product.name}</p>
+                    <p className="text-sm font-medium truncate">{product.name || product.title}</p>
+                    <div className="mt-1 flex items-center justify-center gap-2">
+                        <span className="font-semibold text-lg">₹{product.price}</span>
+                        {product.originalPrice && (
+                            <span className="text-sm text-gray-400 line-through">₹{product.originalPrice}</span>
+                        )}
+                    </div>
                 </div>
             </div>
         </Link>
