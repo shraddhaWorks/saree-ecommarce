@@ -2,28 +2,31 @@ import { ShowcaseCard } from "./ShowcaseCard";
 import type { MenuData } from "./types";
 
 export function ShowcaseArt({
-    variant,
+    menu,
 }: {
-    variant: MenuData["showcase"];
+    menu: MenuData;
 }) {
-    if (variant === "sarees") {
+    const { showcase, showcaseItems } = menu;
+
+    if (showcase === "sarees" && showcaseItems?.length) {
         return (
-            <div className="grid gap-5 self-start">
-                <ShowcaseCard
-                    title="Artisan Silk"
-                    subtitle="Handwoven bridal drapes"
-                    className="min-h-[290px] bg-[radial-gradient(circle_at_top,#e4ad56,#b77922_50%,#5d3110)]"
-                />
-                <ShowcaseCard
-                    title="Printed Sarees"
-                    subtitle="Soft drape, bold florals"
-                    className="min-h-[290px] bg-[radial-gradient(circle_at_top,#f0d9b0,#d19d59_55%,#7c5035)]"
-                />
+            <div className="grid gap-7 self-start lg:grid-cols-2">
+                {showcaseItems.map((item) => (
+                    <ShowcaseCard
+                        key={item.title}
+                        title={item.title}
+                        subtitle={item.subtitle}
+                        href={showcase === "sarees" ? undefined : item.href}
+                        ctaLabel={item.ctaLabel}
+                        imageSrc={item.imageSrc}
+                        className="min-h-[420px] lg:min-h-[560px]"
+                    />
+                ))}
             </div>
         );
     }
 
-    if (variant === "apparel") {
+    if (showcase === "apparel") {
         return (
             <ShowcaseCard
                 title="Prints"
