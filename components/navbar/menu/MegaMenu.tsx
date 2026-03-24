@@ -14,7 +14,7 @@ export function MegaMenu({ menu, onItemClick }: { menu: MenuData; onItemClick: (
     return (
         <section
             className={`border-t px-4 pb-8 pt-6 lg:px-10 ${isSarees
-                ? "fixed inset-x-0 top-[96px] z-[55] max-h-[72vh] overflow-y-auto border-[#9f6f77] bg-[linear-gradient(135deg,#4c1320,#6e2030_35%,#5b1826)] px-8 pb-10 pt-6 lg:px-11"
+                ? "scrollbar-invisible fixed inset-x-0 top-[96px] z-[55] max-h-[72vh] overflow-y-auto border-[#9f6f77] bg-[linear-gradient(135deg,#4c1320,#6e2030_35%,#5b1826)] px-8 pb-10 pt-6 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden lg:px-11"
                 : "border-black/8 bg-[#fdfbf7]"
                 }`}
         >

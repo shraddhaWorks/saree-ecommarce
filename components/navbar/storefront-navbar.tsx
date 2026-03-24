@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState, type MouseEvent } from "react";
+import { useEffect, useRef, useState, type MouseEvent } from "react";
 import { useCart, useWishlist } from "@/components/cart";
 import { MegaMenu, menuData, primaryLinks, suggestedSearches, type MenuEntryKey } from "./menu";
 import { Drawer, IconButton, RangamLogo } from "./ui";
@@ -26,6 +26,8 @@ export function StorefrontNavbar() {
   const [activePanel, setActivePanel] = useState<PanelKey>(null);
   const [activeMenu, setActiveMenu] = useState<MenuEntryKey | null>(null);
   const hasOverlay = activePanel !== null;
+  const hasMenuOverlay = activeMenu !== null;
+  const navbarRef = useRef<HTMLDivElement | null>(null);
 
   const [cart, setCart] = useState<Cart>({ items: [] });
 
@@ -39,6 +41,17 @@ export function StorefrontNavbar() {
 
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
+  }, []);
+
+  useEffect(() => {
+    const onPointerDown = (event: PointerEvent) => {
+      if (!navbarRef.current?.contains(event.target as Node)) {
+        setActiveMenu(null);
+      }
+    };
+
+    document.addEventListener("pointerdown", onPointerDown);
+    return () => document.removeEventListener("pointerdown", onPointerDown);
   }, []);
 
   useEffect(() => {
@@ -88,6 +101,7 @@ export function StorefrontNavbar() {
 
   const openPanel = (panel: Exclude<PanelKey, null>) => {
     setActivePanel(panel);
+    setActiveMenu(null);
   };
 
   const cartCount = cart.items.reduce((sum, item) => sum + item.qty, 0);
@@ -95,31 +109,28 @@ export function StorefrontNavbar() {
   const hasWishlistItems = wishlistState.items.length > 0;
   const formatPrice = (price: number) =>
     `Rs. ${price.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-  const isMegaMenuOpen = activeMenu !== null;
 
   return (
     <>
-      <div className="fixed inset-x-0 top-0 z-50 bg-[#fdfbf7] shadow-[0_10px_34px_rgba(44,25,17,0.08)]">
+      <div ref={navbarRef} className="fixed inset-x-0 top-0 z-50 bg-[#fdfbf7] shadow-[0_10px_34px_rgba(44,25,17,0.08)]">
         <div className="h-[6px] bg-[#822733]" />
         <header className="border-b border-black/10 bg-[#fdfbf7]" onClick={closeAll}>
-          <div className={`mx-auto overflow-hidden px-3 py-3 sm:px-4 sm:py-4 lg:px-8 ${isMegaMenuOpen ? "max-w-none" : "max-w-[1880px]"}`}>
+          <div className="mx-auto max-w-[1880px] overflow-hidden px-3 py-3 sm:px-4 sm:py-4 lg:px-8">
             <div onClick={stopEvent}>
               <div className="flex items-center gap-[clamp(8px,1vw,24px)] whitespace-nowrap">
-                {!isMegaMenuOpen ? (
-                  <Link href="/" className="shrink-0" onClick={closeAll}>
-                    <RangamLogo />
-                  </Link>
-                ) : null}
+                <Link href="/" className="shrink-0" onClick={closeAll}>
+                  <RangamLogo />
+                </Link>
 
-                <nav aria-label="Primary" className="flex-1 min-w-0">
-                  <div className={`flex min-w-0 items-center justify-center gap-[clamp(8px,1.1vw,28px)] py-2 ${isMegaMenuOpen ? "justify-center" : ""}`}>
+                <nav aria-label="Primary" className="min-w-0 flex-1">
+                  <div className="flex min-w-0 items-center justify-center gap-[clamp(8px,1.1vw,28px)] py-2">
                     {primaryLinks.map((item) => (
                       item.menuKey ? (
                         <button
                           key={item.label}
                           type="button"
                           onMouseEnter={() => setActiveMenu(item.menuKey)}
-                          onClick={() => setActiveMenu((current) => current === item.menuKey ? null : item.menuKey)}
+                          onClick={() => setActiveMenu(null)}
                           className={
                             activeMenu === item.menuKey
                               ? "min-w-0 shrink text-center font-[Georgia,'Times_New_Roman',serif] text-[clamp(8px,0.9vw,17px)] leading-none tracking-normal text-[#9d2936] transition"
@@ -142,46 +153,53 @@ export function StorefrontNavbar() {
                   </div>
                 </nav>
 
-                {!isMegaMenuOpen ? (
-                  <div className="ml-auto flex shrink-0 items-center gap-1 sm:gap-2 lg:gap-3">
-                    <IconButton label="Search" onClick={() => openPanel("search")}>
-                      <SearchIcon />
+                <div className="ml-auto flex shrink-0 items-center gap-1 sm:gap-2 lg:gap-3">
+                  <IconButton label="Search" onClick={() => openPanel("search")}>
+                    <SearchIcon />
+                  </IconButton>
+                  <div className="relative">
+                    <IconButton label="Wishlist" onClick={() => openPanel("wishlist")}>
+                      <HeartIcon />
                     </IconButton>
-                    <div className="relative">
-                      <IconButton label="Wishlist" onClick={() => openPanel("wishlist")}>
-                        <HeartIcon />
-                      </IconButton>
-                      {wishlistState.itemCount > 0 ? (
-                        <span className="pointer-events-none absolute -right-1 -top-1 grid h-5 min-w-5 place-items-center rounded-full bg-[#9d2936] px-1 text-[10px] font-semibold text-white">
-                          {wishlistState.itemCount}
-                        </span>
-                      ) : null}
-                    </div>
-                    <IconButton label="Profile" onClick={() => openPanel("profile")}>
-                      <UserIcon />
-                    </IconButton>
-                    <div className="relative">
-                      <IconButton label="Bag" onClick={() => openPanel("bag")}>
-                        <BagIcon />
-                      </IconButton>
-                      {state.itemCount > 0 ? (
-                        <span className="pointer-events-none absolute -right-1 -top-1 grid h-5 min-w-5 place-items-center rounded-full bg-[#9d2936] px-1 text-[10px] font-semibold text-white">
-                          {state.itemCount}
-                        </span>
-                      ) : null}
-                    </div>
+                    {wishlistState.itemCount > 0 ? (
+                      <span className="pointer-events-none absolute -right-1 -top-1 grid h-5 min-w-5 place-items-center rounded-full bg-[#9d2936] px-1 text-[10px] font-semibold text-white">
+                        {wishlistState.itemCount}
+                      </span>
+                    ) : null}
                   </div>
-                ) : null}
+                  <IconButton label="Profile" onClick={() => openPanel("profile")}>
+                    <UserIcon />
+                  </IconButton>
+                  <div className="relative">
+                    <IconButton label="Bag" onClick={() => openPanel("bag")}>
+                      <BagIcon />
+                    </IconButton>
+                    {state.itemCount > 0 ? (
+                      <span className="pointer-events-none absolute -right-1 -top-1 grid h-5 min-w-5 place-items-center rounded-full bg-[#9d2936] px-1 text-[10px] font-semibold text-white">
+                        {state.itemCount}
+                      </span>
+                    ) : null}
+                  </div>
+                </div>
               </div>
             </div>
             {activeMenu ? (
-              <nav aria-label="Primary mega menu" onClick={stopEvent}>
+              <nav aria-label="Primary mega menu" onClick={closeAll}>
                 <MegaMenu menu={menuData[activeMenu]} onItemClick={closeAll} />
               </nav>
             ) : null}
           </div>
         </header>
       </div>
+
+      {hasMenuOverlay ? (
+        <button
+          type="button"
+          aria-label="Close menu overlay"
+          className="fixed inset-0 z-40 bg-[rgba(32,24,21,0.18)] backdrop-brightness-75"
+          onClick={closeAll}
+        />
+      ) : null}
 
       {hasOverlay ? (
         <button
