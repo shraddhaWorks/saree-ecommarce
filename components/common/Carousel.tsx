@@ -92,13 +92,13 @@ export default function Carousel({
 
   return (
     <div
-      className={`relative w-full overflow-hidden ${className}`.trim()}
+      className={`relative w-full overflow-hidden touch-pan-y pan-y ${className}`.trim()}
       onMouseEnter={() => (pauseOnHover ? setIsPaused(true) : undefined)}
       onMouseLeave={() => (pauseOnHover ? setIsPaused(false) : undefined)}
     >
       <div
         ref={trackRef}
-        className="relative flex w-full overflow-x-auto scroll-smooth snap-x snap-mandatory touch-pan-x [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+        className="relative flex w-full overflow-x-auto scroll-smooth snap-x snap-mandatory touch-pan-x touch-pan-y pan-y [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
         role="list"
       >
         {slideChildren.map((slide, idx) => (

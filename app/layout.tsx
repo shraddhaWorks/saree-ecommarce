@@ -19,7 +19,7 @@ export default function RootLayout({
         <WishlistProvider>
           <CartProvider>
             <StorefrontNavbar />
-            <div className="pt-[72px] sm:pt-[92px] lg:pt-[126px] animate-page-entrance">
+            <div className="animate-page-entrance">
               {children}
             </div>
           </CartProvider>

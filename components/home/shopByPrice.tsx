@@ -23,14 +23,14 @@ export default function ShopByPrice() {
         Shop by Price
       </h2>
 
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 max-w-[1400px] mx-auto">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 px-4 max-w-[1400px] mx-auto">
         {priceData.map((item, index) => (
           <div key={index} className="block group">
-            <div className="overflow-hidden rounded-xl shadow-md">
+            <div className="overflow-hidden rounded-2xl shadow-lg border border-gray-100">
               <img
                 src={item.img}
                 alt={`price-${index}`}
-                className="w-full aspect-[3/4] transition-transform duration-300 group-hover:scale-105 object-cover"
+                className="w-full h-auto sm:aspect-[3/4] object-cover transition-transform duration-500 group-hover:scale-105"
               />
             </div>
           </div>

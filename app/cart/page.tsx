@@ -33,8 +33,7 @@ export default function CartPage() {
     }
 
     return (
-        <main className="min-h-screen bg-[#f7f0e7]">
-            <div className="px-6 py-8">
+        <main className="min-h-screen bg-[#f7f0e7] pt-8 pb-12 px-4 md:px-6">
                 <div className="max-w-4xl mx-auto">
                     <div className="flex items-center justify-between mb-8">
                         <div>
@@ -125,7 +124,6 @@ export default function CartPage() {
                                 Proceed to Checkout
                             </button>
                         </div>
-                    </div>
                 </div>
             </div>
             <Footer />

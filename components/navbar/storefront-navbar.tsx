@@ -116,17 +116,11 @@ export function StorefrontNavbar() {
     <>
       <div 
         ref={navbarRef} 
-        className={`fixed inset-x-0 top-0 z-50 transition-all duration-500 ${
-          (isScrolled || !isHomePage) 
-            ? "bg-[#fdfbf7] shadow-[0_10px_34px_rgba(44,25,17,0.08)]" 
-            : "bg-[#fdfbf7] lg:bg-transparent"
-        }`}
+        className="sticky top-0 z-50 bg-[#fdfbf7] transition-all duration-500 shadow-[0_10px_34px_rgba(44,25,17,0.08)]"
       >
-        <div className={`h-[4px] bg-[#822733] transition-opacity duration-500 ${(isScrolled || !isHomePage) ? "opacity-100" : "opacity-100 lg:opacity-0"}`} />
+        <div className="h-[4px] bg-[#822733] transition-opacity duration-500 opacity-100" />
         <header 
-          className={`border-b border-black/10 transition-colors duration-500 ${
-            (isScrolled || !isHomePage) ? "bg-[#fdfbf7]" : "bg-[#fdfbf7] border-transparent lg:bg-transparent"
-          }`} 
+          className="bg-[#fdfbf7] border-b border-black/10 transition-colors duration-500" 
           onClick={closeAll}
         >
           <div className="mx-auto max-w-[1880px] px-3 py-2 sm:px-4 sm:py-3 lg:px-8 lg:py-4">

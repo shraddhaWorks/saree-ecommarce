@@ -16,7 +16,7 @@ export default function Home() {
         className="h-full w-full object-cover object-center brightness-75 transition-transform duration-1000 hover:scale-105"
         loading="lazy"
       />
-      <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/30 px-6 text-center">
+      <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/30 px-6 text-center pointer-events-none">
         <h1 className="max-w-4xl text-3xl sm:text-5xl lg:text-7xl font-bold leading-tight text-white px-2">
           We Brought <span className="text-[#f15a24]">Heritage</span> to <span className="text-[#f15a24]">India</span> For You
         </h1>
@@ -24,7 +24,7 @@ export default function Home() {
           <p className="max-w-2xl text-lg font-medium text-white/95 md:text-2xl">
             Exquisite Handcrafted Silks | Royal Bridal Weaves | Authentic Traditions
           </p>
-          <button className="mt-10 flex items-center gap-3 rounded-full bg-[#f15a24] px-10 py-4 text-lg font-bold text-white shadow-2xl transition-all hover:scale-105 hover:bg-[#d94e1f]">
+          <button className="mt-10 flex items-center gap-3 rounded-full bg-[#f15a24] px-10 py-4 text-lg font-bold text-white shadow-2xl transition-all hover:scale-105 hover:bg-[#d94e1f] pointer-events-auto">
             Shop Modern Traditions
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
           </button>
@@ -46,7 +46,7 @@ export default function Home() {
           <p className="max-w-2xl text-lg font-medium text-white/95 md:text-2xl">
             Kanchipuram Pattu | Banaras Brocades | Pure Silk Masterpieces
           </p>
-          <button className="mt-10 flex items-center gap-3 rounded-full bg-[#f15a24] px-10 py-4 text-lg font-bold text-white shadow-2xl transition-all hover:scale-105 hover:bg-[#d94e1f]">
+          <button className="mt-10 flex items-center gap-3 rounded-full bg-[#f15a24] px-10 py-4 text-lg font-bold text-white shadow-2xl transition-all hover:scale-105 hover:bg-[#d94e1f] pointer-events-auto">
             Discover Bridal Edit
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
           </button>

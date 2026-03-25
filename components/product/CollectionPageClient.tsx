@@ -94,7 +94,7 @@ export function CollectionPageClient({ handle, initialProducts, title, descripti
     const displayTitle = title || handle.split("-").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
 
     return (
-        <div className="pt-24 md:pt-32 pb-16 px-4 md:px-6 max-w-[1400px] mx-auto min-h-screen">
+        <div className="pt-8 pb-16 px-4 md:px-6 max-w-[1400px] mx-auto min-h-screen">
             <h1 className="text-3xl md:text-5xl font-[Georgia,'Times New Roman',serif] font-semibold mb-4 text-center tracking-wide">{displayTitle}</h1>
             {description && (
                 <p className="text-center text-gray-600 max-w-3xl mx-auto mb-10 leading-relaxed text-sm md:text-base">{description}</p>
