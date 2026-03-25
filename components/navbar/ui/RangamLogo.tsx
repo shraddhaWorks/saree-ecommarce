@@ -9,7 +9,7 @@ export function RangamLogo() {
                 width={190}
                 height={190}
                 priority
-                className="h-[44px] w-auto object-contain sm:h-[56px] lg:h-[72px]"
+                className="h-[30px] w-auto object-contain sm:h-[44px] lg:h-[72px]"
             />
         </div>
     );

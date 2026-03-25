@@ -119,20 +119,20 @@ export function StorefrontNavbar() {
         className={`fixed inset-x-0 top-0 z-50 transition-all duration-500 ${
           (isScrolled || !isHomePage) 
             ? "bg-[#fdfbf7] shadow-[0_10px_34px_rgba(44,25,17,0.08)]" 
-            : "bg-transparent"
+            : "bg-[#fdfbf7] lg:bg-transparent"
         }`}
       >
-        <div className={`h-[6px] bg-[#822733] transition-opacity duration-500 ${(isScrolled || !isHomePage) ? "opacity-100" : "opacity-0"}`} />
+        <div className={`h-[4px] bg-[#822733] transition-opacity duration-500 ${(isScrolled || !isHomePage) ? "opacity-100" : "opacity-100 lg:opacity-0"}`} />
         <header 
           className={`border-b border-black/10 transition-colors duration-500 ${
-            (isScrolled || !isHomePage) ? "bg-[#fdfbf7]" : "bg-transparent border-transparent"
+            (isScrolled || !isHomePage) ? "bg-[#fdfbf7]" : "bg-[#fdfbf7] border-transparent lg:bg-transparent"
           }`} 
           onClick={closeAll}
         >
-          <div className="mx-auto max-w-[1880px] px-3 py-3 sm:px-4 sm:py-4 lg:px-8">
+          <div className="mx-auto max-w-[1880px] px-3 py-2 sm:px-4 sm:py-3 lg:px-8 lg:py-4">
             <div onClick={stopEvent}>
               <div className="flex items-center gap-[clamp(8px,1vw,24px)] whitespace-nowrap">
-                  <div className={`flex lg:hidden shrink-0 items-center -ml-2 mr-1 transition-colors duration-500 ${(isScrolled || !isHomePage) ? "text-black" : "text-white"}`}>
+                  <div className="flex lg:hidden shrink-0 items-center mr-1 text-black">
                     <IconButton label="Menu" onClick={() => openPanel("menu")}>
                       <MenuIcon />
                     </IconButton>
@@ -184,7 +184,7 @@ export function StorefrontNavbar() {
                   <IconButton label="Search" onClick={() => openPanel("search")} className="cursor-pointer">
                     <SearchIcon />
                   </IconButton>
-                  <div className="relative">
+                  <div className="relative hidden sm:block">
                     <IconButton label="Wishlist" onClick={() => openPanel("wishlist")} className="cursor-pointer">
                       <HeartIcon />
                     </IconButton>
@@ -197,7 +197,7 @@ export function StorefrontNavbar() {
                   <IconButton label="Profile" onClick={() => openPanel("profile")} className="cursor-pointer">
                     <UserIcon />
                   </IconButton>
-                  <div className="relative">
+                  <div className="relative hidden sm:block">
                     <IconButton label="Bag" onClick={() => openPanel("bag")} className="cursor-pointer">
                       <BagIcon />
                     </IconButton>
@@ -466,7 +466,7 @@ export function StorefrontNavbar() {
               type="button"
               aria-label="Close profile"
               onClick={() => setActivePanel(null)}
-              className="absolute right-5 top-5 flex h-12 w-12 items-center justify-center rounded-full border border-black/45 text-black transition hover:border-[#9d2936] hover:text-[#9d2936]"
+              className="absolute right-5 top-5 flex h-10 w-10 items-center justify-center rounded-full border border-black/45 text-black transition hover:border-[#9d2936] hover:text-[#9d2936]"
             >
               <CloseIcon />
             </button>
@@ -526,6 +526,38 @@ export function StorefrontNavbar() {
         }}
       >
         <div className="flex flex-1 flex-col overflow-y-auto px-6 pb-20">
+                    <div className="grid grid-cols-2 gap-3 border-b border-black/10 pb-5 pt-4 sm:hidden">
+            <button
+              type="button"
+              onClick={() => {
+                setOpenMobileSubmenu(null);
+                setActivePanel("wishlist");
+              }}
+              className="relative rounded-2xl border border-black/15 bg-white px-4 py-3 text-sm font-semibold text-black transition hover:border-[#9d2936] hover:text-[#9d2936]"
+            >
+              Wishlist
+              {wishlistState.itemCount > 0 ? (
+                <span className="absolute -right-1 -top-1 grid h-5 min-w-5 place-items-center rounded-full bg-[#9d2936] px-1 text-[10px] font-semibold text-white">
+                  {wishlistState.itemCount}
+                </span>
+              ) : null}
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setOpenMobileSubmenu(null);
+                setActivePanel("bag");
+              }}
+              className="relative rounded-2xl border border-black/15 bg-white px-4 py-3 text-sm font-semibold text-black transition hover:border-[#9d2936] hover:text-[#9d2936]"
+            >
+              Bag
+              {state.itemCount > 0 ? (
+                <span className="absolute -right-1 -top-1 grid h-5 min-w-5 place-items-center rounded-full bg-[#9d2936] px-1 text-[10px] font-semibold text-white">
+                  {state.itemCount}
+                </span>
+              ) : null}
+            </button>
+          </div>
           <ul className="space-y-6 pt-6">
             {primaryLinks.map((item) => (
               <li key={item.label} className="border-b border-black/5 pb-6 last:border-0">

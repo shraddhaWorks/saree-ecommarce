@@ -28,7 +28,7 @@ export function Drawer({
                     type="button"
                     aria-label={`Close ${title}`}
                     onClick={onClose}
-                    className="mt-1 flex h-12 w-12 items-center justify-center rounded-full border border-black/45 text-black transition hover:border-[#9d2936] hover:text-[#9d2936]"
+                    className="mt-1 flex h-10 w-10 items-center justify-center rounded-full border border-black/45 text-black transition hover:border-[#9d2936] hover:text-[#9d2936]"
                 >
                     <CloseIcon />
                 </button>
