@@ -150,10 +150,8 @@ export function StorefrontNavbar() {
                           onClick={() => setActiveMenu(null)}
                           className={
                             activeMenu === item.menuKey
-                              ? "min-w-0 shrink cursor-pointer text-center font-[Georgia,'Times_New_Roman',serif] text-[clamp(8px,0.9vw,17px)] leading-none tracking-normal text-[#9d2936] transition"
-                              : `min-w-0 shrink cursor-pointer text-center font-[Georgia,'Times_New_Roman',serif] text-[clamp(8px,0.9vw,17px)] leading-none tracking-normal transition hover:text-[#9d2936] ${
-                                  (isScrolled || !isHomePage) ? "text-black" : ""
-                                }`
+                              ? "min-w-0 shrink cursor-pointer text-center font-[Georgia,'Times_New_Roman',serif] text-[clamp(8px,0.91vw,17px)] leading-none tracking-normal text-[#9d2936] transition"
+                              : "min-w-0 shrink cursor-pointer text-center font-[Georgia,'Times_New_Roman',serif] text-[clamp(8px,0.91vw,17px)] leading-none tracking-normal text-black transition hover:text-[#9d2936]"
                           }
                         >
                           {item.label}
@@ -163,9 +161,7 @@ export function StorefrontNavbar() {
                           key={item.label}
                           href={item.href}
                           onClick={closeAll}
-                          className={`min-w-0 shrink cursor-pointer text-center font-[Georgia,'Times_New_Roman',serif] text-[clamp(8px,0.9vw,17px)] leading-none tracking-normal transition hover:text-[#9d2936] ${
-                            (isScrolled || !isHomePage) ? "text-black" : "text-white drop-shadow-sm hover:text-white/80"
-                          }`}
+                          className="min-w-0 shrink cursor-pointer text-center font-[Georgia,'Times_New_Roman',serif] text-[clamp(8px,0.91vw,17px)] leading-none tracking-normal text-black transition hover:text-[#9d2936]"
                         >
                           {item.label}
                         </Link>
