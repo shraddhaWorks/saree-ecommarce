@@ -1,11 +1,9 @@
 import Link from "next/link";
-import { StorefrontNavbar } from "@/components/navbar/storefront-navbar";
 import Footer from "@/components/footer/Footer";
 
 export default function Page() {
   return (
     <main className="min-h-screen bg-[#fdfbf7] text-[#201815]">
-      <StorefrontNavbar />
       <div className="mx-auto max-w-7xl px-6 py-32">
         <nav className="mb-12">
           <Link href="/stores" className="text-sm font-medium text-[#9d2936] hover:underline">
@@ -47,3 +45,4 @@ export default function Page() {
     </main>
   );
 }
+

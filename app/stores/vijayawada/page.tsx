@@ -1,11 +1,9 @@
 import Link from "next/link";
-import { StorefrontNavbar } from "@/components/navbar/storefront-navbar";
 import Footer from "@/components/footer/Footer";
 
 export default function Page() {
   return (
     <main className="min-h-screen bg-[#fdfbf7] text-[#201815]">
-      <StorefrontNavbar />
       <div className="mx-auto max-w-7xl px-6 py-32">
         <nav className="mb-12">
           <Link href="/stores" className="text-sm font-medium text-[#9d2936] hover:underline">
@@ -19,7 +17,7 @@ export default function Page() {
             </h1>
             <div className="mt-8 space-y-6 text-lg text-black/70">
               <p>
-                Experience the finest Vijayawada handlooms and luxury silks at our flagship boutique in the city's premier shopping district.
+                Experience the finest Vijayawada handlooms and luxury silks at our flagship boutique in the city&apos;s premier shopping district.
               </p>
               <div className="space-y-4 rounded-3xl bg-white p-8 shadow-sm">
                 <p className="flex items-center gap-3">
@@ -47,3 +45,4 @@ export default function Page() {
     </main>
   );
 }
+

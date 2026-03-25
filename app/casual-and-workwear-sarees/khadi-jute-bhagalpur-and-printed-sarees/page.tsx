@@ -1,4 +1,3 @@
-import { StorefrontNavbar } from "@/components/navbar/storefront-navbar";
 import Footer from "@/components/footer/Footer";
 import { CollectionPageClient } from "@/components/product/CollectionPageClient";
 import { products } from "@/lib/dummyData";
@@ -14,7 +13,6 @@ export default function KhadiJuteBhagalpurPrintedSareesPage() {
 
   return (
     <main className="min-h-screen bg-[#fdfbf7]">
-      <StorefrontNavbar />
       <CollectionPageClient 
         handle="khadi-jute-bhagalpur-and-printed-sarees" 
         title="Khadi, Jute, Bhagalpur & Printed Sarees"
@@ -25,3 +23,4 @@ export default function KhadiJuteBhagalpurPrintedSareesPage() {
     </main>
   );
 }
+

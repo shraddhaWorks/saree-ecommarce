@@ -1,4 +1,3 @@
-import { StorefrontNavbar } from "@/components/navbar/storefront-navbar";
 import Footer from "@/components/footer/Footer";
 import { CollectionPageClient } from "@/components/product/CollectionPageClient";
 import { products } from "@/lib/dummyData";
@@ -13,7 +12,6 @@ export default function PattuPavadaPage() {
 
   return (
     <main className="min-h-screen bg-[#fdfbf7]">
-      <StorefrontNavbar />
       <CollectionPageClient 
         handle="pattu-pavada-set-half-saree-set-lehengas" 
         title="Pattu Pavada & Half Saree Sets"
@@ -24,3 +22,4 @@ export default function PattuPavadaPage() {
     </main>
   );
 }
+

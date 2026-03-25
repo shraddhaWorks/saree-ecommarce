@@ -1,4 +1,3 @@
-import { StorefrontNavbar } from "@/components/navbar/storefront-navbar";
 import Footer from "@/components/footer/Footer";
 import { CollectionPageClient } from "@/components/product/CollectionPageClient";
 import { products } from "@/lib/dummyData";
@@ -12,7 +11,6 @@ export default function BandiniSareesPage() {
 
   return (
     <main className="min-h-screen bg-[#fdfbf7]">
-      <StorefrontNavbar />
       <CollectionPageClient 
         handle="bandini-sarees" 
         title="Bandhani Sarees"
@@ -23,3 +21,4 @@ export default function BandiniSareesPage() {
     </main>
   );
 }
+

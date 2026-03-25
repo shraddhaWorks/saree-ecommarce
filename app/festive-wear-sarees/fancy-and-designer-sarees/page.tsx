@@ -1,4 +1,3 @@
-import { StorefrontNavbar } from "@/components/navbar/storefront-navbar";
 import Footer from "@/components/footer/Footer";
 import { CollectionPageClient } from "@/components/product/CollectionPageClient";
 import { products } from "@/lib/dummyData";
@@ -13,7 +12,6 @@ export default function FancyAndDesignerSareesPage() {
 
   return (
     <main className="min-h-screen bg-[#fdfbf7]">
-      <StorefrontNavbar />
       <CollectionPageClient 
         handle="fancy-and-designer-sarees" 
         title="Fancy & Designer Sarees"
@@ -24,3 +22,4 @@ export default function FancyAndDesignerSareesPage() {
     </main>
   );
 }
+

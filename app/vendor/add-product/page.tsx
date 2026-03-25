@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { StorefrontNavbar } from "@/components/navbar/storefront-navbar";
 import Footer from "@/components/footer/Footer";
 
 const BRANDS = [
@@ -126,8 +125,6 @@ export default function AddProductPage() {
 
     return (
         <main className="min-h-screen bg-[#f7f0e7]">
-            <StorefrontNavbar />
-
             <div className="pt-32 pb-16 px-6 max-w-3xl mx-auto">
                 <div className="bg-white rounded-2xl shadow-sm p-8 md:p-10 border border-gray-100">
                     <h1 className="text-3xl font-semibold mb-2">Upload Saree Product</h1>
@@ -342,3 +339,4 @@ export default function AddProductPage() {
         </main>
     );
 }
+

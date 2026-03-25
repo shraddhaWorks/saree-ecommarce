@@ -1,4 +1,3 @@
-import { StorefrontNavbar } from "@/components/navbar/storefront-navbar";
 import Footer from "@/components/footer/Footer";
 import { CollectionPageClient } from "@/components/product/CollectionPageClient";
 import { products } from "@/lib/dummyData";
@@ -15,7 +14,6 @@ export default function KanchiPattuSareesPage() {
 
   return (
     <main className="min-h-screen bg-[#fdfbf7]">
-      <StorefrontNavbar />
       <CollectionPageClient 
         handle="kanchi-pattu-sarees" 
         title="Kanchi Pattu Sarees"
@@ -26,3 +24,4 @@ export default function KanchiPattuSareesPage() {
     </main>
   );
 }
+

@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Footer from "@/components/footer/Footer";
 import { clearCart, getCart, type Cart } from "@/lib/cart";
-import { StorefrontNavbar } from "@/components/navbar/storefront-navbar";
 import { useCart } from "@/components/cart";
 
 export default function CheckoutPage() {
@@ -119,3 +118,4 @@ export default function CheckoutPage() {
     </main>
   );
 }
+

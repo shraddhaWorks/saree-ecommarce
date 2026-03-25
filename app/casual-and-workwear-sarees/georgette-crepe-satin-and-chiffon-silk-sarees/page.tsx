@@ -1,4 +1,3 @@
-import { StorefrontNavbar } from "@/components/navbar/storefront-navbar";
 import Footer from "@/components/footer/Footer";
 import { CollectionPageClient } from "@/components/product/CollectionPageClient";
 import { products } from "@/lib/dummyData";
@@ -16,7 +15,6 @@ export default function GeorgetteCrepeSatinChiffonSareesPage() {
 
   return (
     <main className="min-h-screen bg-[#fdfbf7]">
-      <StorefrontNavbar />
       <CollectionPageClient 
         handle="georgette-crepe-satin-and-chiffon-silk-sarees" 
         title="Georgette, Crepe, Satin & Chiffon Sarees"
@@ -27,3 +25,4 @@ export default function GeorgetteCrepeSatinChiffonSareesPage() {
     </main>
   );
 }
+

@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { StorefrontNavbar } from "@/components/navbar/storefront-navbar";
 import Footer from "@/components/footer/Footer";
 
 const stores = [
@@ -36,8 +35,6 @@ const stores = [
 export default function StoresPage() {
   return (
     <main className="min-h-screen bg-[#fdfbf7] text-[#201815]">
-      <StorefrontNavbar />
-      
       {/* Hero Section */}
       <section className="relative h-[40vh] w-full overflow-hidden bg-[#822733] pt-24 lg:h-[500px]">
         <div className="absolute inset-0 bg-black/40" />
@@ -104,3 +101,4 @@ export default function StoresPage() {
     </main>
   );
 }
+
