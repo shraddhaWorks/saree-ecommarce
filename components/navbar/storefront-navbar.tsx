@@ -24,6 +24,7 @@ export function StorefrontNavbar() {
   const hasOverlay = activePanel !== null;
   const hasMenuOverlay = activeMenu !== null;
   const navbarRef = useRef<HTMLDivElement | null>(null);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -82,6 +83,18 @@ export function StorefrontNavbar() {
   const closeAll = () => {
     setActivePanel(null);
     setActiveMenu(null);
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+  };
+
+  const handleMouseEnter = (menuKey: MenuEntryKey) => {
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    setActiveMenu(menuKey);
+  };
+
+  const handleMouseLeave = () => {
+    timeoutRef.current = setTimeout(() => {
+      setActiveMenu(null);
+    }, 200); // 200ms grace period
   };
 
   const stopEvent = (event: MouseEvent<HTMLElement>) => {
@@ -115,38 +128,35 @@ export function StorefrontNavbar() {
           }`} 
           onClick={closeAll}
         >
-          <div className="mx-auto max-w-[1880px] overflow-hidden px-3 py-3 sm:px-4 sm:py-4 lg:px-8">
+          <div className="mx-auto max-w-[1880px] px-3 py-3 sm:px-4 sm:py-4 lg:px-8">
             <div onClick={stopEvent}>
               <div className="flex items-center gap-[clamp(8px,1vw,24px)] whitespace-nowrap">
-                {!isMegaMenuOpen ? (
                   <div className={`flex lg:hidden shrink-0 items-center -ml-2 mr-1 transition-colors duration-500 ${(isScrolled || !isHomePage) ? "text-black" : "text-white"}`}>
                     <IconButton label="Menu" onClick={() => openPanel("menu")}>
                       <MenuIcon />
                     </IconButton>
                   </div>
-                ) : null}
 
-                {!isMegaMenuOpen ? (
                   <Link href="/" className="shrink-0" onClick={closeAll}>
-                    <div className={`transition-all duration-500 ${(isScrolled || !isHomePage) ? "" : ""}`}>
+                    <div className="transition-all duration-500">
                       <RangamLogo />
                     </div>
                   </Link>
-                ) : null}
 
                 <nav aria-label="Primary" className="flex-1 min-w-0 hidden lg:block">
-                  <div className={`flex min-w-0 items-center justify-center gap-[clamp(8px,1.1vw,28px)] py-2 ${isMegaMenuOpen ? "justify-center" : ""}`}>
+                  <div className="flex min-w-0 items-center justify-center gap-[clamp(8px,1.1vw,28px)] py-2">
                     {primaryLinks.map((item) => (
                       item.menuKey ? (
                         <button
                           key={item.label}
                           type="button"
-                          onMouseEnter={() => setActiveMenu(item.menuKey)}
+                          onMouseEnter={() => handleMouseEnter(item.menuKey as MenuEntryKey)}
+                          onMouseLeave={handleMouseLeave}
                           onClick={() => setActiveMenu(null)}
                           className={
                             activeMenu === item.menuKey
-                              ? "min-w-0 shrink text-center font-[Georgia,'Times_New_Roman',serif] text-[clamp(8px,0.9vw,17px)] leading-none tracking-normal text-[#9d2936] transition"
-                              : `min-w-0 shrink text-center font-[Georgia,'Times_New_Roman',serif] text-[clamp(8px,0.9vw,17px)] leading-none tracking-normal transition hover:text-[#9d2936] ${
+                              ? "min-w-0 shrink cursor-pointer text-center font-[Georgia,'Times_New_Roman',serif] text-[clamp(8px,0.9vw,17px)] leading-none tracking-normal text-[#9d2936] transition"
+                              : `min-w-0 shrink cursor-pointer text-center font-[Georgia,'Times_New_Roman',serif] text-[clamp(8px,0.9vw,17px)] leading-none tracking-normal transition hover:text-[#9d2936] ${
                                   (isScrolled || !isHomePage) ? "text-black" : ""
                                 }`
                           }
@@ -158,7 +168,7 @@ export function StorefrontNavbar() {
                           key={item.label}
                           href={item.href}
                           onClick={closeAll}
-                          className={`min-w-0 shrink text-center font-[Georgia,'Times_New_Roman',serif] text-[clamp(8px,0.9vw,17px)] leading-none tracking-normal transition hover:text-[#9d2936] ${
+                          className={`min-w-0 shrink cursor-pointer text-center font-[Georgia,'Times_New_Roman',serif] text-[clamp(8px,0.9vw,17px)] leading-none tracking-normal transition hover:text-[#9d2936] ${
                             (isScrolled || !isHomePage) ? "text-black" : "text-white drop-shadow-sm hover:text-white/80"
                           }`}
                         >
@@ -169,12 +179,12 @@ export function StorefrontNavbar() {
                   </div>
                 </nav>
 
-                <div className={`ml-auto flex shrink-0 items-center gap-1 sm:gap-2 lg:gap-3 transition-colors duration-500 ${(isScrolled || !isHomePage) ? "text-black" : "text-white"}`}>
-                  <IconButton label="Search" onClick={() => openPanel("search")}>
+                <div className="ml-auto flex shrink-0 items-center gap-1 sm:gap-2 lg:gap-3 text-black">
+                  <IconButton label="Search" onClick={() => openPanel("search")} className="cursor-pointer">
                     <SearchIcon />
                   </IconButton>
                   <div className="relative">
-                    <IconButton label="Wishlist" onClick={() => openPanel("wishlist")}>
+                    <IconButton label="Wishlist" onClick={() => openPanel("wishlist")} className="cursor-pointer">
                       <HeartIcon />
                     </IconButton>
                     {wishlistState.itemCount > 0 ? (
@@ -183,11 +193,11 @@ export function StorefrontNavbar() {
                       </span>
                     ) : null}
                   </div>
-                  <IconButton label="Profile" onClick={() => openPanel("profile")}>
+                  <IconButton label="Profile" onClick={() => openPanel("profile")} className="cursor-pointer">
                     <UserIcon />
                   </IconButton>
                   <div className="relative">
-                    <IconButton label="Bag" onClick={() => openPanel("bag")}>
+                    <IconButton label="Bag" onClick={() => openPanel("bag")} className="cursor-pointer">
                       <BagIcon />
                     </IconButton>
                     {state.itemCount > 0 ? (
@@ -199,13 +209,21 @@ export function StorefrontNavbar() {
                 </div>
               </div>
             </div>
-            {activeMenu ? (
-              <nav aria-label="Primary mega menu" onClick={closeAll}>
-                <MegaMenu menu={menuData[activeMenu]} onItemClick={closeAll} />
-              </nav>
-            ) : null}
           </div>
         </header>
+        {activeMenu ? (
+          <nav 
+            aria-label="Primary mega menu" 
+            onClick={closeAll}
+            onMouseEnter={() => {
+              if (timeoutRef.current) clearTimeout(timeoutRef.current);
+            }}
+            onMouseLeave={handleMouseLeave}
+            className="absolute left-0 top-full w-full animate-page-entrance"
+          >
+            <MegaMenu menu={menuData[activeMenu]} onItemClick={closeAll} />
+          </nav>
+        ) : null}
       </div>
 
       {hasMenuOverlay ? (
