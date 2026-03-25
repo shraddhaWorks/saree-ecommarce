@@ -220,7 +220,7 @@ export function StorefrontNavbar() {
               if (timeoutRef.current) clearTimeout(timeoutRef.current);
             }}
             onMouseLeave={handleMouseLeave}
-            className="absolute left-0 top-full w-full animate-page-entrance"
+            className="absolute left-0 top-full w-full hidden lg:block animate-page-entrance"
           >
             <MegaMenu menu={menuData[activeMenu]} onItemClick={closeAll} />
           </nav>
@@ -231,7 +231,7 @@ export function StorefrontNavbar() {
         <button
           type="button"
           aria-label="Close menu overlay"
-          className="fixed inset-0 z-40 bg-[rgba(32,24,21,0.18)] backdrop-brightness-75"
+          className="fixed inset-0 z-40 bg-[rgba(32,24,21,0.18)] backdrop-brightness-75 hidden lg:block"
           onClick={closeAll}
         />
       ) : null}
