@@ -27,8 +27,9 @@ export default function ProductDetails({
     const { toggleItem, isWishlisted } = useWishlist();
     const [selectedImage, setSelectedImage] = useState(product.images[0]);
     const [qty, setQty] = useState(1);
-    const safeQty = Math.max(1, Math.min(qty, product.stock));
-    const isOutOfStock = product.stock <= 0;
+    const stock = product.stock ?? 0;
+    const safeQty = Math.max(1, Math.min(qty, stock));
+    const isOutOfStock = stock <= 0;
 
     const addProductToCart = () => {
         addItem({
@@ -120,7 +121,7 @@ export default function ProductDetails({
                     </p>
 
                     <p className="text-red-500 text-sm mb-4">
-                        • {product.stock} items available
+                        • {stock} items available
                     </p>
 
                     {/* Quantity */}
@@ -136,7 +137,7 @@ export default function ProductDetails({
                             <span className="px-4">{qty}</span>
                             <button
                                 className="px-4 py-2"
-                                onClick={() => qty < product.stock && setQty(qty + 1)}
+                                onClick={() => qty < stock && setQty(qty + 1)}
                             >
                                 +
                             </button>
