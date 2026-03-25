@@ -15,11 +15,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>
+      <body className="antialiased">
         <WishlistProvider>
           <CartProvider>
             <StorefrontNavbar />
-            <div className="pt-[96px] sm:pt-[108px] lg:pt-[126px]">{children}</div>
+            <div className="pt-[96px] sm:pt-[108px] lg:pt-[126px] animate-page-entrance">
+              {children}
+            </div>
           </CartProvider>
         </WishlistProvider>
       </body>

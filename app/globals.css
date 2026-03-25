@@ -8,6 +8,11 @@
   --border-soft: rgba(32, 24, 21, 0.12);
   --accent: #8f2333;
   --accent-soft: #c98d5a;
+  
+  /* Transition tokens */
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-base: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 500ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 @theme inline {
@@ -22,16 +27,6 @@
   --font-mono: var(--font-geist-mono);
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
-}
-
-a {
-  color: inherit;
-}
-
 * {
   box-sizing: border-box;
 }
@@ -39,11 +34,21 @@ a {
 html {
   scrollbar-width: none;
   -ms-overflow-style: none;
+  scroll-behavior: smooth; /* Smooth scrolling for the whole page */
 }
 
 body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
   scrollbar-width: none;
   -ms-overflow-style: none;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a, button {
+  transition: all var(--transition-base); /* Default smooth transitions for interactive elements */
 }
 
 html::-webkit-scrollbar,
@@ -58,4 +63,32 @@ body::-webkit-scrollbar {
 
 .scrollbar-invisible::-webkit-scrollbar {
   display: none;
+}
+
+/* Page entrance animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-page-entrance {
+  animation: fadeIn var(--transition-slow) forwards;
+}
+
+/* Glassmorphism utility */
+.glass {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.dark .glass {
+  background: rgba(0, 0, 0, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
