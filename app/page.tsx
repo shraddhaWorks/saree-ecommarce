@@ -17,7 +17,7 @@ export default function Home() {
         loading="lazy"
       />
       <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/30 px-6 text-center">
-        <h1 className="max-w-4xl text-4xl font-bold leading-tight text-white md:text-7xl">
+        <h1 className="max-w-4xl text-3xl sm:text-5xl lg:text-7xl font-bold leading-tight text-white px-2">
           We Brought <span className="text-[#f15a24]">Heritage</span> to <span className="text-[#f15a24]">India</span> For You
         </h1>
         <div className="mt-8 flex w-full max-w-3xl flex-col items-center border-t border-white/30 pt-8">
@@ -39,7 +39,7 @@ export default function Home() {
         loading="lazy"
       />
       <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/40 px-6 text-center">
-        <h1 className="max-w-4xl text-4xl font-bold leading-tight text-white md:text-7xl">
+        <h1 className="max-w-4xl text-3xl sm:text-5xl lg:text-7xl font-bold leading-tight text-white px-2">
           The <span className="text-[#f15a24]">Wedding</span> Edit For <span className="text-[#f15a24]">India</span> For You
         </h1>
         <div className="mt-8 flex w-full max-w-3xl flex-col items-center border-t border-white/30 pt-8">

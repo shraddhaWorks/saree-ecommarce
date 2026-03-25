@@ -5,17 +5,17 @@ export default function AboutUs() {
     <section className="w-full py-10 px-4 bg-white">
       <div className="grid grid-cols-1 lg:grid-cols-2 min-h-screen">
 
-        {/* LEFT IMAGE - FULL COVER */}
-        <div className="w-full h-full">
+        {/* LEFT IMAGE */}
+        <div className="w-full h-[300px] sm:h-[450px] lg:h-auto">
           <img
             src="/7_About_Us_Banner.webp"
             alt="About Us"
-            className="w-full h-full rounded-lg object-cover"
+            className="w-full h-full lg:rounded-l-2xl object-cover"
           />
         </div>
 
         {/* RIGHT CONTENT */}
-        <div className="flex items-center justify-center px-6 sm:px-12 lg:px-16">
+        <div className="flex items-center justify-center py-12 px-6 sm:px-12 lg:px-16 bg-[#fdfbf7] lg:rounded-r-2xl">
           <div className="max-w-lg">
 
             <h2 className="text-3xl md:text-4xl font-semibold mb-6">

@@ -3,4 +3,4 @@ export { ShowcaseArt } from "./ShowcaseArt";
 export { ShowcaseCard } from "./ShowcaseCard";
 export { menuData, suggestedSearches, primaryLinks } from "./data";
 export type { MenuEntryKey } from "./data";
-export type { MenuKey, MenuSection, MenuData } from "./types";
+export type { MenuKey, MenuSection, MenuData, MenuItem } from "./types";

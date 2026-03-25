@@ -34,7 +34,7 @@ export default function ShopByOccausion() {
       </h2>
 
       {/* Grid */}
-      <div className="grid md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 max-w-[1400px] mx-auto">
         {occasionData.map((item, index) => {
           const handle = item.title.toLowerCase().replace(/ & /g, '-').replace(/ /g, '-');
           return (
@@ -44,15 +44,15 @@ export default function ShopByOccausion() {
             <img
               src={item.img}
               alt={item.title}
-              className="w-full h-[550px] object-cover object-center transition-transform duration-500 group-hover:scale-105"
+              className="w-full h-[300px] sm:h-[450px] md:h-[550px] object-cover object-center transition-transform duration-500 group-hover:scale-105"
             />
 
             {/* Overlay */}
             <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition duration-300"></div>
 
             {/* Text */}
-            <div className="absolute bottom-15 left-0 right-0 text-center ">
-              <h3 className="text-white text-5xl drop-shadow-lg">
+            <div className="absolute bottom-10 left-0 right-0 text-center ">
+              <h3 className="text-white text-3xl sm:text-4xl md:text-5xl drop-shadow-lg font-[Georgia,serif]">
                 {item.title}
               </h3>
             </div>

@@ -19,7 +19,7 @@ export default function ProductCard({ product }: Props) {
                 <div className="relative">
                     <img
                         src={product.images[0]}
-                        className="h-75 w-full object-cover transition group-hover:scale-105"
+                        className="aspect-[3/4] w-full object-cover transition group-hover:scale-105"
                     />
 
                     {product.discount ? (

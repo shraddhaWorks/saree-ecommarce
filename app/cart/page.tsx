@@ -55,8 +55,8 @@ export default function CartPage() {
                         {state.items.map((item) => (
                             <div key={item.id} className="border-b border-gray-200 last:border-b-0">
                                 <div className="p-6">
-                                    <div className="flex items-center gap-6">
-                                        <div className="w-20 h-20 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
+                                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6 relative">
+                                        <div className="w-24 h-24 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
                                             <img
                                                 src={item.image}
                                                 alt={item.name}
@@ -64,36 +64,39 @@ export default function CartPage() {
                                             />
                                         </div>
 
-                                        <div className="flex-1">
-                                            <h3 className="font-semibold text-lg">{item.name}</h3>
+                                        <div className="flex-1 min-w-0">
+                                            <h3 className="font-semibold text-lg truncate">{item.name}</h3>
                                             <p className="text-gray-600">Rs. {item.price.toLocaleString()}</p>
                                             {item.size && <p className="text-sm text-gray-500">Size: {item.size}</p>}
                                             {item.color && <p className="text-sm text-gray-500">Color: {item.color}</p>}
                                         </div>
 
-                                        <div className="flex items-center gap-3">
-                                            <button
-                                                onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                                                className="p-2 hover:bg-gray-100 rounded-lg transition"
-                                            >
-                                                <Minus size={16} />
-                                            </button>
-                                            <span className="w-8 text-center font-medium">{item.quantity}</span>
-                                            <button
-                                                onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                                                className="p-2 hover:bg-gray-100 rounded-lg transition"
-                                            >
-                                                <Plus size={16} />
-                                            </button>
-                                        </div>
+                                        <div className="flex items-center justify-between w-full sm:w-auto gap-4 mt-2 sm:mt-0">
+                                            <div className="flex items-center gap-3 bg-gray-50 rounded-lg p-1">
+                                                <button
+                                                    onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                                                    className="p-1.5 hover:bg-white rounded-md transition shadow-sm"
+                                                >
+                                                    <Minus size={14} />
+                                                </button>
+                                                <span className="w-6 text-center font-medium text-sm">{item.quantity}</span>
+                                                <button
+                                                    onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                                                    className="p-1.5 hover:bg-white rounded-md transition shadow-sm"
+                                                >
+                                                    <Plus size={14} />
+                                                </button>
+                                            </div>
 
-                                        <div className="text-right">
-                                            <p className="font-semibold">Rs. {(item.price * item.quantity).toLocaleString()}</p>
+                                            <div className="text-right sm:min-w-[100px]">
+                                                <p className="font-bold text-[#9d2936]">Rs. {(item.price * item.quantity).toLocaleString()}</p>
+                                            </div>
                                         </div>
 
                                         <button
                                             onClick={() => removeItem(item.id)}
-                                            className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition"
+                                            className="absolute top-0 right-0 p-2 text-red-500 hover:bg-red-50 rounded-lg transition"
+                                            aria-label="Remove item"
                                         >
                                             <Trash2 size={18} />
                                         </button>

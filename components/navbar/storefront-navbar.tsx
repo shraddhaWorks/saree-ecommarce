@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState, type MouseEvent } from "react";
 import { useCart, useWishlist } from "@/components/cart";
-import { MegaMenu, menuData, primaryLinks, suggestedSearches, type MenuEntryKey } from "./menu";
+import { MegaMenu, menuData, primaryLinks, suggestedSearches, type MenuEntryKey, type MenuSection, type MenuItem } from "./menu";
 import { Drawer, IconButton, RangamLogo } from "./ui";
 import { BagIcon, CloseIcon, HeartIcon, SearchIcon, UserIcon, SadBagIcon, MenuIcon } from "./icons";
 
@@ -18,6 +18,7 @@ export function StorefrontNavbar() {
   } = useWishlist();
   const [activePanel, setActivePanel] = useState<PanelKey>(null);
   const [activeMenu, setActiveMenu] = useState<MenuEntryKey | null>(null);
+  const [openMobileSubmenu, setOpenMobileSubmenu] = useState<string | null>(null);
   const [isScrolled, setIsScrolled] = useState(false);
   const pathname = usePathname();
   const isHomePage = pathname === "/";
@@ -519,19 +520,78 @@ export function StorefrontNavbar() {
       <Drawer
         isOpen={activePanel === "menu"}
         title="Menu"
-        onClose={() => setActivePanel(null)}
+        onClose={() => {
+          setActivePanel(null);
+          setOpenMobileSubmenu(null);
+        }}
       >
-        <div className="flex flex-1 flex-col overflow-y-auto px-6 pb-8">
-          <ul className="space-y-4 pt-4">
+        <div className="flex flex-1 flex-col overflow-y-auto px-6 pb-20">
+          <ul className="space-y-6 pt-6">
             {primaryLinks.map((item) => (
-              <li key={item.label} className="border-b border-black/10 pb-4 last:border-0">
-                <Link
-                  href={item.href || '#'}
-                  onClick={closeAll}
-                  className="text-xl font-[Georgia,'Times_New_Roman',serif] text-black transition hover:text-[#9d2936]"
+              <li key={item.label} className="border-b border-black/5 pb-6 last:border-0">
+                <div 
+                  className="flex cursor-pointer items-center justify-between"
+                  onClick={() => {
+                    if (item.menuKey) {
+                      setOpenMobileSubmenu(openMobileSubmenu === item.label ? null : item.label);
+                    } else if (item.href) {
+                      window.location.href = item.href;
+                      closeAll();
+                    }
+                  }}
                 >
-                  {item.label}
-                </Link>
+                  <span className="text-xl font-medium text-black transition hover:text-[#9d2936]">
+                    {item.label}
+                  </span>
+                  {item.menuKey && (
+                    <button
+                      type="button"
+                      className={`p-2 transition-transform duration-300 ${openMobileSubmenu === item.label ? "rotate-180" : ""}`}
+                    >
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="m6 9 6 6 6-6"/>
+                      </svg>
+                    </button>
+                  )}
+                </div>
+
+                {item.menuKey && openMobileSubmenu === item.label && menuData[item.menuKey as MenuEntryKey] && (
+                  <div className="mt-4 animate-page-entrance space-y-6 pl-4 border-l-2 border-[#9d2936]/10">
+                    {/* Link to main category for mobile users */}
+                    <li>
+                      <Link
+                        href={item.href || '#'}
+                        onClick={closeAll}
+                        className="block text-lg font-bold text-[#9d2936] transition hover:underline"
+                      >
+                        View All {item.label}
+                      </Link>
+                    </li>
+                    
+                    {menuData[item.menuKey as MenuEntryKey].sections.map((section: MenuSection) => (
+                      <div key={section.title || "main"}>
+                        {section.title && (
+                          <h4 className="text-sm font-bold uppercase tracking-wider text-black/40 mb-3">
+                            {section.title}
+                          </h4>
+                        )}
+                        <ul className="space-y-4">
+                          {section.items.map((subItem: MenuItem) => (
+                            <li key={subItem.label}>
+                              <Link
+                                href={subItem.href || "#"}
+                                onClick={closeAll}
+                                className="block text-lg text-black/80 transition hover:text-[#9d2936]"
+                              >
+                                {subItem.label}
+                              </Link>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </li>
             ))}
           </ul>

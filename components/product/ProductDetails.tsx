@@ -75,7 +75,7 @@ export default function ProductDetails({
                     <div className="w-full md:w-[75%]">
                         <img
                             src={selectedImage}
-                            className="w-full h-[450px] md:h-[650px] object-cover object-top rounded-xl shadow-sm"
+                            className="w-full aspect-[3/4] md:h-[650px] object-cover object-top rounded-xl shadow-sm"
                         />
                     </div>
 
