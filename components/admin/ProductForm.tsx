@@ -61,6 +61,7 @@ function normalizeSlug(s: string) {
 export default function ProductForm({ mode, initial }: Props) {
   const router = useRouter();
   const [categories, setCategories] = useState<Category[]>([]);
+  const [categoriesLoading, setCategoriesLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -87,17 +88,25 @@ export default function ProductForm({ mode, initial }: Props) {
 
   useEffect(() => {
     (async () => {
+      setCategoriesLoading(true);
       try {
-        const res = await fetch("/api/categories");
-        const data = (await res.json()) as { categories?: Category[] };
+        const res = await fetch("/api/categories", { cache: "no-store" });
+        const data = (await res.json()) as { categories?: Category[]; error?: string };
+        if (!res.ok) {
+          setError(data.error ?? "Could not load categories");
+          setCategories([]);
+          return;
+        }
         const list = data.categories ?? [];
         setCategories(list);
-        setCategoryId((prev) => prev || list[0]?.id || "");
+        setCategoryId((prev) => prev || initial?.categoryId || list[0]?.id || "");
       } catch {
         setError("Could not load categories");
+      } finally {
+        setCategoriesLoading(false);
       }
     })();
-  }, []);
+  }, [initial?.categoryId]);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -310,13 +319,24 @@ export default function ProductForm({ mode, initial }: Props) {
           onChange={(e) => setCategoryId(e.target.value)}
           className="mt-1 w-full rounded-lg border border-zinc-200 px-3 py-2"
           required
+          disabled={categoriesLoading || categories.length === 0}
         >
+          {categories.length === 0 ? (
+            <option value="">
+              {categoriesLoading ? "Loading categories…" : "No categories found"}
+            </option>
+          ) : null}
           {categories.map((c) => (
             <option key={c.id} value={c.id}>
               {c.name}
             </option>
           ))}
         </select>
+        {categories.length === 0 && !categoriesLoading ? (
+          <p className="mt-2 text-xs text-zinc-500">
+            Create a category first (Admin-only) using <code>/api/categories</code>.
+          </p>
+        ) : null}
       </label>
 
       <div className="grid gap-6 sm:grid-cols-2">
