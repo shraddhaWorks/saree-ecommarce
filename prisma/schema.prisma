@@ -21,8 +21,7 @@ model User {
   // Optional role so you can distinguish admin/shop owner vs customers
   role      UserRole @default(CUSTOMER)
 
-  // Example relationship if you later want wishlists, orders, etc.
-  // orders    Order[]
+  orders    Order[]
 }
 
 enum UserRole {
@@ -72,6 +71,7 @@ model Product {
   description    String?
   priceInPaise   Int         // store in smallest currency unit (e.g. paise)
   inStock        Boolean     @default(true)
+  stockQuantity  Int         @default(0)
   clothType      ClothType
   occasion       Occasion?
   isSpecial      Boolean     @default(false) // highlight special / featured sarees
@@ -88,6 +88,53 @@ model Product {
   category       Category    @relation(fields: [categoryId], references: [id])
 
   images         ProductImage[]
+  orderItems     OrderItem[]
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
+
+model Order {
+  id        String      @id @default(uuid())
+  status    OrderStatus @default(PENDING)
+  totalPaise Int
+
+  userId    String?
+  user      User?       @relation(fields: [userId], references: [id])
+
+  guestEmail String?
+  guestName  String?
+  guestPhone String?
+
+  shippingLine1   String
+  shippingCity    String
+  shippingState   String?
+  shippingPostal  String?
+  shippingCountry String? @default("India")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  items OrderItem[]
+}
+
+model OrderItem {
+  id           String  @id @default(uuid())
+  orderId      String
+  order        Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId    String
+  product      Product @relation(fields: [productId], references: [id])
+  quantity     Int
+  priceInPaise Int
+  productName  String
+
+  @@index([orderId])
+  @@index([productId])
 }
 
 model ProductImage {
@@ -100,4 +147,50 @@ model ProductImage {
   product   Product  @relation(fields: [productId], references: [id])
 
   createdAt DateTime @default(now())
+}
+
+/// Homepage hero carousel — managed in admin.
+model HeroSlide {
+  id        String   @id @default(uuid())
+  imageUrl  String
+  altText   String?
+  linkUrl   String?
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum HomeGridSection {
+  WEDDING_EDIT
+  SHOP_BY_PRICE
+  CRAFTS
+  SHOP_BY_OCCASION
+}
+
+/// Promo tiles (wedding edit, shop by price, crafts, occasions) — managed in admin.
+model HomeGridItem {
+  id        String          @id @default(uuid())
+  section   HomeGridSection
+  title     String
+  imageUrl  String
+  linkUrl   String?
+  sortOrder Int             @default(0)
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+
+  @@index([section, sortOrder])
+}
+
+/// Single row: section titles + about copy + about image.
+model SiteConfig {
+  id                    String   @id @default("default")
+  weddingEditTitle      String   @default("Your Wedding Edit")
+  shopByPriceTitle      String   @default("Shop by Price")
+  craftsTitle           String   @default("Discover timeless crafts")
+  shopByOccasionTitle   String   @default("Shop by Occasion")
+  specialsTitle         String   @default("Special picks")
+  aboutTitle            String   @default("About Us")
+  aboutBody             String   @default("") @db.Text
+  aboutImageUrl         String?
+  updatedAt             DateTime @updatedAt
 }

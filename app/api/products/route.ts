@@ -35,39 +35,42 @@ export async function GET(req: NextRequest) {
     const occasion = searchParams.get("occasion");
     const isSpecial = searchParams.get("special");
     const search = searchParams.get("search");
+    const inStockOnly = searchParams.get("inStockOnly");
     const limit = Number(searchParams.get("limit") ?? "20");
     const offset = Number(searchParams.get("offset") ?? "0");
 
-    const where: {
-      category?: { slug: string };
-      clothType?: (typeof ALLOWED_CLOTH_TYPES)[number];
-      occasion?: (typeof ALLOWED_OCCASIONS)[number];
-      isSpecial?: boolean;
-      OR?: { name?: { contains: string; mode: "insensitive" }; description?: { contains: string; mode: "insensitive" } }[];
-    } = {};
+    const and: object[] = [];
 
     if (categorySlug) {
-      where.category = { slug: categorySlug.toLowerCase() };
+      and.push({ category: { slug: categorySlug.toLowerCase() } });
     }
 
     if (clothType && (ALLOWED_CLOTH_TYPES as readonly string[]).includes(clothType)) {
-      where.clothType = clothType as (typeof ALLOWED_CLOTH_TYPES)[number];
+      and.push({ clothType: clothType as (typeof ALLOWED_CLOTH_TYPES)[number] });
     }
 
     if (occasion && (ALLOWED_OCCASIONS as readonly string[]).includes(occasion)) {
-      where.occasion = occasion as (typeof ALLOWED_OCCASIONS)[number];
+      and.push({ occasion: occasion as (typeof ALLOWED_OCCASIONS)[number] });
     }
 
     if (isSpecial === "true") {
-      where.isSpecial = true;
+      and.push({ isSpecial: true });
     }
 
     if (search) {
-      where.OR = [
-        { name: { contains: search, mode: "insensitive" } },
-        { description: { contains: search, mode: "insensitive" } },
-      ];
+      and.push({
+        OR: [
+          { name: { contains: search, mode: "insensitive" } },
+          { description: { contains: search, mode: "insensitive" } },
+        ],
+      });
     }
+
+    if (inStockOnly === "true" || inStockOnly === "1") {
+      and.push({ inStock: true, stockQuantity: { gt: 0 } });
+    }
+
+    const where = and.length > 0 ? { AND: and } : {};
 
     const [items, total] = await Promise.all([
       prisma.product.findMany({
@@ -120,6 +123,7 @@ export async function POST(req: NextRequest) {
       description?: string;
       priceInPaise?: number;
       inStock?: boolean;
+      stockQuantity?: number;
       clothType?: string;
       occasion?: string;
       isSpecial?: boolean;
@@ -162,6 +166,12 @@ export async function POST(req: NextRequest) {
         description: body.description,
         priceInPaise: body.priceInPaise,
         inStock: body.inStock ?? true,
+        stockQuantity:
+          typeof body.stockQuantity === "number"
+            ? Math.max(0, Math.floor(body.stockQuantity))
+            : body.inStock === false
+              ? 0
+              : 1,
         clothType: body.clothType as (typeof ALLOWED_CLOTH_TYPES)[number],
         occasion: body.occasion as (typeof ALLOWED_OCCASIONS)[number] | undefined,
         isSpecial: body.isSpecial ?? false,

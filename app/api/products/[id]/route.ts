@@ -73,6 +73,7 @@ export async function PUT(
       description?: string;
       priceInPaise?: number;
       inStock?: boolean;
+      stockQuantity?: number;
       clothType?: string;
       occasion?: string;
       isSpecial?: boolean;
@@ -100,6 +101,10 @@ export async function PUT(
         description: body.description,
         priceInPaise: body.priceInPaise,
         inStock: body.inStock,
+        stockQuantity:
+          typeof body.stockQuantity === "number"
+            ? Math.max(0, Math.floor(body.stockQuantity))
+            : undefined,
         clothType: body.clothType as (typeof ALLOWED_CLOTH_TYPES)[number] | undefined,
         occasion: body.occasion as (typeof ALLOWED_OCCASIONS)[number] | undefined,
         isSpecial: body.isSpecial,

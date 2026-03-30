@@ -38,7 +38,7 @@ const prismaClientSingleton = () => {
   return new PrismaClient({
     adapter: new PrismaPg({ connectionString }),
     log: process.env.NODE_ENV === "development" ? ["error", "warn"] : ["error"],
-  } as any);
+  });
 };
 
 declare const globalThis: {

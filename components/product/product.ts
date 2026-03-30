@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 export interface Product {
   id: string | number;
   name?: string;
@@ -16,3 +17,6 @@ export interface Product {
   brand?: string;
   occasion?: string;
 }
+=======
+export type { StorefrontProduct as Product } from "@/types/storefront";
+>>>>>>> cb8727c (backend)

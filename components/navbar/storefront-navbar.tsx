@@ -1,21 +1,35 @@
 "use client";
 
 import Link from "next/link";
+<<<<<<< HEAD
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState, type MouseEvent } from "react";
 import { useCart, useWishlist } from "@/components/cart";
 import { MegaMenu, menuData, primaryLinks, suggestedSearches, type MenuEntryKey, type MenuSection, type MenuItem } from "./menu";
+=======
+import { useRouter } from "next/navigation";
+import { useEffect, useState, type MouseEvent } from "react";
+import { getAccessToken, setAccessToken } from "@/lib/auth-client";
+import { MegaMenu, menuData, primaryLinks, suggestedSearches, type MenuKey } from "./menu";
+>>>>>>> cb8727c (backend)
 import { Drawer, IconButton, RangamLogo } from "./ui";
 import { BagIcon, CloseIcon, HeartIcon, SearchIcon, UserIcon, SadBagIcon, MenuIcon } from "./icons";
 
 type PanelKey = "bag" | "search" | "profile" | "wishlist" | "menu" | null;
 
+type SearchHit = { id: string; slug: string; name: string; mainImageUrl?: string | null };
+
 export function StorefrontNavbar() {
+<<<<<<< HEAD
   const { state, removeItem } = useCart();
   const {
     state: wishlistState,
     removeItem: removeWishlistItem,
   } = useWishlist();
+=======
+  const router = useRouter();
+  const [activeMenu, setActiveMenu] = useState<MenuKey | null>(null);
+>>>>>>> cb8727c (backend)
   const [activePanel, setActivePanel] = useState<PanelKey>(null);
   const [activeMenu, setActiveMenu] = useState<MenuEntryKey | null>(null);
   const [openMobileSubmenu, setOpenMobileSubmenu] = useState<string | null>(null);
@@ -27,6 +41,7 @@ export function StorefrontNavbar() {
   const navbarRef = useRef<HTMLDivElement | null>(null);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
+<<<<<<< HEAD
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 50);
@@ -34,6 +49,14 @@ export function StorefrontNavbar() {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+=======
+  const [cart, setCart] = useState<Cart>({ items: [] });
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState<SearchHit[]>([]);
+  const [searchLoading, setSearchLoading] = useState(false);
+  const [searchError, setSearchError] = useState<string | null>(null);
+  const [hasSession, setHasSession] = useState(false);
+>>>>>>> cb8727c (backend)
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
@@ -59,6 +82,44 @@ export function StorefrontNavbar() {
   }, []);
 
 
+
+  useEffect(() => {
+    if (activePanel === "profile") {
+      setHasSession(!!getAccessToken());
+    }
+  }, [activePanel]);
+
+  async function runSearch(overrideQuery?: string) {
+    const q = (overrideQuery ?? searchQuery).trim();
+    if (overrideQuery !== undefined) setSearchQuery(overrideQuery);
+    if (!q) {
+      setSearchResults([]);
+      setSearchError(null);
+      return;
+    }
+    setSearchLoading(true);
+    setSearchError(null);
+    try {
+      const res = await fetch(
+        `/api/products?search=${encodeURIComponent(q)}&limit=12`,
+      );
+      const data = (await res.json()) as {
+        items?: SearchHit[];
+        error?: string;
+      };
+      if (!res.ok) {
+        setSearchError(data.error ?? "Search failed");
+        setSearchResults([]);
+        return;
+      }
+      setSearchResults(data.items ?? []);
+    } catch {
+      setSearchError("Network error");
+      setSearchResults([]);
+    } finally {
+      setSearchLoading(false);
+    }
+  }
 
   useEffect(() => {
     document.body.style.overflow = hasOverlay ? "hidden" : "";
@@ -419,16 +480,53 @@ export function StorefrontNavbar() {
           <div className="flex items-center rounded-2xl border border-black/20 bg-white px-6 py-4">
             <input
               type="search"
-              placeholder="Suggested searches"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  void runSearch(undefined);
+                }
+              }}
+              placeholder="Search sarees by name…"
               className="w-full bg-transparent text-[18px] text-black outline-none placeholder:text-black/55"
             />
             <button
               type="button"
+              onClick={() => void runSearch(undefined)}
               className="flex h-14 w-14 items-center justify-center rounded-full bg-black text-white"
             >
               <SearchIcon />
             </button>
           </div>
+          {searchError ? (
+            <p className="text-sm text-red-600">{searchError}</p>
+          ) : null}
+          {searchLoading ? (
+            <p className="text-sm text-black/50">Searching…</p>
+          ) : null}
+          {searchResults.length > 0 ? (
+            <ul className="max-h-[50vh] space-y-2 overflow-auto">
+              {searchResults.map((p) => (
+                <li key={p.id}>
+                  <Link
+                    href={`/products/${p.slug}`}
+                    onClick={() => setActivePanel(null)}
+                    className="flex items-center gap-3 rounded-xl border border-black/10 bg-white p-3 text-left transition hover:border-[#9d2936]"
+                  >
+                    {p.mainImageUrl ? (
+                      <img
+                        src={p.mainImageUrl}
+                        alt=""
+                        className="h-14 w-14 shrink-0 rounded-lg object-cover"
+                      />
+                    ) : null}
+                    <span className="text-sm font-medium text-black/85">{p.name}</span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          ) : null}
           <div className="h-px bg-black/15" />
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.3em] text-black/40">
@@ -439,6 +537,7 @@ export function StorefrontNavbar() {
                 <button
                   key={item}
                   type="button"
+                  onClick={() => void runSearch(item)}
                   className="rounded-full border border-black/15 bg-white px-4 py-2 text-sm text-black/80 transition hover:border-[#9d2936] hover:text-[#9d2936]"
                 >
                   {item}
@@ -463,45 +562,50 @@ export function StorefrontNavbar() {
             <h2 className="text-center font-[Georgia,'Times New Roman',serif] text-4xl text-black sm:text-6xl">
               Customer login
             </h2>
-            <div className="mx-auto mt-8 max-w-[630px] rounded-[26px] bg-white px-7 py-10 shadow-[0_12px_40px_rgba(44,25,17,0.08)] sm:px-10">
-              <form className="space-y-6">
-                <label className="block">
-                  <span className="mb-3 block text-[18px] text-black">Email</span>
-                  <input
-                    type="email"
-                    placeholder="Email address"
-                    className="h-20 w-full rounded-2xl border border-black/18 px-6 text-[18px] outline-none transition focus:border-[#9d2936]"
-                  />
-                </label>
-                <label className="block">
-                  <span className="mb-3 block text-[18px] text-black">Password</span>
-                  <input
-                    type="password"
-                    placeholder="Enter your password"
-                    className="h-20 w-full rounded-2xl border border-black/18 px-6 text-[18px] outline-none transition focus:border-[#9d2936]"
-                  />
-                </label>
-                <div className="text-right">
-                  <button
-                    type="button"
-                    className="border-b border-black pb-1 text-[16px] text-black"
-                  >
-                    Forgot password?
-                  </button>
-                </div>
-                <button
-                  type="submit"
-                  className="w-full rounded-full border border-[#9d2936] px-6 py-4 font-[Georgia,'Times New Roman',serif] text-2xl text-[#9d2936] transition hover:bg-[#9d2936] hover:text-white"
-                >
-                  Log in
-                </button>
-                <p className="pt-4 text-center text-[17px] text-black">
-                  Don&apos;t have any account?{" "}
-                  <button type="button" className="border-b border-black pb-1">
-                    Create an account
-                  </button>
+            <div className="mx-auto mt-8 max-w-[630px] rounded-[26px] bg-white px-7 py-10 shadow-[0_12px_40px_rgba(44,25,17,0.08)] sm:px-10 space-y-6 text-center">
+              {hasSession ? (
+                <p className="text-[17px] text-black/80">You are signed in.</p>
+              ) : (
+                <p className="text-[17px] text-black/80">
+                  Sign in for faster checkout and order history.
                 </p>
-              </form>
+              )}
+              <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">
+                <Link
+                  href="/sign-in"
+                  onClick={() => setActivePanel(null)}
+                  className="rounded-full border border-[#9d2936] px-8 py-4 font-[Georgia,'Times New Roman',serif] text-xl text-[#9d2936] transition hover:bg-[#9d2936] hover:text-white"
+                >
+                  Sign in
+                </Link>
+                <Link
+                  href="/sign-up"
+                  onClick={() => setActivePanel(null)}
+                  className="rounded-full bg-[#9d2936] px-8 py-4 font-[Georgia,'Times New Roman',serif] text-xl text-white transition hover:opacity-90"
+                >
+                  Create account
+                </Link>
+              </div>
+              {hasSession ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAccessToken(null);
+                    setHasSession(false);
+                    router.refresh();
+                  }}
+                  className="text-[16px] text-black/60 underline underline-offset-4"
+                >
+                  Log out
+                </button>
+              ) : null}
+              <Link
+                href="/admin"
+                onClick={() => setActivePanel(null)}
+                className="block pt-2 text-sm text-black/45 hover:text-[#9d2936]"
+              >
+                Store admin
+              </Link>
             </div>
           </section>
         </div>

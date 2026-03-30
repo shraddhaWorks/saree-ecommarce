@@ -5,3 +5,18 @@ export type PageTemplate = {
   description: string;
   sections: string[];
 };
+
+/** Client-safe product shape for the storefront (mirrors Prisma enums as strings). */
+export type StorefrontProduct = {
+  id: string;
+  slug: string;
+  name: string;
+  price: number;
+  discount?: number;
+  images: string[];
+  description: string;
+  stock: number;
+  inStock: boolean;
+  clothType: string;
+  occasion: string | null;
+};

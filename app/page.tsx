@@ -1,12 +1,21 @@
-import AboutUs from "@/components/AboutUS/AboutUs";
-import Carousel from "@/components/common/Carousel";
 import Footer from "@/components/footer/Footer";
+<<<<<<< HEAD
 import ShopByOccausion from "@/components/home/shopByOccausion";
 import ShopByPrice from "@/components/home/shopByPrice";
 import Crafts from "@/components/home/crafts";
 import WeddingEdit from "@/components/home/weddingEdit";
+=======
+import { HeroCarousel } from "@/components/home/HeroCarousel";
+import { HomePromoGrid } from "@/components/home/HomePromoGrid";
+import { AboutBlock } from "@/components/home/AboutBlock";
+import { SpecialProductsSection } from "@/components/home/SpecialProductsSection";
+import { StorefrontNavbar } from "@/components/navbar/storefront-navbar";
+>>>>>>> cb8727c (backend)
 import ProductList from "@/components/product/ProductList";
+import { getStorefrontPayload } from "@/lib/storefront-server";
+import type { HomeGridItem } from "@/lib/generated/prisma/client";
 
+<<<<<<< HEAD
 export default function Home() {
   const slides = [
     <div className="relative h-[85vh] w-full overflow-hidden bg-[#8f171f] lg:h-[800px]" key="1">
@@ -132,6 +141,71 @@ export default function Home() {
       <Crafts />
       <ShopByOccausion />
       <AboutUs />
+=======
+function mapPromo(items: HomeGridItem[]) {
+  return items.map((i) => ({
+    id: i.id,
+    title: i.title,
+    imageUrl: i.imageUrl,
+    linkUrl: i.linkUrl,
+  }));
+}
+
+export default async function Home() {
+  const data = await getStorefrontPayload();
+  const { siteConfig, heroSlides, gridItems, specialProducts } = data;
+
+  const wedding = mapPromo(gridItems.filter((i) => i.section === "WEDDING_EDIT"));
+  const byPrice = mapPromo(gridItems.filter((i) => i.section === "SHOP_BY_PRICE"));
+  const crafts = mapPromo(gridItems.filter((i) => i.section === "CRAFTS"));
+  const occasions = mapPromo(gridItems.filter((i) => i.section === "SHOP_BY_OCCASION"));
+
+  return (
+    <main className="min-h-screen bg-[#f7f0e7] text-[#201815]">
+      <StorefrontNavbar />
+      <section className="w-full pt-[138px] sm:pt-[146px] lg:pt-[154px]">
+        <HeroCarousel slides={heroSlides} />
+      </section>
+
+      <HomePromoGrid
+        title={siteConfig.weddingEditTitle}
+        items={wedding}
+        columnsClass="grid-cols-1 sm:grid-cols-2 lg:grid-cols-4"
+      />
+
+      <ProductList />
+
+      <SpecialProductsSection
+        title={siteConfig.specialsTitle}
+        products={specialProducts}
+      />
+
+      <HomePromoGrid
+        title={siteConfig.shopByPriceTitle}
+        items={byPrice}
+        columnsClass="grid-cols-2 md:grid-cols-4"
+      />
+
+      <HomePromoGrid
+        title={siteConfig.craftsTitle}
+        items={crafts}
+        columnsClass="grid-cols-1 sm:grid-cols-2 lg:grid-cols-4"
+      />
+
+      <HomePromoGrid
+        title={siteConfig.shopByOccasionTitle}
+        items={occasions}
+        columnsClass="grid-cols-1 md:grid-cols-2"
+        tall
+      />
+
+      <AboutBlock
+        title={siteConfig.aboutTitle}
+        body={siteConfig.aboutBody}
+        imageUrl={siteConfig.aboutImageUrl}
+      />
+
+>>>>>>> cb8727c (backend)
       <Footer />
     </main>
   );

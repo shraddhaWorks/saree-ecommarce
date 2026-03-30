@@ -1,5 +1,5 @@
 export type CartLine = {
-  productId: number;
+  productId: string;
   name: string;
   price: number;
   qty: number;
@@ -29,13 +29,22 @@ function readFromStorage(): Cart {
     const cart = parsed as Partial<Cart>;
     if (!Array.isArray(cart.items)) return emptyCart();
 
-    // Minimal validation of the shape.
+    if (
+      cart.items.some(
+        (i) => typeof (i as { productId?: unknown }).productId === "number",
+      )
+    ) {
+      window.localStorage.removeItem(CART_STORAGE_KEY);
+      return emptyCart();
+    }
+
     return {
       items: cart.items
         .filter((i): i is CartLine => {
           const item = i as Partial<CartLine>;
           return (
-            typeof item.productId === "number" &&
+            typeof item.productId === "string" &&
+            item.productId.length > 0 &&
             typeof item.name === "string" &&
             typeof item.price === "number" &&
             typeof item.qty === "number" &&
@@ -76,7 +85,6 @@ export function addToCart(input: Omit<CartLine, "qty"> & { qty: number }): Cart 
     next[idx] = {
       ...next[idx],
       qty: next[idx].qty + qty,
-      // Keep latest name/price/image in case they changed.
       name: input.name,
       price: input.price,
       image: input.image,
@@ -95,4 +103,3 @@ export function clearCart() {
   if (typeof window === "undefined") return;
   window.localStorage.removeItem(CART_STORAGE_KEY);
 }
-

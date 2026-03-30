@@ -22,15 +22,22 @@ export default function ProductDetails({
     product,
     relatedProducts,
 }: Props) {
+<<<<<<< HEAD
     const router = useRouter();
     const { addItem } = useCart();
     const { toggleItem, isWishlisted } = useWishlist();
     const [selectedImage, setSelectedImage] = useState(product.images[0]);
+=======
+    const [selectedImage, setSelectedImage] = useState(
+        product.images[0] ?? "",
+    );
+>>>>>>> cb8727c (backend)
     const [qty, setQty] = useState(1);
     const stock = product.stock ?? 0;
     const safeQty = Math.max(1, Math.min(qty, stock));
     const isOutOfStock = stock <= 0;
 
+<<<<<<< HEAD
     const addProductToCart = () => {
         addItem({
             id: String(product.id),
@@ -42,6 +49,12 @@ export default function ProductDetails({
         // Notify any cart UI (navbar drawer) to open.
         window.dispatchEvent(new Event("cart:open"));
     };
+=======
+    const router = useRouter();
+    const maxQty = product.inStock ? Math.max(1, product.stock) : 0;
+    const safeQty = Math.max(1, Math.min(qty, maxQty || 1));
+    const isOutOfStock = !product.inStock || product.stock <= 0;
+>>>>>>> cb8727c (backend)
 
     const handleAddToCart = () => {
         if (isOutOfStock) return;
@@ -75,6 +88,7 @@ export default function ProductDetails({
                     <div className="w-full md:w-[75%]">
                         <img
                             src={selectedImage}
+<<<<<<< HEAD
                             className="w-full aspect-[3/4] md:h-[650px] object-cover object-top rounded-xl shadow-sm"
                         />
                     </div>
@@ -91,6 +105,30 @@ export default function ProductDetails({
                                     : "border-gray-200 blur-[2px] opacity-60 hover:blur-none hover:opacity-100"
                                     }`}
                             />
+=======
+                            alt={product.name}
+                            className="w-full h-162.5 object-cover rounded-xl"
+                        />
+                    </div>
+
+                    <div className="flex flex-col gap-4 w-[25%]">
+                        {product.images.map((img) => (
+                            <button
+                                key={img}
+                                type="button"
+                                onClick={() => setSelectedImage(img)}
+                                className={`h-37.5 rounded-lg cursor-pointer border overflow-hidden p-0 bg-transparent ${selectedImage === img
+                                    ? "border-black"
+                                    : "border-gray-200"
+                                    }`}
+                            >
+                                <img
+                                    src={img}
+                                    alt=""
+                                    className="h-full w-full object-cover"
+                                />
+                            </button>
+>>>>>>> cb8727c (backend)
                         ))}
                     </div>
                 </div>
@@ -120,8 +158,19 @@ export default function ProductDetails({
                         Tax included. Shipping calculated at checkout.
                     </p>
 
+<<<<<<< HEAD
                     <p className="text-red-500 text-sm mb-4">
                         • {stock} items available
+=======
+                    <p className={`text-sm mb-4 ${isOutOfStock ? "text-red-600" : "text-red-500"}`}>
+                        {isOutOfStock
+                            ? "• Out of stock"
+                            : `• ${product.stock} items available`}
+                    </p>
+
+                    <p className="text-gray-700 text-sm mb-6">
+                        {product.description}
+>>>>>>> cb8727c (backend)
                     </p>
 
                     {/* Quantity */}
@@ -129,6 +178,7 @@ export default function ProductDetails({
                         <p className="mb-2 font-medium">Quantity</p>
                         <div className="flex border rounded-lg w-fit">
                             <button
+                                type="button"
                                 className="px-4 py-2"
                                 onClick={() => qty > 1 && setQty(qty - 1)}
                             >
@@ -136,8 +186,15 @@ export default function ProductDetails({
                             </button>
                             <span className="px-4">{qty}</span>
                             <button
+                                type="button"
                                 className="px-4 py-2"
+<<<<<<< HEAD
                                 onClick={() => qty < stock && setQty(qty + 1)}
+=======
+                                onClick={() =>
+                                    qty < maxQty && setQty(qty + 1)
+                                }
+>>>>>>> cb8727c (backend)
                             >
                                 +
                             </button>
@@ -214,6 +271,7 @@ export default function ProductDetails({
                             <summary className="cursor-pointer font-medium">
                                 Product Specifications
                             </summary>
+<<<<<<< HEAD
                             <div className="text-sm mt-2 space-y-1 bg-gray-50 p-3 rounded">
                                 {product.fabric && <p><span className="font-semibold">Fabric:</span> {product.fabric}</p>}
                                 {product.color && <p><span className="font-semibold">Color:</span> {product.color}</p>}
@@ -221,6 +279,12 @@ export default function ProductDetails({
                                 {product.category && <p><span className="font-semibold">Category:</span> {product.category}</p>}
                                 {product.occasion && <p><span className="font-semibold">Occasion:</span> {product.occasion}</p>}
                             </div>
+=======
+                            <p className="text-sm mt-2">
+                                Fabric: {product.clothType}
+                                {product.occasion ? ` · Occasion: ${product.occasion}` : ""}
+                            </p>
+>>>>>>> cb8727c (backend)
                         </details>
                     </div>
                 </div>

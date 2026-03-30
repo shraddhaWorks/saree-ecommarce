@@ -1,19 +1,34 @@
 "use client";
 
 import Link from "next/link";
+<<<<<<< HEAD
 import { useEffect, useState, useMemo } from "react";
+=======
+import { notFound } from "next/navigation";
+>>>>>>> cb8727c (backend)
 import Footer from "@/components/footer/Footer";
 import ProductDetails from "@/components/product/ProductDetails";
+<<<<<<< HEAD
 import type { Product } from "@/components/product/product";
+=======
+import { toStorefrontProduct } from "@/lib/storefront-map";
+import prisma from "@/lib/db";
+>>>>>>> cb8727c (backend)
 import { ChevronLeft } from "lucide-react";
 import { products as dummyProducts } from "@/lib/dummyData";
 import { use } from "react";
 
+<<<<<<< HEAD
 export default function ProductPage({
   params: paramsPromise
+=======
+export default async function ProductPage({
+  params,
+>>>>>>> cb8727c (backend)
 }: {
-  params: Promise<{ handle: string }>
+  params: Promise<{ handle: string }>;
 }) {
+<<<<<<< HEAD
   const params = use(paramsPromise);
   const { handle } = params;
   
@@ -74,11 +89,52 @@ export default function ProductPage({
         <Footer />
       </main>
     );
+=======
+  const { handle } = await params;
+  const slug = decodeURIComponent(handle).toLowerCase();
+
+  const row = await prisma.product.findUnique({
+    where: { slug },
+    include: {
+      category: true,
+      images: { orderBy: { position: "asc" } },
+    },
+  });
+
+  if (!row) {
+    notFound();
+>>>>>>> cb8727c (backend)
   }
 
+  const product = toStorefrontProduct(row);
+
+  const relatedRows = await prisma.product.findMany({
+    where: {
+      id: { not: row.id },
+      categoryId: row.categoryId,
+      inStock: true,
+      stockQuantity: { gt: 0 },
+    },
+    include: {
+      category: true,
+      images: { orderBy: { position: "asc" } },
+    },
+    take: 8,
+    orderBy: { createdAt: "desc" },
+  });
+
+  const relatedProducts = relatedRows.map(toStorefrontProduct);
+
   return (
+<<<<<<< HEAD
     <main className="min-h-screen bg-[#fdfbf7]">
       <div className="max-w-[1440px] mx-auto px-6 py-6">
+=======
+    <main className="min-h-screen bg-[#f7f0e7]">
+      <StorefrontNavbar />
+
+      <div className="pt-38.5 px-6 py-4">
+>>>>>>> cb8727c (backend)
         <Link
           href="/"
           className="inline-flex items-center gap-2 text-[#9d2936] hover:text-[#7c1f29] font-medium transition"
@@ -88,10 +144,14 @@ export default function ProductPage({
         </Link>
       </div>
 
+<<<<<<< HEAD
       <ProductDetails
         product={product}
         relatedProducts={relatedProducts}
       />
+=======
+      <ProductDetails product={product} relatedProducts={relatedProducts} />
+>>>>>>> cb8727c (backend)
 
       <Footer />
     </main>

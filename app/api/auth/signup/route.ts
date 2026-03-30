@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/db";
+import { describeSupabaseConnectionFailure } from "@/lib/supabaseErrors";
 import { supabaseAdmin } from "@/lib/supabaseServer";
 
 type SignupBody = {
@@ -22,13 +23,34 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { data, error } = await supabaseAdmin.auth.admin.createUser({
-      email,
-      password,
-      email_confirm: true,
-    });
+    let data: Awaited<
+      ReturnType<typeof supabaseAdmin.auth.admin.createUser>
+    >["data"];
+    let error: Awaited<
+      ReturnType<typeof supabaseAdmin.auth.admin.createUser>
+    >["error"];
+
+    try {
+      const res = await supabaseAdmin.auth.admin.createUser({
+        email,
+        password,
+        email_confirm: true,
+      });
+      data = res.data;
+      error = res.error;
+    } catch (e) {
+      const hint = describeSupabaseConnectionFailure(e);
+      if (hint) {
+        return NextResponse.json({ error: hint }, { status: 503 });
+      }
+      throw e;
+    }
 
     if (error || !data.user) {
+      const hint = describeSupabaseConnectionFailure(error);
+      if (hint) {
+        return NextResponse.json({ error: hint }, { status: 503 });
+      }
       return NextResponse.json(
         { error: error?.message ?? "Failed to create user" },
         { status: 400 },

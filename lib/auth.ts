@@ -2,8 +2,8 @@ import { NextRequest } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import prisma from "@/lib/db";
 
-const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim();
+const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.trim();
 
 if (!SUPABASE_URL) {
   throw new Error("NEXT_PUBLIC_SUPABASE_URL is not set in environment");

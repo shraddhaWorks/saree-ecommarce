@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { describeSupabaseConnectionFailure } from "@/lib/supabaseErrors";
 
-const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim();
+const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.trim();
 
 if (!SUPABASE_URL) {
   throw new Error("NEXT_PUBLIC_SUPABASE_URL is not set in environment");
@@ -37,12 +38,33 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+    let data: Awaited<
+      ReturnType<typeof supabase.auth.signInWithPassword>
+    >["data"];
+    let error: Awaited<
+      ReturnType<typeof supabase.auth.signInWithPassword>
+    >["error"];
+
+    try {
+      const res = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      data = res.data;
+      error = res.error;
+    } catch (e) {
+      const hint = describeSupabaseConnectionFailure(e);
+      if (hint) {
+        return NextResponse.json({ error: hint }, { status: 503 });
+      }
+      throw e;
+    }
 
     if (error || !data.session) {
+      const hint = describeSupabaseConnectionFailure(error);
+      if (hint) {
+        return NextResponse.json({ error: hint }, { status: 503 });
+      }
       return NextResponse.json(
         { error: error?.message ?? "Invalid email or password" },
         { status: 401 },
