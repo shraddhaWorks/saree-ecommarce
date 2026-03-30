@@ -1,112 +1,65 @@
 "use client";
 
 import Link from "next/link";
-<<<<<<< HEAD
-import { usePathname } from "next/navigation";
-import { useEffect, useRef, useState, type MouseEvent } from "react";
-import { useCart, useWishlist } from "@/components/cart";
-import { MegaMenu, menuData, primaryLinks, suggestedSearches, type MenuEntryKey, type MenuSection, type MenuItem } from "./menu";
-=======
-import { useRouter } from "next/navigation";
-import { useEffect, useState, type MouseEvent } from "react";
-import { getAccessToken, setAccessToken } from "@/lib/auth-client";
-import { MegaMenu, menuData, primaryLinks, suggestedSearches, type MenuKey } from "./menu";
->>>>>>> cb8727c (backend)
-import { Drawer, IconButton, RangamLogo } from "./ui";
-import { BagIcon, CloseIcon, HeartIcon, SearchIcon, UserIcon, SadBagIcon, MenuIcon } from "./icons";
+import { useEffect, useMemo, useState } from "react";
 
-type PanelKey = "bag" | "search" | "profile" | "wishlist" | "menu" | null;
+import { authHeaders, getAccessToken, setAccessToken } from "@/lib/auth-client";
+import { getCart, getCartCount, type Cart } from "@/lib/cart";
+import { BagIcon, SearchIcon, UserIcon } from "./icons";
+import { Drawer, IconButton, RangamLogo } from "./ui";
+import { MainNavigation } from "./main-navigation";
+
+type PanelKey = "bag" | "search" | "profile" | null;
 
 type SearchHit = { id: string; slug: string; name: string; mainImageUrl?: string | null };
 
 export function StorefrontNavbar() {
-<<<<<<< HEAD
-  const { state, removeItem } = useCart();
-  const {
-    state: wishlistState,
-    removeItem: removeWishlistItem,
-  } = useWishlist();
-=======
-  const router = useRouter();
-  const [activeMenu, setActiveMenu] = useState<MenuKey | null>(null);
->>>>>>> cb8727c (backend)
   const [activePanel, setActivePanel] = useState<PanelKey>(null);
-  const [activeMenu, setActiveMenu] = useState<MenuEntryKey | null>(null);
-  const [openMobileSubmenu, setOpenMobileSubmenu] = useState<string | null>(null);
-  const [isScrolled, setIsScrolled] = useState(false);
-  const pathname = usePathname();
-  const isHomePage = pathname === "/";
-  const hasOverlay = activePanel !== null;
-  const hasMenuOverlay = activeMenu !== null;
-  const navbarRef = useRef<HTMLDivElement | null>(null);
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
-
-<<<<<<< HEAD
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
-    };
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-=======
   const [cart, setCart] = useState<Cart>({ items: [] });
+
+  const [hasSession, setHasSession] = useState(false);
+
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<SearchHit[]>([]);
   const [searchLoading, setSearchLoading] = useState(false);
   const [searchError, setSearchError] = useState<string | null>(null);
-  const [hasSession, setHasSession] = useState(false);
->>>>>>> cb8727c (backend)
+
+  const cartCount = useMemo(() => getCartCount(cart), [cart]);
+
+  useEffect(() => {
+    const sync = () => setCart(getCart());
+    sync();
+    window.addEventListener("cart:updated", sync);
+    return () => window.removeEventListener("cart:updated", sync);
+  }, []);
+
+  useEffect(() => {
+    if (activePanel === "profile") setHasSession(!!getAccessToken());
+  }, [activePanel]);
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        setActivePanel(null);
-        setActiveMenu(null);
-      }
+      if (event.key === "Escape") setActivePanel(null);
     };
-
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
   }, []);
 
-  useEffect(() => {
-    const onPointerDown = (event: PointerEvent) => {
-      if (!navbarRef.current?.contains(event.target as Node)) {
-        setActiveMenu(null);
-      }
-    };
+  async function runSearch(q: string) {
+    const query = q.trim();
+    setSearchQuery(q);
 
-    document.addEventListener("pointerdown", onPointerDown);
-    return () => document.removeEventListener("pointerdown", onPointerDown);
-  }, []);
-
-
-
-  useEffect(() => {
-    if (activePanel === "profile") {
-      setHasSession(!!getAccessToken());
-    }
-  }, [activePanel]);
-
-  async function runSearch(overrideQuery?: string) {
-    const q = (overrideQuery ?? searchQuery).trim();
-    if (overrideQuery !== undefined) setSearchQuery(overrideQuery);
-    if (!q) {
+    if (!query) {
       setSearchResults([]);
       setSearchError(null);
       return;
     }
+
     setSearchLoading(true);
     setSearchError(null);
     try {
-      const res = await fetch(
-        `/api/products?search=${encodeURIComponent(q)}&limit=12`,
-      );
-      const data = (await res.json()) as {
-        items?: SearchHit[];
-        error?: string;
-      };
+      const res = await fetch(`/api/products?search=${encodeURIComponent(query)}&limit=12`);
+      const data = (await res.json()) as { items?: SearchHit[]; error?: string };
       if (!res.ok) {
         setSearchError(data.error ?? "Search failed");
         setSearchResults([]);
@@ -121,354 +74,82 @@ export function StorefrontNavbar() {
     }
   }
 
-  useEffect(() => {
-    document.body.style.overflow = hasOverlay ? "hidden" : "";
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, [hasOverlay]);
-
-  useEffect(() => {
-    const openBag = () => setActivePanel("bag");
-    window.addEventListener("cart:open", openBag);
-
-    return () => window.removeEventListener("cart:open", openBag);
-  }, []);
-
-  useEffect(() => {
-    const openWishlist = () => setActivePanel("wishlist");
-    window.addEventListener("wishlist:open", openWishlist);
-
-    return () => window.removeEventListener("wishlist:open", openWishlist);
-  }, []);
-
-  const closeAll = () => {
+  async function logout() {
+    setAccessToken(null);
+    setHasSession(false);
     setActivePanel(null);
-    setActiveMenu(null);
-    if (timeoutRef.current) clearTimeout(timeoutRef.current);
-  };
-
-  const handleMouseEnter = (menuKey: MenuEntryKey) => {
-    if (timeoutRef.current) clearTimeout(timeoutRef.current);
-    setActiveMenu(menuKey);
-  };
-
-  const handleMouseLeave = () => {
-    timeoutRef.current = setTimeout(() => {
-      setActiveMenu(null);
-    }, 200); // 200ms grace period
-  };
-
-  const stopEvent = (event: MouseEvent<HTMLElement>) => {
-    event.stopPropagation();
-  };
-
-  const openPanel = (panel: Exclude<PanelKey, null>) => {
-    setActivePanel(panel);
-    setActiveMenu(null);
-  };
-
-  const hasWishlistItems = wishlistState.items.length > 0;
-  const formatPrice = (price: number) =>
-    `Rs. ${price.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-  const isMegaMenuOpen = activeMenu !== null;
+  }
 
   return (
     <>
-      <div 
-        ref={navbarRef} 
-        className="sticky top-0 z-50 bg-[#fdfbf7] transition-all duration-500 shadow-[0_10px_34px_rgba(44,25,17,0.08)]"
-      >
-        <div className="h-[4px] bg-[#822733] transition-opacity duration-500 opacity-100" />
-        <header 
-          className="bg-[#fdfbf7] border-b border-black/10 transition-colors duration-500" 
-          onClick={closeAll}
-        >
-          <div className="mx-auto max-w-[1880px] px-3 py-2 sm:px-4 sm:py-3 lg:px-8 lg:py-4">
-            <div onClick={stopEvent}>
-              <div className="flex items-center gap-[clamp(8px,1vw,24px)] whitespace-nowrap">
-                  <div className="flex lg:hidden shrink-0 items-center mr-1 text-black">
-                    <IconButton label="Menu" onClick={() => openPanel("menu")}>
-                      <MenuIcon />
-                    </IconButton>
-                  </div>
+      <header className="fixed left-0 top-0 z-40 w-full bg-[#f7f0e7]/95 backdrop-blur">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-4 sm:px-6">
+          <Link href="/" className="shrink-0" aria-label="Home">
+            <RangamLogo />
+          </Link>
 
-                  <Link href="/" className="shrink-0" onClick={closeAll}>
-                    <div className="transition-all duration-500">
-                      <RangamLogo />
-                    </div>
-                  </Link>
-
-                <nav aria-label="Primary" className="flex-1 min-w-0 hidden lg:block">
-                  <div className="flex min-w-0 items-center justify-center gap-[clamp(8px,1.1vw,28px)] py-2">
-                    {primaryLinks.map((item) => (
-                      item.menuKey ? (
-                        <button
-                          key={item.label}
-                          type="button"
-                          onMouseEnter={() => handleMouseEnter(item.menuKey as MenuEntryKey)}
-                          onMouseLeave={handleMouseLeave}
-                          onClick={() => setActiveMenu(null)}
-                          className={
-                            activeMenu === item.menuKey
-                              ? "min-w-0 shrink cursor-pointer text-center font-[Georgia,'Times_New_Roman',serif] text-[clamp(8px,0.91vw,17px)] leading-none tracking-normal text-[#9d2936] transition"
-                              : "min-w-0 shrink cursor-pointer text-center font-[Georgia,'Times_New_Roman',serif] text-[clamp(8px,0.91vw,17px)] leading-none tracking-normal text-black transition hover:text-[#9d2936]"
-                          }
-                        >
-                          {item.label}
-                        </button>
-                      ) : (
-                        <Link
-                          key={item.label}
-                          href={item.href}
-                          onClick={closeAll}
-                          className="min-w-0 shrink cursor-pointer text-center font-[Georgia,'Times_New_Roman',serif] text-[clamp(8px,0.91vw,17px)] leading-none tracking-normal text-black transition hover:text-[#9d2936]"
-                        >
-                          {item.label}
-                        </Link>
-                      )
-                    ))}
-                  </div>
-                </nav>
-
-                <div className="ml-auto flex shrink-0 items-center gap-1 sm:gap-2 lg:gap-3 text-black">
-                  <IconButton label="Search" onClick={() => openPanel("search")} className="cursor-pointer">
-                    <SearchIcon />
-                  </IconButton>
-                  <div className="relative hidden sm:block">
-                    <IconButton label="Wishlist" onClick={() => openPanel("wishlist")} className="cursor-pointer">
-                      <HeartIcon />
-                    </IconButton>
-                    {wishlistState.itemCount > 0 ? (
-                      <span className="pointer-events-none absolute -right-1 -top-1 grid h-5 min-w-5 place-items-center rounded-full bg-[#9d2936] px-1 text-[10px] font-semibold text-white">
-                        {wishlistState.itemCount}
-                      </span>
-                    ) : null}
-                  </div>
-                  <IconButton label="Profile" onClick={() => openPanel("profile")} className="cursor-pointer">
-                    <UserIcon />
-                  </IconButton>
-                  <div className="relative hidden sm:block">
-                    <IconButton label="Bag" onClick={() => openPanel("bag")} className="cursor-pointer">
-                      <BagIcon />
-                    </IconButton>
-                    {state.itemCount > 0 ? (
-                      <span className="pointer-events-none absolute -right-1 -top-1 grid h-5 min-w-5 place-items-center rounded-full bg-[#9d2936] px-1 text-[10px] font-semibold text-white">
-                        {state.itemCount}
-                      </span>
-                    ) : null}
-                  </div>
-                </div>
-              </div>
-            </div>
+          <div className="flex-1">
+            <MainNavigation />
           </div>
-        </header>
-        {activeMenu ? (
-          <nav 
-            aria-label="Primary mega menu" 
-            onClick={closeAll}
-            onMouseEnter={() => {
-              if (timeoutRef.current) clearTimeout(timeoutRef.current);
-            }}
-            onMouseLeave={handleMouseLeave}
-            className="absolute left-0 top-full w-full hidden lg:block animate-page-entrance"
-          >
-            <MegaMenu menu={menuData[activeMenu]} onItemClick={closeAll} />
-          </nav>
-        ) : null}
-      </div>
 
-      {hasMenuOverlay ? (
-        <button
-          type="button"
-          aria-label="Close menu overlay"
-          className="fixed inset-0 z-40 bg-[rgba(32,24,21,0.18)] backdrop-brightness-75 hidden lg:block"
-          onClick={closeAll}
-        />
-      ) : null}
+          <div className="flex items-center gap-1">
+            <IconButton label="Search" onClick={() => setActivePanel("search")}>
+              <SearchIcon />
+            </IconButton>
 
-      {hasOverlay ? (
-        <button
-          type="button"
-          aria-label="Close overlay"
-          className="fixed inset-0 z-40 bg-black/25 backdrop-blur-[1px]"
-          onClick={closeAll}
-        />
-      ) : null}
+            <IconButton label="Account" onClick={() => setActivePanel("profile")}>
+              <UserIcon />
+            </IconButton>
 
-      <Drawer
-        isOpen={activePanel === "wishlist"}
-        title="Wishlist"
-        count={`(${wishlistState.itemCount})`}
-        onClose={() => setActivePanel(null)}
-      >
-        {hasWishlistItems ? (
-          <div className="flex flex-1 flex-col px-6 pb-8">
-            <div className="flex-1 space-y-4 overflow-y-auto pr-1">
-              {wishlistState.items.map((item) => (
-                <article
-                  key={item.id}
-                  className="rounded-[28px] border border-black/10 bg-white p-4 shadow-[0_12px_34px_rgba(44,25,17,0.07)]"
-                >
-                  <div className="flex gap-4">
-                    <div className="h-28 w-24 overflow-hidden rounded-2xl bg-[#f3ebe0]">
-                      <img
-                        src={item.image}
-                        alt={item.name}
-                        className="h-full w-full object-cover"
-                      />
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-start justify-between gap-3">
-                        <div>
-                          <h3 className="line-clamp-2 text-base font-semibold text-black">
-                            {item.name}
-                          </h3>
-                          <p className="mt-2 text-sm font-medium text-[#9d2936]">
-                            {formatPrice(item.price)}
-                          </p>
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() => removeWishlistItem(item.id)}
-                          className="text-sm text-black/45 transition hover:text-[#9d2936]"
-                        >
-                          Remove
-                        </button>
-                      </div>
-                      {item.href ? (
-                        <Link
-                          href={item.href}
-                          onClick={closeAll}
-                          className="mt-4 inline-block border-b border-black pb-1 text-sm text-black/75"
-                        >
-                          View Product
-                        </Link>
-                      ) : null}
-                    </div>
-                  </div>
-                </article>
-              ))}
-            </div>
+            <IconButton label="Cart" onClick={() => setActivePanel("bag")} className="relative">
+              <BagIcon />
+              {cartCount > 0 ? (
+                <span className="absolute -right-1 -top-1 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-accent px-1 text-[11px] font-semibold text-white">
+                  {cartCount}
+                </span>
+              ) : null}
+            </IconButton>
           </div>
-        ) : (
-          <div className="flex flex-1 flex-col items-center justify-center px-6 text-center">
-            <div className="mb-7 flex h-16 w-16 items-center justify-center rounded-full border-2 border-black text-black">
-              <HeartIcon />
-            </div>
-            <h3 className="font-[Georgia,'Times New Roman',serif] text-4xl tracking-[0.02em] text-black">
-              Your wishlist is empty
-            </h3>
-            <button
-              type="button"
-              onClick={() => setActivePanel(null)}
-              className="mt-8 border-b border-black pb-1 text-lg text-black/80"
-            >
-              Continue Shopping
-            </button>
-          </div>
-        )}
-      </Drawer>
+        </div>
+      </header>
+
+      <div className="h-[92px] sm:h-[108px] lg:h-[128px]" />
 
       <Drawer
         isOpen={activePanel === "bag"}
-        title="Your bag"
-        count={`(${state.itemCount})`}
+        title="Bag"
+        count={cartCount ? `(${cartCount})` : ""}
         onClose={() => setActivePanel(null)}
       >
-        {state.items.length === 0 ? (
-          <div className="flex flex-1 flex-col items-center justify-center px-6 text-center">
-            <div className="mb-7 flex h-16 w-16 items-center justify-center rounded-full border-2 border-black text-black">
-              <SadBagIcon />
+        <div className="flex-1 overflow-auto px-8 pb-8">
+          {cart.items.length === 0 ? (
+            <div className="rounded-3xl border border-black/10 bg-white p-6 text-center text-sm text-black/60">
+              Your bag is empty.
             </div>
-            <h3 className="font-[Georgia,'Times New Roman',serif] text-4xl tracking-[0.02em] text-black">
-              Your cart is empty
-            </h3>
-            <button
-              type="button"
-              onClick={() => setActivePanel(null)}
-              className="mt-8 border-b border-black pb-1 text-lg text-black/80"
-            >
-              Continue Shopping
-            </button>
-          </div>
-        ) : (
-          <div className="flex flex-1 flex-col">
-            <ul className="flex-1 space-y-3 overflow-auto px-8 py-6">
-              {state.items.map((item) => (
-                <li
-                  key={item.id}
-                  className="rounded-2xl border border-black/10 bg-white p-4"
-                >
-                  <div className="flex gap-4">
-                    {item.image ? (
-                      <div className="h-20 w-16 shrink-0 overflow-hidden rounded-xl bg-[#f3ebe0]">
-                        <img
-                          src={item.image}
-                          alt={item.name}
-                          className="h-full w-full object-cover"
-                        />
-                      </div>
-                    ) : (
-                      <div className="h-20 w-16 shrink-0 rounded-xl bg-[#f3ebe0]" />
-                    )}
-                    <div className="flex flex-1 items-start justify-between gap-3 min-w-0">
-                      <div className="min-w-0 flex flex-col justify-between h-full">
-                        <div>
-                          <p className="line-clamp-2 text-sm font-semibold text-black/80">
-                            {item.name}
-                          </p>
-                          <p className="mt-1 text-xs text-black/55">
-                            Qty {item.quantity}
-                            {item.size ? ` • Size: ${item.size}` : ""}
-                            {item.color ? ` • Color: ${item.color}` : ""}
-                          </p>
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() => removeItem(item.id)}
-                          className="mt-2 text-xs text-black/45 transition hover:text-[#9d2936] text-left"
-                        >
-                          Remove
-                        </button>
-                      </div>
-                      <p className="shrink-0 text-sm font-semibold text-accent">
-                        Rs. {item.price * item.quantity}
-                      </p>
+          ) : (
+            <div className="space-y-3">
+              {cart.items.map((i) => (
+                <div key={i.productId} className="rounded-3xl border border-black/10 bg-white p-4">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-semibold">{i.name}</p>
+                      <p className="mt-1 text-sm text-black/55">Qty {i.qty}</p>
                     </div>
+                    <p className="shrink-0 text-sm font-semibold text-accent">Rs. {i.price * i.qty}</p>
                   </div>
-                </li>
+                </div>
               ))}
-            </ul>
 
-            <div className="border-t border-black/10 px-8 py-6">
-              <div className="flex items-center justify-between gap-3">
-                <span className="text-sm font-semibold text-black/70">Total</span>
-                <span className="text-sm font-semibold text-black">
-                  Rs. {state.total}
-                </span>
-              </div>
-
-              <div className="mt-5">
-                <Link
-                  href="/checkout"
-                  onClick={() => setActivePanel(null)}
-                  className="block w-full rounded-full bg-accent px-4 py-3 text-sm font-semibold text-white transition hover:opacity-90 text-center"
-                >
-                  Checkout
-                </Link>
-              </div>
-
-              <button
-                type="button"
+              <Link
+                href="/checkout"
                 onClick={() => setActivePanel(null)}
-                className="mt-3 block w-full rounded-full border border-black/15 bg-white px-4 py-3 text-sm font-semibold text-black/80 transition hover:border-[#9d2936] hover:text-[#9d2936]"
+                className="mt-4 block w-full rounded-full bg-accent px-4 py-3 text-center text-sm font-semibold text-white transition hover:opacity-90"
               >
-                Continue Shopping
-              </button>
+                Checkout
+              </Link>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </Drawer>
 
       <Drawer
@@ -476,253 +157,91 @@ export function StorefrontNavbar() {
         title="Search"
         onClose={() => setActivePanel(null)}
       >
-        <div className="space-y-8 px-6 pb-8">
-          <div className="flex items-center rounded-2xl border border-black/20 bg-white px-6 py-4">
+        <div className="flex-1 overflow-auto px-8 pb-8">
+          <div className="rounded-3xl border border-black/10 bg-white p-4">
             <input
-              type="search"
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  e.preventDefault();
-                  void runSearch(undefined);
-                }
+              onChange={(e) => {
+                const next = e.target.value;
+                setSearchQuery(next);
+                void runSearch(next);
               }}
-              placeholder="Search sarees by name…"
-              className="w-full bg-transparent text-[18px] text-black outline-none placeholder:text-black/55"
+              placeholder="Search sarees..."
+              className="w-full bg-transparent text-sm outline-none"
             />
-            <button
-              type="button"
-              onClick={() => void runSearch(undefined)}
-              className="flex h-14 w-14 items-center justify-center rounded-full bg-black text-white"
-            >
-              <SearchIcon />
-            </button>
           </div>
-          {searchError ? (
-            <p className="text-sm text-red-600">{searchError}</p>
-          ) : null}
-          {searchLoading ? (
-            <p className="text-sm text-black/50">Searching…</p>
-          ) : null}
-          {searchResults.length > 0 ? (
-            <ul className="max-h-[50vh] space-y-2 overflow-auto">
-              {searchResults.map((p) => (
-                <li key={p.id}>
-                  <Link
-                    href={`/products/${p.slug}`}
-                    onClick={() => setActivePanel(null)}
-                    className="flex items-center gap-3 rounded-xl border border-black/10 bg-white p-3 text-left transition hover:border-[#9d2936]"
-                  >
-                    {p.mainImageUrl ? (
-                      <img
-                        src={p.mainImageUrl}
-                        alt=""
-                        className="h-14 w-14 shrink-0 rounded-lg object-cover"
-                      />
-                    ) : null}
-                    <span className="text-sm font-medium text-black/85">{p.name}</span>
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          ) : null}
-          <div className="h-px bg-black/15" />
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.3em] text-black/40">
-              Popular Searches
-            </p>
-            <div className="mt-5 flex flex-wrap gap-3">
-              {suggestedSearches.map((item) => (
-                <button
-                  key={item}
-                  type="button"
-                  onClick={() => void runSearch(item)}
-                  className="rounded-full border border-black/15 bg-white px-4 py-2 text-sm text-black/80 transition hover:border-[#9d2936] hover:text-[#9d2936]"
-                >
-                  {item}
-                </button>
-              ))}
-            </div>
+
+          {searchLoading ? <p className="mt-3 text-sm text-black/55">Searching…</p> : null}
+          {searchError ? <p className="mt-3 text-sm text-red-600">{searchError}</p> : null}
+
+          <div className="mt-4 grid gap-3">
+            {searchResults.map((hit) => (
+              <Link
+                key={hit.id}
+                href={`/products/${hit.slug}`}
+                onClick={() => setActivePanel(null)}
+                className="rounded-3xl border border-black/10 bg-white p-4 transition hover:border-[#9d2936]"
+              >
+                <p className="text-sm font-semibold">{hit.name}</p>
+              </Link>
+            ))}
           </div>
         </div>
       </Drawer>
 
-      {activePanel === "profile" ? (
-        <div className="fixed inset-0 z-[60] grid place-items-center p-4">
-          <section className="relative w-full max-w-[1050px] rounded-[32px] bg-[#fdfbf7] p-6 shadow-[0_30px_80px_rgba(44,25,17,0.2)] sm:p-10">
-            <button
-              type="button"
-              aria-label="Close profile"
-              onClick={() => setActivePanel(null)}
-              className="absolute right-5 top-5 flex h-10 w-10 items-center justify-center rounded-full border border-black/45 text-black transition hover:border-[#9d2936] hover:text-[#9d2936]"
-            >
-              <CloseIcon />
-            </button>
-            <h2 className="text-center font-[Georgia,'Times New Roman',serif] text-4xl text-black sm:text-6xl">
-              Customer login
-            </h2>
-            <div className="mx-auto mt-8 max-w-[630px] rounded-[26px] bg-white px-7 py-10 shadow-[0_12px_40px_rgba(44,25,17,0.08)] sm:px-10 space-y-6 text-center">
-              {hasSession ? (
-                <p className="text-[17px] text-black/80">You are signed in.</p>
-              ) : (
-                <p className="text-[17px] text-black/80">
-                  Sign in for faster checkout and order history.
-                </p>
-              )}
-              <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">
+      <Drawer
+        isOpen={activePanel === "profile"}
+        title="Account"
+        onClose={() => setActivePanel(null)}
+      >
+        <div className="flex-1 overflow-auto px-8 pb-8">
+          <div className="rounded-3xl border border-black/10 bg-white p-6">
+            {hasSession ? (
+              <div className="space-y-3">
+                <Link
+                  href="/admin"
+                  onClick={() => setActivePanel(null)}
+                  className="block rounded-2xl border border-black/10 px-4 py-3 text-sm font-semibold transition hover:border-[#9d2936] hover:text-[#9d2936]"
+                >
+                  Admin dashboard
+                </Link>
+                <button
+                  type="button"
+                  onClick={() => void logout()}
+                  className="w-full rounded-2xl bg-black px-4 py-3 text-sm font-semibold text-white transition hover:opacity-90"
+                >
+                  Logout
+                </button>
+              </div>
+            ) : (
+              <div className="space-y-3">
                 <Link
                   href="/sign-in"
                   onClick={() => setActivePanel(null)}
-                  className="rounded-full border border-[#9d2936] px-8 py-4 font-[Georgia,'Times New Roman',serif] text-xl text-[#9d2936] transition hover:bg-[#9d2936] hover:text-white"
+                  className="block rounded-2xl bg-black px-4 py-3 text-center text-sm font-semibold text-white transition hover:opacity-90"
                 >
                   Sign in
                 </Link>
                 <Link
                   href="/sign-up"
                   onClick={() => setActivePanel(null)}
-                  className="rounded-full bg-[#9d2936] px-8 py-4 font-[Georgia,'Times New Roman',serif] text-xl text-white transition hover:opacity-90"
+                  className="block rounded-2xl border border-black/10 px-4 py-3 text-center text-sm font-semibold transition hover:border-[#9d2936] hover:text-[#9d2936]"
                 >
                   Create account
                 </Link>
+                <Link
+                  href="/admin/login"
+                  onClick={() => setActivePanel(null)}
+                  className="block text-center text-sm text-black/60 underline"
+                >
+                  Admin login
+                </Link>
               </div>
-              {hasSession ? (
-                <button
-                  type="button"
-                  onClick={() => {
-                    setAccessToken(null);
-                    setHasSession(false);
-                    router.refresh();
-                  }}
-                  className="text-[16px] text-black/60 underline underline-offset-4"
-                >
-                  Log out
-                </button>
-              ) : null}
-              <Link
-                href="/admin"
-                onClick={() => setActivePanel(null)}
-                className="block pt-2 text-sm text-black/45 hover:text-[#9d2936]"
-              >
-                Store admin
-              </Link>
-            </div>
-          </section>
-        </div>
-      ) : null}
-
-      <Drawer
-        isOpen={activePanel === "menu"}
-        title="Menu"
-        onClose={() => {
-          setActivePanel(null);
-          setOpenMobileSubmenu(null);
-        }}
-      >
-        <div className="flex flex-1 flex-col overflow-y-auto px-6 pb-20">
-                    <div className="grid grid-cols-2 gap-3 border-b border-black/10 pb-5 pt-4 sm:hidden">
-            <button
-              type="button"
-              onClick={() => {
-                setOpenMobileSubmenu(null);
-                setActivePanel("wishlist");
-              }}
-              className="relative rounded-2xl border border-black/15 bg-white px-4 py-3 text-sm font-semibold text-black transition hover:border-[#9d2936] hover:text-[#9d2936]"
-            >
-              Wishlist
-              {wishlistState.itemCount > 0 ? (
-                <span className="absolute -right-1 -top-1 grid h-5 min-w-5 place-items-center rounded-full bg-[#9d2936] px-1 text-[10px] font-semibold text-white">
-                  {wishlistState.itemCount}
-                </span>
-              ) : null}
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setOpenMobileSubmenu(null);
-                setActivePanel("bag");
-              }}
-              className="relative rounded-2xl border border-black/15 bg-white px-4 py-3 text-sm font-semibold text-black transition hover:border-[#9d2936] hover:text-[#9d2936]"
-            >
-              Bag
-              {state.itemCount > 0 ? (
-                <span className="absolute -right-1 -top-1 grid h-5 min-w-5 place-items-center rounded-full bg-[#9d2936] px-1 text-[10px] font-semibold text-white">
-                  {state.itemCount}
-                </span>
-              ) : null}
-            </button>
+            )}
           </div>
-          <ul className="space-y-6 pt-6">
-            {primaryLinks.map((item) => (
-              <li key={item.label} className="border-b border-black/5 pb-6 last:border-0">
-                <div 
-                  className="flex cursor-pointer items-center justify-between"
-                  onClick={() => {
-                    if (item.menuKey) {
-                      setOpenMobileSubmenu(openMobileSubmenu === item.label ? null : item.label);
-                    } else if (item.href) {
-                      window.location.href = item.href;
-                      closeAll();
-                    }
-                  }}
-                >
-                  <span className="text-xl font-medium text-black transition hover:text-[#9d2936]">
-                    {item.label}
-                  </span>
-                  {item.menuKey && (
-                    <button
-                      type="button"
-                      className={`p-2 transition-transform duration-300 ${openMobileSubmenu === item.label ? "rotate-180" : ""}`}
-                    >
-                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="m6 9 6 6 6-6"/>
-                      </svg>
-                    </button>
-                  )}
-                </div>
-
-                {item.menuKey && openMobileSubmenu === item.label && menuData[item.menuKey as MenuEntryKey] && (
-                  <div className="mt-4 animate-page-entrance space-y-6 pl-4 border-l-2 border-[#9d2936]/10">
-                    {/* Link to main category for mobile users */}
-                    <li>
-                      <Link
-                        href={item.href || '#'}
-                        onClick={closeAll}
-                        className="block text-lg font-bold text-[#9d2936] transition hover:underline"
-                      >
-                        View All {item.label}
-                      </Link>
-                    </li>
-                    
-                    {menuData[item.menuKey as MenuEntryKey].sections.map((section: MenuSection) => (
-                      <div key={section.title || "main"}>
-                        {section.title && (
-                          <h4 className="text-sm font-bold uppercase tracking-wider text-black/40 mb-3">
-                            {section.title}
-                          </h4>
-                        )}
-                        <ul className="space-y-4">
-                          {section.items.map((subItem: MenuItem) => (
-                            <li key={subItem.label}>
-                              <Link
-                                href={subItem.href || "#"}
-                                onClick={closeAll}
-                                className="block text-lg text-black/80 transition hover:text-[#9d2936]"
-                              >
-                                {subItem.label}
-                              </Link>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </li>
-            ))}
-          </ul>
         </div>
       </Drawer>
     </>
   );
 }
+
