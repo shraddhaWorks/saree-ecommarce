@@ -61,7 +61,7 @@ function normalizeSlug(s: string) {
 export default function ProductForm({ mode, initial }: Props) {
   const router = useRouter();
   const [categories, setCategories] = useState<Category[]>([]);
-  const [categoriesLoading, setCategoriesLoading] = useState(false);
+  const [categoriesLoading, setCategoriesLoading] = useState(false);   
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
