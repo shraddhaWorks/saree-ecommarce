@@ -75,7 +75,6 @@ export default async function Home() {
         body={siteConfig.aboutBody}
         imageUrl={siteConfig.aboutImageUrl}
       />
-
       <Footer />
     </main>
   );
