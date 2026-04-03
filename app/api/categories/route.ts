@@ -1,12 +1,28 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/db";
 import { getUserFromRequest } from "@/lib/auth";
+import { STARTER_CATEGORIES } from "@/lib/starter-categories";
 
 export async function GET() {
   try {
-    const categories = await prisma.category.findMany({
+    let categories = await prisma.category.findMany({
       orderBy: { name: "asc" },
     });
+
+    if (categories.length === 0) {
+      await prisma.category.createMany({
+        data: STARTER_CATEGORIES.map((category) => ({
+          name: category.name,
+          slug: category.slug,
+          description: category.description,
+        })),
+        skipDuplicates: true,
+      });
+
+      categories = await prisma.category.findMany({
+        orderBy: { name: "asc" },
+      });
+    }
 
     return NextResponse.json({ categories }, { status: 200 });
   } catch (err) {

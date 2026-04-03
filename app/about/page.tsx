@@ -1,6 +1,13 @@
-import { TemplatePlaceholder } from "@/components/planning/template-placeholder";
-import { aboutPageTemplate } from "@/features/storefront/blueprint-data";
+import { AboutRangamArticle } from "@/components/about/AboutRangamArticle";
+import Footer from "@/components/footer/Footer";
+import { StorefrontNavbar } from "@/components/navbar/storefront-navbar";
 
 export default function AboutPage() {
-  return <TemplatePlaceholder template={aboutPageTemplate} />;
+  return (
+    <main className="min-h-screen bg-white text-[#201815]">
+      <StorefrontNavbar />
+      <AboutRangamArticle />
+      <Footer />
+    </main>
+  );
 }

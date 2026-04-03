@@ -39,6 +39,8 @@ enum ClothType {
   BANARASI
   TUSSAR
   ORGANZA
+  CREPE
+  SICO
   OTHER
 }
 

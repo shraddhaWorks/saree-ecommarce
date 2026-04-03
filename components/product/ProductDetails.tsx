@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 
 import { addToCart } from "@/lib/cart";
+import { clothTypeDisplayLabel } from "@/lib/fabric-facets";
 import type { StorefrontProduct } from "@/types/storefront";
 import RelatedProducts from "./RelatedProducts";
 
@@ -144,7 +145,7 @@ export default function ProductDetails({ product, relatedProducts }: Props) {
               <dl className="mt-4 grid grid-cols-2 gap-3 text-sm">
                 <div>
                   <dt className="text-black/50">Cloth</dt>
-                  <dd className="font-semibold">{product.clothType}</dd>
+                  <dd className="font-semibold">{clothTypeDisplayLabel(product.clothType)}</dd>
                 </div>
                 <div>
                   <dt className="text-black/50">Occasion</dt>

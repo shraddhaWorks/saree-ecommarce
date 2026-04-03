@@ -11,7 +11,9 @@ export function SpecialProductsSection({ title, products }: Props) {
 
   return (
     <div className="bg-white px-4 py-10">
-      <h2 className="mb-6 text-center text-2xl font-semibold sm:text-3xl">{title}</h2>
+      <h2 className="mb-8 text-center font-serif-royal text-2xl font-semibold tracking-[0.02em] text-[#1a1512] md:mb-10 md:text-3xl lg:text-[2.15rem]">
+        {title}
+      </h2>
       <p className="mb-8 text-center text-sm text-black/50">
         Mark products as “Featured / special” in Admin → Products to show them here.
       </p>

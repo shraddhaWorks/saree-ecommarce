@@ -16,7 +16,7 @@ export function Drawer({
 }) {
     return (
         <aside
-            className={`fixed right-0 top-0 z-50 flex h-screen w-full max-w-[780px] flex-col rounded-l-[18px] bg-[#fdfbf7] shadow-[-16px_0_48px_rgba(44,25,17,0.18)] transition-transform duration-300 ${isOpen ? "translate-x-0 pointer-events-auto" : "translate-x-full pointer-events-none"
+            className={`fixed right-0 top-8 z-[55] flex h-[calc(100dvh-2rem)] w-full max-w-[780px] flex-col rounded-l-[18px] bg-[#fdfbf7] shadow-[-16px_0_48px_rgba(44,25,17,0.18)] transition-transform duration-300 ${isOpen ? "translate-x-0 pointer-events-auto" : "translate-x-full pointer-events-none"
                 }`}
             aria-hidden={!isOpen}
         >

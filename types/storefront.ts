@@ -12,6 +12,8 @@ export type StorefrontProduct = {
   slug: string;
   name: string;
   price: number;
+  /** Original list price when discounted (rupees, for strikethrough). */
+  compareAtPrice?: number;
   discount?: number;
   images: string[];
   description: string;
@@ -19,4 +21,6 @@ export type StorefrontProduct = {
   inStock: boolean;
   clothType: string;
   occasion: string | null;
+  color: string | null;
+  pattern: string | null;
 };

@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect, useMemo, useState } from "react";
+
 import Carousel from "@/components/common/Carousel";
 import { OutOrInLink } from "@/lib/external-link";
 
@@ -8,12 +10,29 @@ export type HeroSlideView = {
   imageUrl: string;
   altText: string | null;
   linkUrl: string | null;
+  /** If true, slide is only included from the `lg` breakpoint (laptop/desktop). */
+  desktopOnly?: boolean;
 };
 
 export function HeroCarousel({ slides }: { slides: HeroSlideView[] }) {
-  if (slides.length === 0) {
+  const [isLg, setIsLg] = useState(false);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 1024px)");
+    const apply = () => setIsLg(mq.matches);
+    apply();
+    mq.addEventListener("change", apply);
+    return () => mq.removeEventListener("change", apply);
+  }, []);
+
+  const visibleSlides = useMemo(
+    () => slides.filter((s) => !s.desktopOnly || isLg),
+    [slides, isLg],
+  );
+
+  if (visibleSlides.length === 0) {
     return (
-      <div className="relative flex h-[420px] w-full items-center justify-center bg-[#8f171f] text-center text-white sm:h-[520px] lg:h-[700px]">
+      <div className="relative flex h-[90dvh] min-h-[220px] w-full items-center justify-center bg-[#8f171f] text-center text-white lg:h-[700px] lg:min-h-0">
         <p className="max-w-md px-6 text-sm sm:text-base">
           No hero images yet. Add cover photos in{" "}
           <strong>Admin → Storefront</strong>.
@@ -22,17 +41,21 @@ export function HeroCarousel({ slides }: { slides: HeroSlideView[] }) {
     );
   }
 
-  const nodes = slides.map((s) => (
+  const nodes = visibleSlides.map((s) => (
     <div
       key={s.id}
-      className="relative h-[420px] w-full overflow-hidden bg-[#8f171f] sm:h-[520px] lg:h-[700px]"
+      className="relative h-[90dvh] min-h-[220px] w-full touch-pan-x overflow-hidden bg-[#8f171f] lg:h-[700px] lg:min-h-0"
     >
       {s.linkUrl ? (
-        <OutOrInLink href={s.linkUrl} className="block h-full w-full">
+        <OutOrInLink
+          href={s.linkUrl}
+          className="block h-full w-full touch-pan-x [-webkit-user-drag:none]"
+        >
           <img
             src={s.imageUrl}
             alt={s.altText ?? ""}
-            className="h-full w-full object-cover object-center"
+            className="block h-full w-full object-cover object-center select-none"
+            draggable={false}
             loading="eager"
           />
         </OutOrInLink>
@@ -40,7 +63,8 @@ export function HeroCarousel({ slides }: { slides: HeroSlideView[] }) {
         <img
           src={s.imageUrl}
           alt={s.altText ?? ""}
-          className="h-full w-full object-cover object-center"
+          className="block h-full w-full touch-pan-x object-cover object-center select-none"
+          draggable={false}
           loading="eager"
         />
       )}
@@ -48,5 +72,11 @@ export function HeroCarousel({ slides }: { slides: HeroSlideView[] }) {
     </div>
   ));
 
-  return <Carousel slides={nodes} className="w-full" />;
+  return (
+    <Carousel
+      key={isLg ? "lg" : "sm"}
+      slides={nodes}
+      className="w-full bg-[#8f171f]"
+    />
+  );
 }

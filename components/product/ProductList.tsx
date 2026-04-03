@@ -1,6 +1,15 @@
+import { StorefrontProductGrid } from "@/components/product/StorefrontProductGrid";
+import { COLLECTION_SPOTLIGHT_ITEMS } from "@/lib/collection-spotlight";
+import { attachCatalogToSpotlights } from "@/lib/collection-spotlight-resolve";
+import { HOME_CATALOG_PREVIEW_LIMIT } from "@/lib/storefront-constants";
 import prisma from "@/lib/db";
 import { toStorefrontProduct } from "@/lib/storefront-map";
-import ProductCard from "./ProductCard";
+
+const spotlightSlugs = new Set(
+  COLLECTION_SPOTLIGHT_ITEMS.map((i) => i.productSlug?.trim().toLowerCase()).filter(
+    Boolean,
+  ) as string[],
+);
 
 export default async function ProductList() {
   const rows = await prisma.product.findMany({
@@ -12,28 +21,40 @@ export default async function ProductList() {
       category: true,
       images: { orderBy: { position: "asc" } },
     },
-    orderBy: { createdAt: "desc" },
-    take: 12,
+    orderBy: [{ isSpecial: "desc" }, { updatedAt: "desc" }],
+    take: 32,
   });
 
-  const products = rows.map(toStorefrontProduct);
+  const products = rows
+    .map(toStorefrontProduct)
+    .filter((p) => !spotlightSlugs.has(p.slug.toLowerCase()))
+    .slice(0, HOME_CATALOG_PREVIEW_LIMIT);
+  const spotlightWithCatalog = await attachCatalogToSpotlights(COLLECTION_SPOTLIGHT_ITEMS);
 
   return (
-    <div className="px-4 sm:px-6 py-6 bg-white">
-      <h2 className="text-2xl sm:text-3xl font-semibold mb-6 text-center">
+    <div className="bg-white px-3 py-6 sm:px-6">
+      <h2 className="mb-8 text-center font-serif-royal text-2xl font-semibold tracking-[0.02em] text-[#1a1512] md:mb-10 md:text-3xl lg:text-[2.15rem]">
         Best of Sale
       </h2>
 
       {products.length === 0 ? (
-        <p className="text-center text-black/55 text-sm">
-          No products yet. Add sarees from the admin panel.
-        </p>
+        <>
+          <StorefrontProductGrid
+            products={[]}
+            density="compact"
+            prependSpotlightItems={spotlightWithCatalog}
+          />
+          <p className="mt-4 text-center text-sm text-black/55">
+            Add products in Admin — up to {HOME_CATALOG_PREVIEW_LIMIT} will list below these picks
+            when in stock.
+          </p>
+        </>
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
-          {products.map((p) => (
-            <ProductCard key={p.id} product={p} />
-          ))}
-        </div>
+        <StorefrontProductGrid
+          products={products}
+          density="compact"
+          prependSpotlightItems={spotlightWithCatalog}
+        />
       )}
     </div>
   );

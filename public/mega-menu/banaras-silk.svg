@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800" viewBox="0 0 1200 800" fill="none">
+  <defs>
+    <linearGradient id="bg2" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#7a1027"/>
+      <stop offset="55%" stop-color="#4d0b1b"/>
+      <stop offset="100%" stop-color="#320712"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="800" fill="url(#bg2)"/>
+  <path d="M0 580 C280 490 430 690 700 610 C900 550 1080 620 1200 560 V800 H0 Z" fill="#e8d5b8" fill-opacity="0.12"/>
+  <rect x="80" y="80" width="1040" height="640" rx="32" stroke="#e8d5b8" stroke-opacity="0.32" stroke-width="2"/>
+  <text x="120" y="620" fill="#e8d5b8" font-family="Georgia, serif" font-size="80" font-weight="600" letter-spacing="1.2">
+    Banaras Silk Sarees
+  </text>
+</svg>

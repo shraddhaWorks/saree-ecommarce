@@ -8,10 +8,25 @@ type Slide = { imageUrl: string; altText: string; linkUrl: string };
 type GridRow = { title: string; imageUrl: string; linkUrl: string };
 
 const SECTION_KEYS = [
-  { id: "WEDDING_EDIT", label: "Your Wedding Edit (4 tiles)" },
-  { id: "SHOP_BY_PRICE", label: "Shop by Price (4 tiles)" },
-  { id: "CRAFTS", label: "Discover crafts (4 tiles)" },
-  { id: "SHOP_BY_OCCASION", label: "Shop by Occasion (2 large tiles)" },
+  {
+    id: "WEDDING_EDIT",
+    label: "Your Wedding Edit (unused on home — 5 Pattu tiles are fixed in app + public/wedding-edit/)",
+  },
+  {
+    id: "SHOP_BY_PRICE",
+    label:
+      "Shop by Price (home tiles are fixed: public/shop-by-price/*.png — only the section title below is used)",
+  },
+  {
+    id: "CRAFTS",
+    label:
+      "Discover timeless crafts (home tiles are fixed: public/timeless-crafts/*.png — only the section title below is used)",
+  },
+  {
+    id: "SHOP_BY_OCCASION",
+    label:
+      "Shop by Occasion (home is fixed 2×2: public/shop-by-occasion/*.png — only the section title below is used)",
+  },
 ] as const;
 
 export default function StorefrontEditor() {
@@ -399,6 +414,13 @@ export default function StorefrontEditor() {
 
       <section className="space-y-3 rounded-xl border border-zinc-200 bg-white p-5">
         <h2 className="font-semibold text-zinc-900">About</h2>
+        <p className="text-xs text-zinc-500">
+          Home About banner is fixed in the repo:{" "}
+          <code className="rounded bg-zinc-100 px-1">public/about/kalanjali-about-hero.png</code>.
+          The image field below is optional and is not shown on the home page. Intro copy is fixed
+          (two paragraphs + Know More); the full story lives on{" "}
+          <code className="rounded bg-zinc-100 px-1">/about</code>.
+        </p>
         <label className="text-sm block">
           Title
           <input
@@ -408,13 +430,13 @@ export default function StorefrontEditor() {
           />
         </label>
         <SupabaseImageField
-          label="About banner image"
+          label="About banner image (home uses fixed file public/about/kalanjali-about-hero.png — this field is for future use / other pages)"
           folder="storefront/about"
           value={aboutImageUrl}
           onChange={setAboutImageUrl}
         />
         <label className="text-sm block">
-          Text
+          Text (not shown on site — reserved for future use)
           <textarea
             value={aboutBody}
             onChange={(e) => setAboutBody(e.target.value)}

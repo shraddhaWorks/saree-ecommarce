@@ -1,0 +1,3 @@
+-- AlterEnum
+ALTER TYPE "ClothType" ADD VALUE 'CREPE';
+ALTER TYPE "ClothType" ADD VALUE 'SICO';

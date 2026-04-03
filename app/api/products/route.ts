@@ -12,6 +12,8 @@ const ALLOWED_CLOTH_TYPES = [
   "BANARASI",
   "TUSSAR",
   "ORGANZA",
+  "CREPE",
+  "SICO",
   "OTHER",
 ] as const;
 

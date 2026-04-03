@@ -16,8 +16,25 @@ const CLOTH_TYPES = [
   "BANARASI",
   "TUSSAR",
   "ORGANZA",
+  "CREPE",
+  "SICO",
   "OTHER",
 ] as const;
+
+const CLOTH_TYPE_LABELS: Record<(typeof CLOTH_TYPES)[number], string> = {
+  SILK: "Silk",
+  COTTON: "Cotton",
+  LINEN: "Linen",
+  GEORGETTE: "Georgette",
+  CHIFFON: "Chiffon",
+  KANJIVARAM: "Kanjivaram",
+  BANARASI: "Banarasi",
+  TUSSAR: "Tussar",
+  ORGANZA: "Organza",
+  CREPE: "Crepe",
+  SICO: "Sico",
+  OTHER: "Other",
+};
 
 const OCCASIONS = [
   "WEDDING",
@@ -63,6 +80,7 @@ export default function ProductForm({ mode, initial }: Props) {
   const [categories, setCategories] = useState<Category[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [categoriesLoading, setCategoriesLoading] = useState(true);
 
   const [name, setName] = useState(initial?.name ?? "");
   const [slug, setSlug] = useState(initial?.slug ?? "");
@@ -89,12 +107,26 @@ export default function ProductForm({ mode, initial }: Props) {
     (async () => {
       try {
         const res = await fetch("/api/categories");
-        const data = (await res.json()) as { categories?: Category[] };
+        const data = (await res.json()) as {
+          categories?: Category[];
+          error?: string;
+        };
+        if (!res.ok) {
+          setCategories([]);
+          setCategoryId("");
+          setError(data.error ?? "Could not load categories");
+          return;
+        }
         const list = data.categories ?? [];
         setCategories(list);
         setCategoryId((prev) => prev || list[0]?.id || "");
+        if (list.length === 0) {
+          setError("No categories found. Please create a category first.");
+        }
       } catch {
         setError("Could not load categories");
+      } finally {
+        setCategoriesLoading(false);
       }
     })();
   }, []);
@@ -281,7 +313,7 @@ export default function ProductForm({ mode, initial }: Props) {
           >
             {CLOTH_TYPES.map((c) => (
               <option key={c} value={c}>
-                {c}
+                {CLOTH_TYPE_LABELS[c]}
               </option>
             ))}
           </select>
@@ -308,9 +340,17 @@ export default function ProductForm({ mode, initial }: Props) {
         <select
           value={categoryId}
           onChange={(e) => setCategoryId(e.target.value)}
-          className="mt-1 w-full rounded-lg border border-zinc-200 px-3 py-2"
+          className="mt-1 w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-zinc-900 disabled:bg-zinc-100 disabled:text-zinc-500"
+          disabled={categoriesLoading || categories.length === 0}
           required
         >
+          <option value="" disabled>
+            {categoriesLoading
+              ? "Loading categories..."
+              : categories.length === 0
+                ? "No categories available"
+                : "Select a category"}
+          </option>
           {categories.map((c) => (
             <option key={c.id} value={c.id}>
               {c.name}

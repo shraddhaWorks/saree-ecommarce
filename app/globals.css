@@ -8,7 +8,16 @@
   --border-soft: rgba(32, 24, 21, 0.12);
   --accent: #8f2333;
   --accent-soft: #c98d5a;
-  
+  /* Royal navbar */
+  --nav-royal-green-deep: #062a22;
+  --nav-royal-green-mid: #0f4d3c;
+  --nav-royal-gold: #d4af37;
+  --nav-royal-gold-bright: #e8c76a;
+  --announcement-maroon: #5c1523;
+  --announcement-sandal: #e8d5b8;
+  /* Main navbar strip (sandal) */
+  --navbar-sandal: #e8d5b8;
+
   /* Transition tokens */
   --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
   --transition-base: 300ms cubic-bezier(0.4, 0, 0.2, 1);
@@ -25,6 +34,7 @@
   --color-accent-soft: var(--accent-soft);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-serif-royal: var(--font-royal-serif), "Cormorant Garamond", Georgia, serif;
 }
 
 * {
@@ -79,6 +89,28 @@ body::-webkit-scrollbar {
 
 .animate-page-entrance {
   animation: fadeIn var(--transition-slow) forwards;
+}
+
+@keyframes announcement-marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* Marquee: two equal-width tracks; -50% = one full track for a seamless loop */
+.announcement-marquee-inner {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: center;
+  width: max-content;
+  height: 100%;
+  flex-shrink: 0;
+  animation: announcement-marquee 55s linear infinite;
+  will-change: transform;
 }
 
 /* Glassmorphism utility */
