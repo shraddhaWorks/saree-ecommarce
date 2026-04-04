@@ -19,11 +19,6 @@ export interface CarouselProps {
   edgeTapPercent?: number;
   /** Finger swipes up (story-style) → next slide. */
   swipeUpForNext?: boolean;
-  /**
-   * Short tap/click almost anywhere on the track → next slide (captures clicks so full-bleed slide links won’t open).
-   * When true, `edgeTapPercent` short-tap bands are skipped (swipe left/right/up still work).
-   */
-  tapAnywhereForNext?: boolean;
 }
 
 export default function Carousel({
@@ -38,7 +33,6 @@ export default function Carousel({
   loop = true,
   edgeTapPercent = 0,
   swipeUpForNext = true,
-  tapAnywhereForNext = false,
 }: CarouselProps) {
   const slideChildren = useMemo<ReactNode[]>(() => {
     if (slides && slides.length > 0) return slides;
@@ -58,13 +52,7 @@ export default function Carousel({
   const touchStartY = useRef(0);
   const touchStartSlideIndex = useRef(0);
   const lastTouchEdgeNavAt = useRef(0);
-  /** Touch target at finger-down (for tap-through elements like hero CTAs). */
-  const touchStartTarget = useRef<EventTarget | null>(null);
   const currentIndex = slideCount > 0 ? Math.min(activeIndex, slideCount - 1) : 0;
-
-  const isTapThroughTarget = useCallback((node: EventTarget | null) => {
-    return node instanceof Element && node.closest("[data-carousel-tap-through]") != null;
-  }, []);
 
   const goToIndex = useCallback(
     (index: number) => {
@@ -128,7 +116,6 @@ export default function Carousel({
 
   const handleTouchStart = useCallback(
     (e: React.TouchEvent) => {
-      touchStartTarget.current = e.target;
       if (slideCount <= 1) return;
       const t = e.touches[0];
       if (!t) return;
@@ -178,18 +165,6 @@ export default function Carousel({
       }
 
       if (
-        tapAnywhereForNext &&
-        Math.abs(dx) <= TAP_MOVE_MAX_PX &&
-        Math.abs(dy) <= TAP_MOVE_MAX_PX
-      ) {
-        if (isTapThroughTarget(touchStartTarget.current)) return;
-        lastTouchEdgeNavAt.current = Date.now();
-        next();
-        window.setTimeout(() => syncActiveFromScroll(), 80);
-        return;
-      }
-
-      if (
         edgePct > 0 &&
         Math.abs(dx) <= TAP_MOVE_MAX_PX &&
         Math.abs(dy) <= TAP_MOVE_MAX_PX
@@ -215,26 +190,13 @@ export default function Carousel({
         }
       }
     },
-    [edgePct, goToIndex, isTapThroughTarget, next, prev, slideCount, swipeUpForNext, syncActiveFromScroll, tapAnywhereForNext],
+    [edgePct, goToIndex, next, prev, slideCount, swipeUpForNext, syncActiveFromScroll],
   );
 
-  const handleTrackClickCapture = useCallback(
+  const handleEdgeClickCapture = useCallback(
     (e: React.MouseEvent) => {
-      if (slideCount <= 1) return;
-      if (isTapThroughTarget(e.target)) return;
-      if (Date.now() - lastTouchEdgeNavAt.current < 500) {
-        e.preventDefault();
-        e.stopPropagation();
-        return;
-      }
-      if (tapAnywhereForNext) {
-        e.preventDefault();
-        e.stopPropagation();
-        next();
-        window.setTimeout(() => syncActiveFromScroll(), 80);
-        return;
-      }
-      if (edgePct <= 0) return;
+      if (edgePct <= 0 || slideCount <= 1) return;
+      if (Date.now() - lastTouchEdgeNavAt.current < 500) return;
       const el = trackRef.current;
       if (!el) return;
       const rect = el.getBoundingClientRect();
@@ -255,7 +217,7 @@ export default function Carousel({
         window.setTimeout(() => syncActiveFromScroll(), 80);
       }
     },
-    [edgePct, isTapThroughTarget, next, prev, slideCount, syncActiveFromScroll, tapAnywhereForNext],
+    [edgePct, next, prev, slideCount, syncActiveFromScroll],
   );
 
   useEffect(() => {
@@ -308,7 +270,7 @@ export default function Carousel({
         onScrollEnd={syncActiveFromScroll}
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
-        onClickCapture={handleTrackClickCapture}
+        onClickCapture={handleEdgeClickCapture}
         onTouchCancel={() => syncActiveFromScroll()}
         onPointerDown={(e) => {
           if (e.pointerType === "touch" || e.pointerType === "pen") {

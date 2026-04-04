@@ -46,13 +46,28 @@ export function HeroCarousel({ slides }: { slides: HeroSlideView[] }) {
       key={s.id}
       className="relative h-[90dvh] min-h-[220px] w-full touch-pan-x overflow-hidden bg-[#8f171f] lg:h-[700px] lg:min-h-0"
     >
-      <img
-        src={s.imageUrl}
-        alt={s.altText ?? ""}
-        className="block h-full w-full touch-pan-x object-cover object-center select-none"
-        draggable={false}
-        loading="eager"
-      />
+      {s.linkUrl ? (
+        <OutOrInLink
+          href={s.linkUrl}
+          className="block h-full w-full touch-pan-x [-webkit-user-drag:none]"
+        >
+          <img
+            src={s.imageUrl}
+            alt={s.altText ?? ""}
+            className="block h-full w-full object-cover object-center select-none"
+            draggable={false}
+            loading="eager"
+          />
+        </OutOrInLink>
+      ) : (
+        <img
+          src={s.imageUrl}
+          alt={s.altText ?? ""}
+          className="block h-full w-full touch-pan-x object-cover object-center select-none"
+          draggable={false}
+          loading="eager"
+        />
+      )}
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/5 via-black/0 to-black/25" />
     </div>
   ));
@@ -62,7 +77,7 @@ export function HeroCarousel({ slides }: { slides: HeroSlideView[] }) {
       key={isLg ? "lg" : "sm"}
       slides={nodes}
       className="w-full bg-[#8f171f]"
-      tapAnywhereForNext
+      edgeTapPercent={47}
       swipeUpForNext
     />
   );
