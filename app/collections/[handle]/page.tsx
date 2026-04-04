@@ -5,21 +5,14 @@ import { CollectionThemeNav } from "@/components/collection/CollectionThemeNav";
 import Footer from "@/components/footer/Footer";
 import { StorefrontProductGrid } from "@/components/product/StorefrontProductGrid";
 import { StorefrontNavbar } from "@/components/navbar/storefront-navbar";
-import {
-  buildFacets,
-  collectionTitleFromHandle,
-  filterProducts,
-  parseCollectionBrowse,
-  sortProducts,
-} from "@/lib/collection-browse";
+import { getCollectionCatalog } from "@/lib/collection-catalog";
 import { COLLECTION_SPOTLIGHT_ITEMS } from "@/lib/collection-spotlight";
 import { attachCatalogToSpotlights } from "@/lib/collection-spotlight-resolve";
-import prisma from "@/lib/db";
-import { toStorefrontProduct } from "@/lib/storefront-map";
 
 type SearchParams = Record<string, string | string[] | undefined>;
 
 export const dynamic = "force-dynamic";
+export const dynamicParams = true;
 
 export default async function CollectionPage({
   params,
@@ -30,31 +23,11 @@ export default async function CollectionPage({
 }) {
   const { handle } = await params;
   const sp = searchParams ? await searchParams : {};
-
   const raw: SearchParams = { ...sp };
-  const browse = parseCollectionBrowse(raw);
 
-  const category = await prisma.category.findUnique({ where: { slug: handle } });
+  const { browse, title, products, facets, megaMeta, parentCategory, category } =
+    await getCollectionCatalog(handle, raw);
 
-  const baseWhere = {
-    inStock: true,
-    stockQuantity: { gt: 0 },
-    ...(category ? { categoryId: category.id } : {}),
-  };
-
-  const allRows = await prisma.product.findMany({
-    where: baseWhere,
-    include: { category: true, images: { orderBy: { position: "asc" } } },
-    orderBy: { updatedAt: "desc" },
-    take: 400,
-  });
-
-  const filtered = filterProducts(allRows, browse);
-  const sorted = sortProducts(filtered, browse.sort);
-  const products = sorted.map(toStorefrontProduct);
-  const facets = buildFacets(allRows);
-
-  const title = collectionTitleFromHandle(handle, category?.name);
   const spotlightWithCatalog = await attachCatalogToSpotlights(COLLECTION_SPOTLIGHT_ITEMS);
 
   return (
@@ -101,7 +74,11 @@ export default async function CollectionPage({
                 />
               </div>
               <p className="mt-6 rounded-2xl border border-black/10 bg-white p-8 text-center text-sm text-black/55">
-                No products match these filters. Try clearing filters or pick another category.
+                {megaMeta && !parentCategory && !category
+                  ? "No products in this collection yet, or the parent category is not set up in the catalog. Only items that match this line (e.g. Kanchi pattu) appear here."
+                  : megaMeta && (parentCategory || category)
+                    ? "No products match this line. Try another category or clear filters."
+                    : "No products match these filters. Try clearing filters or pick another category."}
               </p>
             </>
           ) : (

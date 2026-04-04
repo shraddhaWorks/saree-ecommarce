@@ -110,6 +110,76 @@ export function filterProducts(products: ProductWithRelations[], s: CollectionBr
   return products.filter((row) => matchesBrowse(row, s));
 }
 
+/** Stopwords when matching mega-menu labels to product text (slug/name/description). */
+const MEGA_LABEL_STOPWORDS = new Set([
+  "sarees",
+  "saree",
+  "silk",
+  "wear",
+  "and",
+  "the",
+  "for",
+  "set",
+  "half",
+  "full",
+  "party",
+  "casual",
+  "work",
+  "traditional",
+  "designer",
+  "festive",
+]);
+
+/** A token matches if any of these substrings appear in hay (e.g. Kanjivaram → Kanchi line). */
+const MEGA_TOKEN_ALIASES: Record<string, readonly string[]> = {
+  kanchi: ["kanchi", "kanjivaram", "kanchipuram", "kanchi pattu"],
+  pattu: ["pattu"],
+  banaras: ["banaras", "banarasi"],
+  paithani: ["paithani"],
+  patola: ["patola"],
+  gadwal: ["gadwal"],
+  arani: ["arani"],
+  venkatagiri: ["venkatagiri"],
+  uppada: ["uppada"],
+  mangalagiri: ["mangalagiri"],
+  mysore: ["mysore"],
+  bridal: ["bridal"],
+  reception: ["reception"],
+  organza: ["organza"],
+  ikkat: ["ikkat", "ikat"],
+  bandini: ["bandini", "bandhani"],
+  georgette: ["georgette"],
+  khadi: ["khadi"],
+  tusser: ["tusser", "tussar", "tussore"],
+  tissu: ["tissu", "tissue"],
+};
+
+function megaTokenMatches(token: string, hay: string): boolean {
+  if (hay.includes(token)) return true;
+  const aliases = MEGA_TOKEN_ALIASES[token];
+  if (aliases) return aliases.some((a) => hay.includes(a.replace(/\s+/g, "")) || hay.includes(a));
+  return false;
+}
+
+/**
+ * Narrows products to those that match a mega-menu / wedding-edit line (e.g. "Kanchi Pattu Sarees").
+ * Short labels (≤3 keywords): every keyword must match. Longer labels: majority must match.
+ * If nothing meaningful is left after stopwords, no products match.
+ */
+export function productMatchesMegaMenuLabel(p: ProductWithRelations, menuLabel: string): boolean {
+  const tokens = (menuLabel.toLowerCase().match(/[a-z0-9]+/g) ?? []).filter(
+    (t) => t.length > 2 && !MEGA_LABEL_STOPWORDS.has(t),
+  );
+  if (tokens.length === 0) return false;
+  const hay = `${p.name} ${p.description ?? ""} ${p.slug} ${p.pattern ?? ""} ${p.color ?? ""} ${p.clothType} ${p.category?.name ?? ""}`.toLowerCase();
+  const hits = tokens.filter((t) => megaTokenMatches(t, hay));
+  if (tokens.length <= 3) {
+    return hits.length === tokens.length;
+  }
+  const need = Math.max(2, Math.ceil(tokens.length * 0.55));
+  return hits.length >= need;
+}
+
 export function sortProducts(products: ProductWithRelations[], sort: string) {
   const next = [...products];
   switch (sort) {

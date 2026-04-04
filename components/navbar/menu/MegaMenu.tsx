@@ -1,4 +1,6 @@
 import Link from "next/link";
+
+import { resolveMenuItemHref } from "./resolve-menu-href";
 import { ShowcaseArt } from "./ShowcaseArt";
 import type { MenuData } from "./types";
 
@@ -33,7 +35,7 @@ export function MegaMenu({ menu, onItemClick }: { menu: MenuData; onItemClick: (
                                     className={`leading-none ${isSarees ? "text-[20px] text-[#e4b95d]" : "text-[18px] text-black/90"}`}
                                 >
                                     <Link
-                                        href={item.href ?? "#"}
+                                        href={resolveMenuItemHref(item)}
                                         onClick={onItemClick}
                                         className={`transition ${isSarees ? "hover:text-white" : "hover:text-[#9d2936]"}`}
                                     >
@@ -44,7 +46,7 @@ export function MegaMenu({ menu, onItemClick }: { menu: MenuData; onItemClick: (
                         </ul>
                     </div>
                 ))}
-                <ShowcaseArt menu={menu} />
+                <ShowcaseArt menu={menu} onItemClick={onItemClick} />
             </div>
         </section>
     );

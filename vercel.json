@@ -1,0 +1,104 @@
+{
+  "redirects": [
+    {
+      "source": "/traditional-sarees/:slug",
+      "destination": "/collections/:slug",
+      "permanent": true
+    },
+    {
+      "source": "/traditional-sarees",
+      "destination": "/collections/traditional-sarees",
+      "permanent": true
+    },
+    {
+      "source": "/wedding-sarees/:slug",
+      "destination": "/collections/:slug",
+      "permanent": true
+    },
+    {
+      "source": "/wedding-sarees",
+      "destination": "/collections/wedding-sarees",
+      "permanent": true
+    },
+    {
+      "source": "/designer-and-party-wear-sarees/:slug",
+      "destination": "/collections/:slug",
+      "permanent": true
+    },
+    {
+      "source": "/designer-and-party-wear-sarees",
+      "destination": "/collections/designer-party-wear",
+      "permanent": true
+    },
+    {
+      "source": "/designer-party-wear/:slug",
+      "destination": "/collections/:slug",
+      "permanent": true
+    },
+    {
+      "source": "/designer-party-wear",
+      "destination": "/collections/designer-party-wear",
+      "permanent": true
+    },
+    {
+      "source": "/festive-wear-sarees/:slug",
+      "destination": "/collections/:slug",
+      "permanent": true
+    },
+    {
+      "source": "/festive-wear-sarees",
+      "destination": "/collections/festive-wear",
+      "permanent": true
+    },
+    {
+      "source": "/festive-wear/:slug",
+      "destination": "/collections/:slug",
+      "permanent": true
+    },
+    {
+      "source": "/festive-wear",
+      "destination": "/collections/festive-wear",
+      "permanent": true
+    },
+    {
+      "source": "/casual-and-workwear-sarees/:slug",
+      "destination": "/collections/:slug",
+      "permanent": true
+    },
+    {
+      "source": "/casual-and-workwear-sarees",
+      "destination": "/collections/casual-workwear",
+      "permanent": true
+    },
+    {
+      "source": "/casual-workwear/:slug",
+      "destination": "/collections/:slug",
+      "permanent": true
+    },
+    {
+      "source": "/casual-workwear",
+      "destination": "/collections/casual-workwear",
+      "permanent": true
+    },
+    {
+      "source": "/dhoti-and-kanduva/:slug",
+      "destination": "/collections/:slug",
+      "permanent": true
+    },
+    {
+      "source": "/dhoti-and-kanduva",
+      "destination": "/collections/dhoti-kanduva",
+      "permanent": true
+    },
+    {
+      "source": "/dhoti-kanduva/:slug",
+      "destination": "/collections/:slug",
+      "permanent": true
+    },
+    {
+      "source": "/dhoti-kanduva",
+      "destination": "/collections/dhoti-kanduva",
+      "permanent": true
+    }
+  ]
+}

@@ -1,7 +1,7 @@
 import { StorefrontProductGrid } from "@/components/product/StorefrontProductGrid";
 import { COLLECTION_SPOTLIGHT_ITEMS } from "@/lib/collection-spotlight";
 import { attachCatalogToSpotlights } from "@/lib/collection-spotlight-resolve";
-import { HOME_CATALOG_PREVIEW_LIMIT } from "@/lib/storefront-constants";
+import { PRODUCT_LIST_FULL_PAGE_TAKE } from "@/lib/storefront-constants";
 import prisma from "@/lib/db";
 import { toStorefrontProduct } from "@/lib/storefront-map";
 
@@ -11,7 +11,18 @@ const spotlightSlugs = new Set(
   ) as string[],
 );
 
-export default async function ProductList() {
+export type ProductListProps = {
+  /**
+   * When set (e.g. home page), only this many catalog products are shown after excluding spotlight SKUs.
+   * When omitted, all matching in-stock products are shown (up to {@link PRODUCT_LIST_FULL_PAGE_TAKE}).
+   */
+  maxProducts?: number;
+};
+
+export default async function ProductList({ maxProducts }: ProductListProps = {}) {
+  const take =
+    maxProducts != null ? Math.min(PRODUCT_LIST_FULL_PAGE_TAKE, Math.max(maxProducts * 10, 48)) : PRODUCT_LIST_FULL_PAGE_TAKE;
+
   const rows = await prisma.product.findMany({
     where: {
       inStock: true,
@@ -22,14 +33,18 @@ export default async function ProductList() {
       images: { orderBy: { position: "asc" } },
     },
     orderBy: [{ isSpecial: "desc" }, { updatedAt: "desc" }],
-    take: 32,
+    take,
   });
 
-  const products = rows
+  let products = rows
     .map(toStorefrontProduct)
-    .filter((p) => !spotlightSlugs.has(p.slug.toLowerCase()))
-    .slice(0, HOME_CATALOG_PREVIEW_LIMIT);
+    .filter((p) => !spotlightSlugs.has(p.slug.toLowerCase()));
+
+  if (maxProducts != null) {
+    products = products.slice(0, Math.max(0, maxProducts));
+  }
   const spotlightWithCatalog = await attachCatalogToSpotlights(COLLECTION_SPOTLIGHT_ITEMS);
+  // Home (`maxProducts`): skip prepended spotlight cards so the grid is only catalog rows (stays at 6 cells).
 
   return (
     <div className="bg-white px-3 py-6 sm:px-6">
@@ -45,15 +60,15 @@ export default async function ProductList() {
             prependSpotlightItems={spotlightWithCatalog}
           />
           <p className="mt-4 text-center text-sm text-black/55">
-            Add products in Admin — up to {HOME_CATALOG_PREVIEW_LIMIT} will list below these picks
-            when in stock.
+            Add products in Admin — they will list below these picks when in stock
+            {maxProducts != null ? ` (home shows up to ${maxProducts})` : ""}.
           </p>
         </>
       ) : (
         <StorefrontProductGrid
           products={products}
           density="compact"
-          prependSpotlightItems={spotlightWithCatalog}
+          prependSpotlightItems={maxProducts != null ? [] : spotlightWithCatalog}
         />
       )}
     </div>

@@ -1,8 +1,7 @@
 "use client";
 
-import Link from "next/link";
 import { useState, type MouseEvent } from "react";
-import { Eye, ShoppingBag } from "lucide-react";
+import { ShoppingBag } from "lucide-react";
 
 import { addToCart } from "@/lib/cart";
 
@@ -20,7 +19,6 @@ type CartBySlug = {
 };
 
 type Props = {
-  productSlug: string;
   /** Shown in aria-labels (e.g. product name). */
   label?: string;
   compact?: boolean;
@@ -33,10 +31,9 @@ type Props = {
 };
 
 /**
- * Hover / touch actions aligned with catalog tiles: open PDP or add line to local cart.
+ * Hover / touch actions on catalog tiles: add to cart (PDP is one tap on the image/title).
  */
 export function ProductTileQuickActions({
-  productSlug,
   label,
   compact = false,
   cart,
@@ -44,14 +41,13 @@ export function ProductTileQuickActions({
   addDisabledLabel,
   className = "",
 }: Props) {
-  const ariaLabel = label ?? productSlug;
+  const ariaLabel = label ?? "product";
   const [busy, setBusy] = useState(false);
 
   const chip = compact
     ? "gap-1.5 rounded-full px-2 py-1.5 text-[10px] font-semibold shadow-lg"
     : "gap-2 rounded-full px-3 py-2.5 text-xs font-semibold shadow-lg";
 
-  const iconView = compact ? 14 : 16;
   const iconCart = compact ? 14 : 16;
 
   const handleAdd = async (e: MouseEvent) => {
@@ -103,14 +99,6 @@ export function ProductTileQuickActions({
     <div
       className={`pointer-events-auto flex flex-col items-end gap-2 transition-opacity duration-300 sm:pointer-events-none sm:opacity-0 sm:group-hover:pointer-events-auto sm:group-hover:opacity-100 ${className}`.trim()}
     >
-      <Link
-        href={`/products/${productSlug}`}
-        className={`flex items-center bg-black text-white transition hover:opacity-90 ${chip}`}
-        aria-label={`View ${ariaLabel}`}
-      >
-        <Eye size={iconView} aria-hidden />
-        View product
-      </Link>
       <button
         type="button"
         onClick={handleAdd}

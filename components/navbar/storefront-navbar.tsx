@@ -5,9 +5,18 @@ import { useEffect, useMemo, useState } from "react";
 
 import { getAccessToken, setAccessToken } from "@/lib/auth-client";
 import { getCart, getCartCount, type Cart } from "@/lib/cart";
+import {
+  fetchWishlistCountRemote,
+  getWishlistCachedCount,
+  readWishlistLocal,
+  WISHLIST_UPDATED_EVENT,
+  type WishlistUpdatedDetail,
+} from "@/lib/wishlist";
 import { AnnouncementBar } from "./announcement-bar";
 import { BagIcon, ChevronIcon, CloseIcon, HeartIcon, MenuIcon, SearchIcon, UserIcon } from "./icons";
-import { getNavMegaItems } from "./nav-mega-items";
+import { resolveMenuItemHref } from "@/components/navbar/menu/resolve-menu-href";
+
+import { getNavMegaItems, resolveMegaPreviewHref } from "./nav-mega-items";
 import { Drawer, IconButton, RangamLogo } from "./ui";
 import { MainNavigation } from "./main-navigation";
 
@@ -30,6 +39,8 @@ export function StorefrontNavbar() {
 
   const cartCount = useMemo(() => getCartCount(cart), [cart]);
 
+  const [wishlistCount, setWishlistCount] = useState(0);
+
   const navMegaItems = useMemo(() => getNavMegaItems(), []);
 
   useEffect(() => {
@@ -42,6 +53,34 @@ export function StorefrontNavbar() {
   useEffect(() => {
     if (activePanel === "profile") setHasSession(!!getAccessToken());
   }, [activePanel]);
+
+  useEffect(() => {
+    const sync = async () => {
+      if (!getAccessToken()) {
+        setWishlistCount(readWishlistLocal().length);
+        return;
+      }
+      const cached = getWishlistCachedCount();
+      if (cached != null) {
+        setWishlistCount(cached);
+        return;
+      }
+      setWishlistCount(await fetchWishlistCountRemote());
+    };
+
+    void sync();
+
+    const onWishlist = (e: Event) => {
+      const d = (e as CustomEvent<WishlistUpdatedDetail>).detail?.count;
+      if (typeof d === "number") {
+        setWishlistCount(d);
+        return;
+      }
+      void sync();
+    };
+    window.addEventListener(WISHLIST_UPDATED_EVENT, onWishlist);
+    return () => window.removeEventListener(WISHLIST_UPDATED_EVENT, onWishlist);
+  }, []);
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
@@ -151,8 +190,17 @@ export function StorefrontNavbar() {
               <SearchIcon />
             </IconButton>
 
-            <Link href="/wishlist" className={iconLinkClass} aria-label="Wishlist">
+            <Link
+              href="/wishlist"
+              className={`${iconLinkClass} relative`}
+              aria-label="Wishlist"
+            >
               <HeartIcon />
+              {wishlistCount > 0 ? (
+                <span className="absolute -right-0.5 -top-0.5 inline-flex h-[16px] min-w-[16px] items-center justify-center rounded-full bg-accent px-1 text-[9px] font-bold text-white ring-2 ring-[var(--navbar-sandal)] sm:h-[18px] sm:min-w-[18px] sm:text-[10px]">
+                  {wishlistCount > 99 ? "99+" : wishlistCount}
+                </span>
+              ) : null}
             </Link>
 
             <IconButton label="Account" onClick={() => setActivePanel("profile")}>
@@ -229,10 +277,15 @@ export function StorefrontNavbar() {
               <Link
                 href="/wishlist"
                 onClick={() => setMobileNavOpen(false)}
-                className="flex flex-col items-center justify-center gap-1 rounded-xl border border-black/10 bg-white/40 px-2 py-2 text-[11px] font-medium text-black/75 transition hover:bg-white/70"
+                className="relative flex flex-col items-center justify-center gap-1 rounded-xl border border-black/10 bg-white/40 px-2 py-2 text-[11px] font-medium text-black/75 transition hover:bg-white/70"
               >
                 <HeartIcon />
                 Wishlist
+                {wishlistCount > 0 ? (
+                  <span className="absolute right-1 top-1 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-accent px-1 text-[9px] font-bold text-white">
+                    {wishlistCount > 99 ? "99+" : wishlistCount}
+                  </span>
+                ) : null}
               </Link>
               <button
                 type="button"
@@ -312,7 +365,7 @@ export function StorefrontNavbar() {
                         {item.previews.map((preview) => (
                           <Link
                             key={preview.title}
-                            href={item.href}
+                            href={resolveMegaPreviewHref(item, preview)}
                             onClick={() => setMobileNavOpen(false)}
                             className="relative block w-[min(78vw,280px)] shrink-0 overflow-hidden rounded-lg border border-[var(--announcement-sandal)]/25"
                           >
@@ -338,7 +391,7 @@ export function StorefrontNavbar() {
                         {item.children.map((child) => (
                           <li key={child.href}>
                             <Link
-                              href={child.href}
+                              href={resolveMenuItemHref(child)}
                               onClick={() => setMobileNavOpen(false)}
                               className="block rounded-md px-3 py-2.5 text-sm font-medium text-[var(--announcement-sandal)]/95 transition-colors hover:bg-white/10 hover:text-white"
                             >

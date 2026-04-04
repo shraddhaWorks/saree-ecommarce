@@ -1,3 +1,12 @@
+/**
+ * Maps `/collections/{slug}` mega-menu slugs (when not a real Category row) to the parent
+ * collection slug + human label for scoped product filtering.
+ */
+export const MEGA_MENU_SLUG_META: Record<
+  string,
+  { parentCollectionSlug: string; label: string }
+> = {};
+
 export const toStaticSlug = (label: string) =>
   label
     .toLowerCase()
@@ -5,17 +14,24 @@ export const toStaticSlug = (label: string) =>
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-|-$/g, "");
 
-const createItems = (categorySlug: string, labels: string[]) =>
-  labels.map((label) => ({
-    label,
-    href: `/${categorySlug}/${toStaticSlug(label)}`,
-  }));
+/** Same URL shape as Wedding Edit tiles: `/collections/{slug}`. */
+export function labelToCollectionHref(label: string): string {
+  return `/collections/${toStaticSlug(label)}`;
+}
+
+function addMegaMenuItems(parentCollectionSlug: string, labels: readonly string[]) {
+  return labels.map((label) => {
+    const slug = toStaticSlug(label);
+    MEGA_MENU_SLUG_META[slug] = { parentCollectionSlug, label };
+    return { label, href: `/collections/${slug}` as const };
+  });
+}
 
 export const staticNavCategories = {
   traditionalSarees: {
     title: "Traditional Sarees",
-    href: "/traditional-sarees",
-    items: createItems("traditional-sarees", [
+    href: "/collections/traditional-sarees",
+    items: addMegaMenuItems("traditional-sarees", [
       "Kanchi Pattu Sarees",
       "Banaras Sarees",
       "Paithani Sarees",
@@ -30,8 +46,8 @@ export const staticNavCategories = {
   },
   weddingSarees: {
     title: "Wedding Sarees",
-    href: "/wedding-sarees",
-    items: createItems("wedding-sarees", [
+    href: "/collections/wedding-sarees",
+    items: addMegaMenuItems("wedding-sarees", [
       "Bridal Sarees",
       "Reception Sarees",
       "Pradanam & Talambralu Sarees",
@@ -41,8 +57,8 @@ export const staticNavCategories = {
   },
   designerPartyWearSarees: {
     title: "Designer & Party Wear Sarees",
-    href: "/designer-and-party-wear-sarees",
-    items: createItems("designer-and-party-wear-sarees", [
+    href: "/collections/designer-party-wear",
+    items: addMegaMenuItems("designer-party-wear", [
       "Organza Sarees",
       "Zari Kota & Semi Kota Sarees",
       "Muslin, Dola & Mashru Sarees",
@@ -51,8 +67,8 @@ export const staticNavCategories = {
   },
   festiveWearSarees: {
     title: "Festive Wear Sarees",
-    href: "/festive-wear-sarees",
-    items: createItems("festive-wear-sarees", [
+    href: "/collections/festive-wear",
+    items: addMegaMenuItems("festive-wear", [
       "Pattu Pavada Set / Half Saree Set / Lehengas",
       "Chanderi & Bailu Silk Sarees",
       "Ikkat Sarees",
@@ -63,8 +79,8 @@ export const staticNavCategories = {
   },
   casualWorkwearSarees: {
     title: "Casual & Workwear Sarees",
-    href: "/casual-and-workwear-sarees",
-    items: createItems("casual-and-workwear-sarees", [
+    href: "/collections/casual-workwear",
+    items: addMegaMenuItems("casual-workwear", [
       "Georgette, Crepe, Satin & Chiffon Silk Sarees",
       "Khadi, Jute, Bhagalpur & Printed Sarees",
       "Tissu Sarees",
@@ -73,8 +89,8 @@ export const staticNavCategories = {
   },
   dhotiAndKanduva: {
     title: "Dhoti & Kanduva",
-    href: "/dhoti-and-kanduva",
-    items: createItems("dhoti-and-kanduva", [
+    href: "/collections/dhoti-kanduva",
+    items: addMegaMenuItems("dhoti-kanduva", [
       "Silk Dhotis",
       "Cotton Dhotis",
       "Pattu Kanduvas",
@@ -84,11 +100,22 @@ export const staticNavCategories = {
   stores: {
     title: "Our Stores",
     href: "/stores",
-    items: createItems("stores", [
-      "Hyderabad Banjara Hills",
-      "Secunderabad",
-      "Vijayawada",
-      "Visakhapatnam",
-    ]),
+    items: [
+      { label: "Hyderabad Banjara Hills", href: "/stores#hyderabad-banjara-hills" },
+      { label: "Secunderabad", href: "/stores#secunderabad" },
+      { label: "Vijayawada", href: "/stores#vijayawada" },
+      { label: "Visakhapatnam", href: "/stores#visakhapatnam" },
+    ],
   },
 } as const;
+
+/** Same line filter + parent scope as nav “Venkatagiri Sarees” (Your Wedding Edit tile URL). */
+const vMeta = MEGA_MENU_SLUG_META["venkatagiri-sarees"];
+if (vMeta) {
+  MEGA_MENU_SLUG_META["venkatagiri-silk-sarees"] = { ...vMeta };
+}
+
+MEGA_MENU_SLUG_META["dharmavaram-pattu-sarees"] = {
+  parentCollectionSlug: "traditional-sarees",
+  label: "Dharmavaram Pattu Sarees",
+};

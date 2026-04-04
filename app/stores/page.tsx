@@ -52,9 +52,10 @@ export default function StoresPage() {
       <section className="mx-auto max-w-7xl px-6 py-24 sm:px-8 lg:px-12">
         <div className="grid gap-12 md:grid-cols-2">
           {stores.map((store) => (
-            <div 
+            <div
+              id={store.slug}
               key={store.slug}
-              className="group overflow-hidden rounded-[32px] bg-white shadow-[0_20px_60px_rgba(44,25,17,0.05)] transition-all hover:shadow-[0_30px_80px_rgba(44,25,17,0.1)]"
+              className="group scroll-mt-28 overflow-hidden rounded-[32px] bg-white shadow-[0_20px_60px_rgba(44,25,17,0.05)] transition-all hover:shadow-[0_30px_80px_rgba(44,25,17,0.1)]"
             >
               <div className="relative h-72 overflow-hidden bg-[#f3ebe0]">
                 <img 

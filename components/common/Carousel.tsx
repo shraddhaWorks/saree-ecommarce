@@ -38,6 +38,10 @@ export default function Carousel({
   const itemRefs = useRef<Array<HTMLDivElement | null>>([]);
   const scrollSyncTimerRef = useRef<number | null>(null);
   const [touchInProgress, setTouchInProgress] = useState(false);
+  /** Touch swipe: index at finger-down (mobile sensitivity). */
+  const touchStartX = useRef(0);
+  const touchStartY = useRef(0);
+  const touchStartSlideIndex = useRef(0);
   const currentIndex = slideCount > 0 ? Math.min(activeIndex, slideCount - 1) : 0;
 
   const goToIndex = useCallback(
@@ -81,8 +85,51 @@ export default function Carousel({
     scrollSyncTimerRef.current = window.setTimeout(() => {
       scrollSyncTimerRef.current = null;
       syncActiveFromScroll();
-    }, 60);
+    }, 32);
   }, [syncActiveFromScroll]);
+
+  /** Light horizontal swipe advances slide (helps when snap/scroll feels stiff on mobile). */
+  const MIN_SWIPE_PX = 22;
+  /** If vertical movement dominates, let the page scroll instead. */
+  const SWIPE_VERTICAL_TOLERANCE = 0.72;
+
+  const handleTouchStart = useCallback(
+    (e: React.TouchEvent) => {
+      if (slideCount <= 1) return;
+      const t = e.touches[0];
+      if (!t) return;
+      touchStartX.current = t.clientX;
+      touchStartY.current = t.clientY;
+      const el = trackRef.current;
+      if (!el) return;
+      const w = el.clientWidth;
+      if (w < 1) return;
+      const idx = Math.round(el.scrollLeft / w);
+      touchStartSlideIndex.current = Math.max(0, Math.min(slideCount - 1, idx));
+    },
+    [slideCount],
+  );
+
+  const handleTouchEnd = useCallback(
+    (e: React.TouchEvent) => {
+      if (slideCount <= 1) return;
+      const t = e.changedTouches[0];
+      if (!t) return;
+      const dx = t.clientX - touchStartX.current;
+      const dy = t.clientY - touchStartY.current;
+      if (Math.abs(dx) < MIN_SWIPE_PX) return;
+      if (Math.abs(dy) > Math.abs(dx) * SWIPE_VERTICAL_TOLERANCE) return;
+
+      const from = touchStartSlideIndex.current;
+      if (dx < 0) {
+        goToIndex(from + 1);
+      } else {
+        goToIndex(from - 1);
+      }
+      window.setTimeout(() => syncActiveFromScroll(), 80);
+    },
+    [goToIndex, slideCount, syncActiveFromScroll],
+  );
 
   useEffect(() => {
     return () => {
@@ -122,25 +169,46 @@ export default function Carousel({
 
   return (
     <div
-      className={`relative w-full overflow-hidden ${className}`.trim()}
+      className={`relative w-full overflow-hidden [overscroll-behavior-x:contain] ${className}`.trim()}
       onMouseEnter={() => (pauseOnHover ? setIsPaused(true) : undefined)}
       onMouseLeave={() => (pauseOnHover ? setIsPaused(false) : undefined)}
     >
       <div
         ref={trackRef}
-        className="relative flex w-full touch-pan-x overflow-x-auto overscroll-x-contain scroll-smooth snap-x snap-mandatory [scrollbar-width:none] [-ms-overflow-style:none] [-webkit-overflow-scrolling:touch] [&::-webkit-scrollbar]:hidden"
+        className="relative flex w-full touch-pan-x overflow-x-auto overscroll-x-contain scroll-smooth snap-x snap-proximity lg:snap-mandatory [scrollbar-width:none] [-ms-overflow-style:none] [-webkit-overflow-scrolling:touch] [&::-webkit-scrollbar]:hidden"
         role="list"
         onScroll={handleTrackScroll}
         onScrollEnd={syncActiveFromScroll}
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+        onTouchCancel={() => syncActiveFromScroll()}
         onPointerDown={(e) => {
           if (e.pointerType === "touch" || e.pointerType === "pen") {
             setTouchInProgress(true);
+            const el = trackRef.current;
+            if (el && e.pointerId != null) {
+              try {
+                el.setPointerCapture(e.pointerId);
+              } catch {
+                /* ignore */
+              }
+            }
           }
         }}
         onPointerUp={(e) => {
           if (e.pointerType === "touch" || e.pointerType === "pen") {
-            window.setTimeout(() => setTouchInProgress(false), 400);
-            window.setTimeout(() => syncActiveFromScroll(), 120);
+            const el = trackRef.current;
+            if (el && e.pointerId != null) {
+              try {
+                if (el.hasPointerCapture(e.pointerId)) {
+                  el.releasePointerCapture(e.pointerId);
+                }
+              } catch {
+                /* ignore */
+              }
+            }
+            window.setTimeout(() => setTouchInProgress(false), 280);
+            window.setTimeout(() => syncActiveFromScroll(), 100);
           }
         }}
         onPointerCancel={(e) => {

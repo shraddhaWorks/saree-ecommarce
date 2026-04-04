@@ -7,6 +7,7 @@ export function ShowcaseCard({
     imageSrc,
     href,
     ctaLabel,
+    onNavigate,
 }: {
     title: string;
     subtitle: string;
@@ -14,6 +15,7 @@ export function ShowcaseCard({
     imageSrc?: string;
     href?: string;
     ctaLabel?: string;
+    onNavigate?: () => void;
 }) {
     return (
         <div
@@ -36,6 +38,7 @@ export function ShowcaseCard({
                     href ? (
                         <Link
                             href={href}
+                            onClick={onNavigate}
                             className="mt-8 inline-flex w-fit items-center justify-center rounded-[18px] bg-[#d4a63f] px-10 py-4 text-xl font-semibold text-white transition hover:bg-[#bf9333]"
                         >
                             {ctaLabel}

@@ -9,10 +9,10 @@ type Props = {
   layout?: "five" | "four";
 };
 
-function ArrowCircle() {
+function TileArrowBadge() {
   return (
     <span
-      className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-2 border-white text-white shadow-sm transition duration-300 group-hover/card:border-white group-hover/card:bg-white/10 md:h-11 md:w-11"
+      className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-2 border-white text-white transition duration-300 group-hover/card:rotate-[-30deg] md:h-11 md:w-11"
       aria-hidden
     >
       <svg
@@ -21,12 +21,15 @@ function ArrowCircle() {
         viewBox="0 0 24 24"
         fill="none"
         className="md:h-5 md:w-5"
-        stroke="currentColor"
-        strokeWidth="2.25"
-        strokeLinecap="round"
-        strokeLinejoin="round"
+        aria-hidden
       >
-        <path d="M5 12h14M14 6l6 6-6 6" />
+        <path
+          d="M5 12H19M19 12L13 6M19 12L13 18"
+          stroke="currentColor"
+          strokeWidth="2.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
       </svg>
     </span>
   );
@@ -67,7 +70,7 @@ export function WeddingEditSection({ title, items, layout = "five" }: Props) {
                     <h3 className="max-w-[72%] font-sans text-[0.9375rem] font-medium leading-snug tracking-wide text-white md:text-base lg:text-[1.05rem]">
                       {item.title}
                     </h3>
-                    <ArrowCircle />
+                    <TileArrowBadge />
                   </div>
                 </div>
               </article>

@@ -1,11 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { Eye } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import type { CollectionSpotlightItem } from "@/lib/collection-spotlight";
+import { DecorativeTileHeart } from "@/components/product/DecorativeTileHeart";
 import { ProductTileQuickActions } from "@/components/product/ProductTileQuickActions";
+import { WishlistFloatingHeart, WishlistInlineHeart } from "@/components/product/WishlistHeartButtons";
+import { useWishlistItem } from "@/hooks/use-wishlist-item";
 import { FALLBACK_SAREE_IMAGE } from "@/lib/storefront-images";
 import type { StorefrontProduct } from "@/types/storefront";
 
@@ -84,6 +86,18 @@ export function CollectionSpotlightCard({ item, compact = false, catalogProduct 
   const linkSlug =
     resolved?.slug ?? item.productSlug?.trim() ?? undefined;
 
+  const thumbForWishlist = linkSlug
+    ? cartThumbForSpotlight(resolved ?? null, imageSrc)
+    : FALLBACK_SAREE_IMAGE;
+
+  const wishlist = useWishlistItem({
+    productId: resolved?.id,
+    slug: linkSlug ?? "",
+    name: title,
+    price,
+    image: thumbForWishlist,
+  });
+
   const shell = compact ? "rounded-lg shadow-sm" : "rounded-xl shadow-md";
 
   const meta = (
@@ -153,15 +167,14 @@ export function CollectionSpotlightCard({ item, compact = false, catalogProduct 
             />
           </Link>
           {badges}
-          <Link
-            href={`/products/${linkSlug}`}
-            className={`absolute z-[1] rounded-full bg-black text-white transition hover:opacity-90 ${compact ? "right-2 top-2 p-1.5" : "right-3 top-3 p-2"}`}
-            aria-label={`Quick view ${title}`}
-          >
-            <Eye size={compact ? 14 : 16} aria-hidden />
-          </Link>
+          <WishlistFloatingHeart
+            name={title}
+            compact={compact}
+            saved={wishlist.saved}
+            busy={wishlist.busy}
+            toggle={wishlist.toggle}
+          />
           <ProductTileQuickActions
-            productSlug={linkSlug}
             label={title}
             compact={compact}
             addDisabled={addDisabled}
@@ -180,9 +193,34 @@ export function CollectionSpotlightCard({ item, compact = false, catalogProduct 
             className={`absolute z-[2] ${compact ? "bottom-2 right-2" : "bottom-3 right-3"}`}
           />
         </div>
-        <Link href={`/products/${linkSlug}`} className="block min-w-0">
-          {meta}
-        </Link>
+        <div className={`min-w-0 text-left ${compact ? "p-2" : "p-3 sm:p-4"}`}>
+          <Link href={`/products/${linkSlug}`} className="block min-w-0">
+            <p
+              className={`break-words font-medium leading-snug text-[#1a1512] ${compact ? "line-clamp-2 text-xs" : "text-sm"}`}
+            >
+              {title}
+            </p>
+            <div className={`flex flex-wrap items-baseline gap-1.5 ${compact ? "mt-1" : "mt-2 gap-2"}`}>
+              {compareAtPrice != null && compareAtPrice > price ? (
+                <span className={`text-black/40 line-through ${compact ? "text-[11px]" : "text-sm"}`}>
+                  Rs. {compareAtPrice.toLocaleString("en-IN")}.00
+                </span>
+              ) : null}
+              <span
+                className={`font-semibold ${discount ? "text-[#c41e3a]" : "text-accent"} ${compact ? "text-xs" : "text-sm"}`}
+              >
+                Rs. {price.toLocaleString("en-IN")}.00
+              </span>
+            </div>
+          </Link>
+          <WishlistInlineHeart
+            name={title}
+            compact={compact}
+            saved={wishlist.saved}
+            busy={wishlist.busy}
+            toggle={wishlist.toggle}
+          />
+        </div>
       </div>
     );
   }
@@ -202,11 +240,7 @@ export function CollectionSpotlightCard({ item, compact = false, catalogProduct 
             withHoverScale
           />
           {badges}
-          <span
-            className={`absolute rounded-full bg-black text-white ${compact ? "right-2 top-2 p-1.5" : "right-3 top-3 p-2"}`}
-          >
-            <Eye size={compact ? 14 : 16} aria-hidden />
-          </span>
+          <DecorativeTileHeart compact={compact} />
         </div>
         {meta}
       </Link>
@@ -223,11 +257,7 @@ export function CollectionSpotlightCard({ item, compact = false, catalogProduct 
           compact={compact}
         />
         {badges}
-        <span
-          className={`absolute rounded-full bg-black text-white ${compact ? "right-2 top-2 p-1.5" : "right-3 top-3 p-2"}`}
-        >
-          <Eye size={compact ? 14 : 16} aria-hidden />
-        </span>
+        <DecorativeTileHeart compact={compact} />
       </div>
       {meta}
     </div>

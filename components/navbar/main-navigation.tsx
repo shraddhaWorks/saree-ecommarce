@@ -3,7 +3,9 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 
-import { getNavMegaItems } from "./nav-mega-items";
+import { resolveMenuItemHref } from "@/components/navbar/menu/resolve-menu-href";
+
+import { getNavMegaItems, resolveMegaPreviewHref } from "./nav-mega-items";
 
 export function MainNavigation() {
   const [openLabel, setOpenLabel] = useState<string | null>(null);
@@ -43,7 +45,7 @@ export function MainNavigation() {
                   {openItem.children.map((child) => (
                     <li key={child.href}>
                       <Link
-                        href={child.href}
+                        href={resolveMenuItemHref(child)}
                         onClick={() => setOpenLabel(null)}
                         className="block rounded-lg px-3 py-2.5 text-[15px] font-medium leading-snug text-[var(--announcement-sandal)]/95 transition-colors hover:bg-white/10 hover:text-white"
                       >
@@ -57,7 +59,7 @@ export function MainNavigation() {
                   {openItem.previews.map((preview) => (
                     <Link
                       key={preview.title}
-                      href={openItem.href}
+                      href={resolveMegaPreviewHref(openItem, preview)}
                       onClick={() => setOpenLabel(null)}
                       className="group relative block overflow-hidden rounded-xl border border-[var(--announcement-sandal)]/22 bg-[#6f1325]"
                     >

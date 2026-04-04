@@ -1,10 +1,13 @@
+import { resolveMenuShowcaseHref } from "./resolve-menu-href";
 import { ShowcaseCard } from "./ShowcaseCard";
 import type { MenuData } from "./types";
 
 export function ShowcaseArt({
     menu,
+    onItemClick,
 }: {
     menu: MenuData;
+    onItemClick?: () => void;
 }) {
     const { showcase, showcaseItems } = menu;
 
@@ -16,9 +19,10 @@ export function ShowcaseArt({
                         key={item.title}
                         title={item.title}
                         subtitle={item.subtitle}
-                        href={showcase === "sarees" ? undefined : item.href}
+                        href={resolveMenuShowcaseHref(menu, item)}
                         ctaLabel={item.ctaLabel}
                         imageSrc={item.imageSrc}
+                        onNavigate={onItemClick}
                         className="min-h-[420px] lg:min-h-[560px]"
                     />
                 ))}

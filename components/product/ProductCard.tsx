@@ -1,13 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { Eye } from "lucide-react";
 import { useEffect, useState } from "react";
 
+import { useWishlistItem } from "@/hooks/use-wishlist-item";
 import { FALLBACK_SAREE_IMAGE } from "@/lib/storefront-images";
 import type { StorefrontProduct as Product } from "@/types/storefront";
 
 import { ProductTileQuickActions } from "./ProductTileQuickActions";
+import { WishlistFloatingHeart, WishlistInlineHeart } from "./WishlistHeartButtons";
 
 interface Props {
   product: Product;
@@ -23,6 +24,14 @@ export default function ProductCard({ product, compact = false }: Props) {
     setImgSrc(thumb);
   }, [thumb]);
   const isOutOfStock = !product.inStock || product.stock <= 0;
+
+  const wishlist = useWishlistItem({
+    productId: product.id,
+    slug: product.slug,
+    name: product.name,
+    price: product.price,
+    image: imgSrc,
+  });
 
   const shell = compact
     ? "rounded-lg shadow-sm"
@@ -59,16 +68,15 @@ export default function ProductCard({ product, compact = false }: Props) {
           </div>
         ) : null}
 
-        <Link
-          href={`/products/${product.slug}`}
-          className={`absolute z-[1] rounded-full bg-black text-white transition hover:opacity-90 ${compact ? "right-2 top-2 p-1.5" : "right-3 top-3 p-2"}`}
-          aria-label={`Quick view ${product.name}`}
-        >
-          <Eye size={compact ? 14 : 16} aria-hidden />
-        </Link>
+        <WishlistFloatingHeart
+          name={product.name}
+          compact={compact}
+          saved={wishlist.saved}
+          busy={wishlist.busy}
+          toggle={wishlist.toggle}
+        />
 
         <ProductTileQuickActions
-          productSlug={product.slug}
           label={product.name}
           compact={compact}
           addDisabled={isOutOfStock}
@@ -84,8 +92,8 @@ export default function ProductCard({ product, compact = false }: Props) {
         />
       </div>
 
-      <Link href={`/products/${product.slug}`} className="block min-w-0 text-left">
-        <div className={`min-w-0 ${compact ? "p-2" : "p-3 sm:p-4"}`}>
+      <div className={`min-w-0 text-left ${compact ? "p-2" : "p-3 sm:p-4"}`}>
+        <Link href={`/products/${product.slug}`} className="block min-w-0">
           <p
             className={`break-words font-medium leading-snug text-[#1a1512] ${compact ? "line-clamp-2 text-xs" : "text-sm"}`}
           >
@@ -103,8 +111,15 @@ export default function ProductCard({ product, compact = false }: Props) {
               Rs. {product.price.toLocaleString("en-IN")}.00
             </span>
           </div>
-        </div>
-      </Link>
+        </Link>
+        <WishlistInlineHeart
+          name={product.name}
+          compact={compact}
+          saved={wishlist.saved}
+          busy={wishlist.busy}
+          toggle={wishlist.toggle}
+        />
+      </div>
     </div>
   );
 }

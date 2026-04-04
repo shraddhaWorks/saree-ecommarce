@@ -1,8 +1,14 @@
-import { staticNavCategories } from "@/lib/static-nav-data";
+import { staticNavCategories, toStaticSlug } from "@/lib/static-nav-data";
 
 import { primaryNavItems } from "./nav-items";
 
-export type MegaPreview = { title: string; subtitle: string; imageUrl: string };
+export type MegaPreview = {
+  title: string;
+  subtitle: string;
+  imageUrl: string;
+  /** When title slug does not match a mega child label, link here (same as Wedding Edit `/collections/...`). */
+  href?: string;
+};
 
 const previewByLabel: Record<string, [MegaPreview, MegaPreview]> = {
   "Traditional Sarees": [
@@ -15,6 +21,7 @@ const previewByLabel: Record<string, [MegaPreview, MegaPreview]> = {
       title: "Banaras Silk Sarees",
       subtitle: "Timeless zari craftsmanship",
       imageUrl: "/mega-menu/banaras-silk.svg",
+      href: "/collections/banaras-sarees",
     },
   ],
   "Wedding Sarees": [
@@ -33,13 +40,13 @@ const previewByLabel: Record<string, [MegaPreview, MegaPreview]> = {
   ],
   "Designer & Party Wear Sarees": [
     {
-      title: "Designer Sarees",
+      title: "Organza Sarees",
       subtitle: "Statement looks for celebrations",
       imageUrl:
         "https://images.unsplash.com/photo-1595459894258-3f3f0f2f1d36?auto=format&fit=crop&w=1200&q=80",
     },
     {
-      title: "Party Wear Sarees",
+      title: "Zari Kota & Semi Kota Sarees",
       subtitle: "Modern drapes with rich detailing",
       imageUrl:
         "https://images.unsplash.com/photo-1610030469668-3c4f6a7d2b09?auto=format&fit=crop&w=1200&q=80",
@@ -47,13 +54,13 @@ const previewByLabel: Record<string, [MegaPreview, MegaPreview]> = {
   ],
   "Festive Wear Sarees": [
     {
-      title: "Festive Collection",
+      title: "Ikkat Sarees",
       subtitle: "Bright tones and festive zari",
       imageUrl:
         "https://images.unsplash.com/photo-1619378607490-6f2f7ef5a8b5?auto=format&fit=crop&w=1200&q=80",
     },
     {
-      title: "Traditional Festive Looks",
+      title: "Bandini Sarees",
       subtitle: "Elegant silk for every function",
       imageUrl:
         "https://images.unsplash.com/photo-1610189000046-7fcb6e9f8f63?auto=format&fit=crop&w=1200&q=80",
@@ -61,13 +68,13 @@ const previewByLabel: Record<string, [MegaPreview, MegaPreview]> = {
   ],
   "Casual & Workwear Sarees": [
     {
-      title: "Casual Sarees",
+      title: "Georgette, Crepe, Satin & Chiffon Silk Sarees",
       subtitle: "Lightweight everyday styles",
       imageUrl:
         "https://images.unsplash.com/photo-1625591340245-4f4a2f2b575f?auto=format&fit=crop&w=1200&q=80",
     },
     {
-      title: "Workwear Sarees",
+      title: "Khadi, Jute, Bhagalpur & Printed Sarees",
       subtitle: "Minimal, graceful office picks",
       imageUrl:
         "https://images.unsplash.com/photo-1597983073493-88cd35cf93b0?auto=format&fit=crop&w=1200&q=80",
@@ -81,7 +88,7 @@ const previewByLabel: Record<string, [MegaPreview, MegaPreview]> = {
         "https://images.unsplash.com/photo-1583391733981-76f0e35fa592?auto=format&fit=crop&w=1200&q=80",
     },
     {
-      title: "Kanduva Sets",
+      title: "Dhoti & Kanduva Sets",
       subtitle: "Traditional sets for occasions",
       imageUrl:
         "https://images.unsplash.com/photo-1602211844066-d3bb556e983b?auto=format&fit=crop&w=1200&q=80",
@@ -93,12 +100,14 @@ const previewByLabel: Record<string, [MegaPreview, MegaPreview]> = {
       subtitle: "Experience collections in person",
       imageUrl:
         "https://images.unsplash.com/photo-1522312346375-d1a52e2b99b3?auto=format&fit=crop&w=1200&q=80",
+      href: "/stores",
     },
     {
       title: "Find Nearby Showrooms",
       subtitle: "Hyderabad, Vijayawada, Vizag",
       imageUrl:
         "https://images.unsplash.com/photo-1481437156560-3205f6a55735?auto=format&fit=crop&w=1200&q=80",
+      href: "/stores",
     },
   ],
 };
@@ -124,6 +133,17 @@ export type NavMegaItem = {
   children: readonly { label: string; href: string }[];
   previews: [MegaPreview, MegaPreview];
 };
+
+/** Preview card → same collection URL as the matching mega-menu child (Wedding Edit flow). */
+export function resolveMegaPreviewHref(
+  item: NavMegaItem,
+  preview: MegaPreview,
+): string {
+  if (preview.href) return preview.href;
+  const key = toStaticSlug(preview.title);
+  const child = item.children.find((c) => toStaticSlug(c.label) === key);
+  return child?.href ?? item.href;
+}
 
 export function getNavMegaItems(): NavMegaItem[] {
   const categories = Object.values(staticNavCategories);

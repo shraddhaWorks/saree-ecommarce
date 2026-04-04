@@ -10,6 +10,7 @@ import ProductList from "@/components/product/ProductList";
 import { TIMELESS_CRAFTS_HOME_TILES } from "@/lib/timeless-crafts-defaults";
 import { WEDDING_EDIT_HOME_TILES } from "@/lib/wedding-edit-defaults";
 import { SHOP_BY_OCCASION_HOME_TILES } from "@/lib/shop-by-occasion-defaults";
+import { HOME_BEST_OF_SALE_LIMIT } from "@/lib/storefront-constants";
 import { getStorefrontPayload } from "@/lib/storefront-server";
 
 export default async function Home() {
@@ -58,7 +59,7 @@ export default async function Home() {
 
       <WeddingEditSection title={siteConfig.weddingEditTitle} items={WEDDING_EDIT_HOME_TILES} />
 
-      <ProductList />
+      <ProductList maxProducts={HOME_BEST_OF_SALE_LIMIT} />
 
       <SpecialProductsSection title={siteConfig.specialsTitle} products={specialProducts} />
 
