@@ -53,15 +53,6 @@ export function HeroCarousel({ slides }: { slides: HeroSlideView[] }) {
         draggable={false}
         loading="eager"
       />
-      {s.linkUrl ? (
-        <OutOrInLink
-          href={s.linkUrl}
-          data-carousel-tap-through
-          className="absolute bottom-10 left-1/2 z-20 inline-flex min-h-11 -translate-x-1/2 touch-manipulation items-center justify-center rounded-full bg-white/95 px-6 py-2.5 text-sm font-semibold text-[#8f171f] shadow-md transition hover:bg-white md:bottom-14"
-        >
-          Shop now
-        </OutOrInLink>
-      ) : null}
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/5 via-black/0 to-black/25" />
     </div>
   ));
