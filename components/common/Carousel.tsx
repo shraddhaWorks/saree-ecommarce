@@ -12,6 +12,18 @@ export interface CarouselProps {
   pauseOnHover?: boolean;
   autoPlayInterval?: number;
   loop?: boolean;
+  /**
+   * Each side gets this % width as an invisible “tap to prev/next” band (center stays usable for links + horizontal swipe).
+   * Example: 42 → left 42% tap = previous, right 42% = next, middle ~16% for hero CTA.
+   */
+  edgeTapPercent?: number;
+  /** Finger swipes up (story-style) → next slide. */
+  swipeUpForNext?: boolean;
+  /**
+   * Short tap/click almost anywhere on the track → next slide (captures clicks so full-bleed slide links won’t open).
+   * When true, `edgeTapPercent` short-tap bands are skipped (swipe left/right/up still work).
+   */
+  tapAnywhereForNext?: boolean;
 }
 
 export default function Carousel({
@@ -24,6 +36,9 @@ export default function Carousel({
   pauseOnHover = false,
   autoPlayInterval = 5000,
   loop = true,
+  edgeTapPercent = 0,
+  swipeUpForNext = true,
+  tapAnywhereForNext = false,
 }: CarouselProps) {
   const slideChildren = useMemo<ReactNode[]>(() => {
     if (slides && slides.length > 0) return slides;
@@ -42,7 +57,14 @@ export default function Carousel({
   const touchStartX = useRef(0);
   const touchStartY = useRef(0);
   const touchStartSlideIndex = useRef(0);
+  const lastTouchEdgeNavAt = useRef(0);
+  /** Touch target at finger-down (for tap-through elements like hero CTAs). */
+  const touchStartTarget = useRef<EventTarget | null>(null);
   const currentIndex = slideCount > 0 ? Math.min(activeIndex, slideCount - 1) : 0;
+
+  const isTapThroughTarget = useCallback((node: EventTarget | null) => {
+    return node instanceof Element && node.closest("[data-carousel-tap-through]") != null;
+  }, []);
 
   const goToIndex = useCallback(
     (index: number) => {
@@ -95,9 +117,18 @@ export default function Carousel({
    * Higher = more forgiving diagonal / upward drift.
    */
   const SWIPE_VERTICAL_DOMINANCE = 1.45;
+  /** Upward swipe: next slide (mobile). */
+  const SWIPE_UP_MIN_PX = 14;
+  /** Upward movement must beat horizontal by this ratio (low = easier to trigger). */
+  const SWIPE_UP_VS_HORIZONTAL = 0.42;
+  /** Short tap (little movement) on left/right bands → prev/next; does not block horizontal scroll. */
+  const TAP_MOVE_MAX_PX = 16;
+
+  const edgePct = Math.min(48, Math.max(0, edgeTapPercent));
 
   const handleTouchStart = useCallback(
     (e: React.TouchEvent) => {
+      touchStartTarget.current = e.target;
       if (slideCount <= 1) return;
       const t = e.touches[0];
       if (!t) return;
@@ -120,18 +151,111 @@ export default function Carousel({
       if (!t) return;
       const dx = t.clientX - touchStartX.current;
       const dy = t.clientY - touchStartY.current;
-      if (Math.abs(dx) < MIN_SWIPE_PX) return;
-      if (Math.abs(dy) > Math.abs(dx) * SWIPE_VERTICAL_DOMINANCE) return;
 
-      const from = touchStartSlideIndex.current;
-      if (dx < 0) {
-        goToIndex(from + 1);
-      } else {
-        goToIndex(from - 1);
+      if (swipeUpForNext) {
+        if (
+          dy < -SWIPE_UP_MIN_PX &&
+          Math.abs(dy) > Math.abs(dx) * SWIPE_UP_VS_HORIZONTAL
+        ) {
+          lastTouchEdgeNavAt.current = Date.now();
+          goToIndex(touchStartSlideIndex.current + 1);
+          window.setTimeout(() => syncActiveFromScroll(), 80);
+          return;
+        }
       }
-      window.setTimeout(() => syncActiveFromScroll(), 80);
+
+      if (Math.abs(dx) >= MIN_SWIPE_PX) {
+        if (Math.abs(dy) <= Math.abs(dx) * SWIPE_VERTICAL_DOMINANCE) {
+          const from = touchStartSlideIndex.current;
+          if (dx < 0) {
+            goToIndex(from + 1);
+          } else {
+            goToIndex(from - 1);
+          }
+          window.setTimeout(() => syncActiveFromScroll(), 80);
+        }
+        return;
+      }
+
+      if (
+        tapAnywhereForNext &&
+        Math.abs(dx) <= TAP_MOVE_MAX_PX &&
+        Math.abs(dy) <= TAP_MOVE_MAX_PX
+      ) {
+        if (isTapThroughTarget(touchStartTarget.current)) return;
+        lastTouchEdgeNavAt.current = Date.now();
+        next();
+        window.setTimeout(() => syncActiveFromScroll(), 80);
+        return;
+      }
+
+      if (
+        edgePct > 0 &&
+        Math.abs(dx) <= TAP_MOVE_MAX_PX &&
+        Math.abs(dy) <= TAP_MOVE_MAX_PX
+      ) {
+        const el = trackRef.current;
+        if (el) {
+          const rect = el.getBoundingClientRect();
+          const relX = t.clientX - rect.left;
+          const fw = rect.width;
+          if (fw > 0) {
+            const leftBand = (edgePct / 100) * fw;
+            const rightStart = (1 - edgePct / 100) * fw;
+            if (relX < leftBand) {
+              lastTouchEdgeNavAt.current = Date.now();
+              prev();
+              window.setTimeout(() => syncActiveFromScroll(), 80);
+            } else if (relX > rightStart) {
+              lastTouchEdgeNavAt.current = Date.now();
+              next();
+              window.setTimeout(() => syncActiveFromScroll(), 80);
+            }
+          }
+        }
+      }
     },
-    [goToIndex, slideCount, syncActiveFromScroll],
+    [edgePct, goToIndex, isTapThroughTarget, next, prev, slideCount, swipeUpForNext, syncActiveFromScroll, tapAnywhereForNext],
+  );
+
+  const handleTrackClickCapture = useCallback(
+    (e: React.MouseEvent) => {
+      if (slideCount <= 1) return;
+      if (isTapThroughTarget(e.target)) return;
+      if (Date.now() - lastTouchEdgeNavAt.current < 500) {
+        e.preventDefault();
+        e.stopPropagation();
+        return;
+      }
+      if (tapAnywhereForNext) {
+        e.preventDefault();
+        e.stopPropagation();
+        next();
+        window.setTimeout(() => syncActiveFromScroll(), 80);
+        return;
+      }
+      if (edgePct <= 0) return;
+      const el = trackRef.current;
+      if (!el) return;
+      const rect = el.getBoundingClientRect();
+      const relX = e.clientX - rect.left;
+      const fw = rect.width;
+      if (fw < 1) return;
+      const leftBand = (edgePct / 100) * fw;
+      const rightStart = (1 - edgePct / 100) * fw;
+      if (relX < leftBand) {
+        e.preventDefault();
+        e.stopPropagation();
+        prev();
+        window.setTimeout(() => syncActiveFromScroll(), 80);
+      } else if (relX > rightStart) {
+        e.preventDefault();
+        e.stopPropagation();
+        next();
+        window.setTimeout(() => syncActiveFromScroll(), 80);
+      }
+    },
+    [edgePct, isTapThroughTarget, next, prev, slideCount, syncActiveFromScroll, tapAnywhereForNext],
   );
 
   useEffect(() => {
@@ -184,6 +308,7 @@ export default function Carousel({
         onScrollEnd={syncActiveFromScroll}
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
+        onClickCapture={handleTrackClickCapture}
         onTouchCancel={() => syncActiveFromScroll()}
         onPointerDown={(e) => {
           if (e.pointerType === "touch" || e.pointerType === "pen") {
@@ -239,7 +364,7 @@ export default function Carousel({
           <button
             type="button"
             onClick={prev}
-            className="absolute left-4 top-1/2 z-20 flex h-12 w-12 min-h-12 min-w-12 -translate-y-1/2 touch-manipulation items-center justify-center rounded-full bg-black/20 text-white backdrop-blur-md transition hover:bg-black/40 md:left-8"
+            className="absolute left-4 top-1/2 z-[25] flex h-12 w-12 min-h-12 min-w-12 -translate-y-1/2 touch-manipulation items-center justify-center rounded-full bg-black/20 text-white backdrop-blur-md transition hover:bg-black/40 md:left-8"
             aria-label="Previous slide"
           >
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
@@ -247,7 +372,7 @@ export default function Carousel({
           <button
             type="button"
             onClick={next}
-            className="absolute right-4 top-1/2 z-20 flex h-12 w-12 min-h-12 min-w-12 -translate-y-1/2 touch-manipulation items-center justify-center rounded-full bg-black/20 text-white backdrop-blur-md transition hover:bg-black/40 md:right-8"
+            className="absolute right-4 top-1/2 z-[25] flex h-12 w-12 min-h-12 min-w-12 -translate-y-1/2 touch-manipulation items-center justify-center rounded-full bg-black/20 text-white backdrop-blur-md transition hover:bg-black/40 md:right-8"
             aria-label="Next slide"
           >
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6"/></svg>
@@ -256,7 +381,7 @@ export default function Carousel({
       ) : null}
 
       {showIndicators && slideCount > 1 ? (
-        <div className="absolute bottom-4 left-1/2 z-20 flex -translate-x-1/2 items-center gap-3 rounded-full bg-black/40 px-4 py-2.5 backdrop-blur-xl border border-white/10 md:bottom-8 md:gap-4 md:px-6 md:py-3">
+        <div className="absolute bottom-4 left-1/2 z-[25] flex -translate-x-1/2 items-center gap-3 rounded-full bg-black/40 px-4 py-2.5 backdrop-blur-xl border border-white/10 md:bottom-8 md:gap-4 md:px-6 md:py-3">
           <button
             type="button"
             onClick={() => setIsPaused(!isPaused)}
