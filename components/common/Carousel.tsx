@@ -88,10 +88,13 @@ export default function Carousel({
     }, 32);
   }, [syncActiveFromScroll]);
 
-  /** Light horizontal swipe advances slide (helps when snap/scroll feels stiff on mobile). */
-  const MIN_SWIPE_PX = 22;
-  /** If vertical movement dominates, let the page scroll instead. */
-  const SWIPE_VERTICAL_TOLERANCE = 0.72;
+  /** Light horizontal swipe advances slide (mobile thumbs often drift upward — keep this low). */
+  const MIN_SWIPE_PX = 10;
+  /**
+   * Ignore swipe-to-advance only when vertical drag clearly wins (so slight “up” while swiping still moves slides).
+   * Higher = more forgiving diagonal / upward drift.
+   */
+  const SWIPE_VERTICAL_DOMINANCE = 1.45;
 
   const handleTouchStart = useCallback(
     (e: React.TouchEvent) => {
@@ -118,7 +121,7 @@ export default function Carousel({
       const dx = t.clientX - touchStartX.current;
       const dy = t.clientY - touchStartY.current;
       if (Math.abs(dx) < MIN_SWIPE_PX) return;
-      if (Math.abs(dy) > Math.abs(dx) * SWIPE_VERTICAL_TOLERANCE) return;
+      if (Math.abs(dy) > Math.abs(dx) * SWIPE_VERTICAL_DOMINANCE) return;
 
       const from = touchStartSlideIndex.current;
       if (dx < 0) {
@@ -175,7 +178,7 @@ export default function Carousel({
     >
       <div
         ref={trackRef}
-        className="relative flex w-full touch-pan-x overflow-x-auto overscroll-x-contain scroll-smooth snap-x snap-proximity lg:snap-mandatory [scrollbar-width:none] [-ms-overflow-style:none] [-webkit-overflow-scrolling:touch] [&::-webkit-scrollbar]:hidden"
+        className="relative flex w-full touch-pan-x overflow-x-auto overscroll-x-contain scroll-smooth snap-x snap-mandatory lg:snap-proximity [scrollbar-width:none] [-ms-overflow-style:none] [-webkit-overflow-scrolling:touch] [&::-webkit-scrollbar]:hidden"
         role="list"
         onScroll={handleTrackScroll}
         onScrollEnd={syncActiveFromScroll}
