@@ -98,7 +98,7 @@ export function HeroCarousel({ slides }: { slides: HeroSlideView[] }) {
     <Carousel
       key={isLg ? "lg" : "sm"}
       slides={nodes}
-      className="w-full bg-[#8f171f]"
+      className="mx-auto w-[90%] bg-[#8f171f] lg:w-full"
       edgeTapPercent={47}
       swipeUpForNext
     />
