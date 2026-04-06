@@ -1,4 +1,4 @@
-import { getAccessToken } from "@/lib/auth-client";
+import { getAccessToken, setAccessToken } from "@/lib/auth-client";
 
 export type WishlistLine = {
   productId: string;
@@ -27,6 +27,13 @@ function emitWishlistUpdated(count: number) {
   window.dispatchEvent(
     new CustomEvent<WishlistUpdatedDetail>(WISHLIST_UPDATED_EVENT, { detail: { count } }),
   );
+}
+
+function handleWishlistUnauthorized() {
+  setAccessToken(null);
+  invalidateWishlistCache();
+  const count = readWishlistLocal().length;
+  emitWishlistUpdated(count);
 }
 
 export function invalidateWishlistCache() {
@@ -113,6 +120,11 @@ async function loadRemoteIntoSlot(
       const r = await fetch(`/api/wishlist?mode=${mode}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
+      if (r.status === 401) {
+        handleWishlistUnauthorized();
+        slot.inflight = null;
+        return readWishlistLocal();
+      }
       if (!r.ok) {
         slot.inflight = null;
         return [];
@@ -150,6 +162,10 @@ export async function fetchWishlistCountRemote(): Promise<number> {
     const r = await fetch("/api/wishlist?mode=count", {
       headers: { Authorization: `Bearer ${token}` },
     });
+    if (r.status === 401) {
+      handleWishlistUnauthorized();
+      return readWishlistLocal().length;
+    }
     if (!r.ok) return getWishlistCachedCount() ?? 0;
     const j = (await r.json()) as { count?: number };
     return typeof j.count === "number" ? j.count : 0;
@@ -229,6 +245,13 @@ export async function wishlistAdd(
       body: JSON.stringify({ productId }),
     });
     const j = (await r.json().catch(() => ({}))) as { error?: string; count?: number };
+    if (r.status === 401) {
+      handleWishlistUnauthorized();
+      addWishlistLocal(line);
+      const count = readWishlistLocal().length;
+      emitWishlistUpdated(count);
+      return { ok: true, count };
+    }
     if (!r.ok) {
       return { ok: false, error: j.error ?? "Could not save to wishlist" };
     }
@@ -254,6 +277,13 @@ export async function wishlistRemove(
       headers: { Authorization: `Bearer ${token}` },
     });
     const j = (await r.json().catch(() => ({}))) as { error?: string; count?: number };
+    if (r.status === 401) {
+      handleWishlistUnauthorized();
+      removeWishlistLocal(productId);
+      const count = readWishlistLocal().length;
+      emitWishlistUpdated(count);
+      return { ok: true, count };
+    }
     if (!r.ok) {
       return { ok: false, error: j.error ?? "Could not remove" };
     }

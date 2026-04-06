@@ -1,3 +1,8 @@
+import {
+  filterProducts,
+  parseCollectionBrowse,
+  sortProducts,
+} from "@/lib/collection-browse";
 import prisma from "@/lib/db";
 import type { HeroSlide, HomeGridItem, SiteConfig } from "@/lib/generated/prisma/client";
 import { toStorefrontProduct } from "@/lib/storefront-map";
@@ -44,4 +49,26 @@ export async function getStorefrontPayload(): Promise<StorefrontPayload> {
     gridItems,
     specialProducts: specialRows.map(toStorefrontProduct),
   };
+}
+
+export async function getFilteredSpecialProducts(
+  rawSearchParams?: Record<string, string | string[] | undefined>,
+): Promise<StorefrontProduct[]> {
+  const browse = parseCollectionBrowse(rawSearchParams ?? {});
+
+  const specialRows = await prisma.product.findMany({
+    where: {
+      isSpecial: true,
+      inStock: true,
+      stockQuantity: { gt: 0 },
+    },
+    include: {
+      category: true,
+      images: { orderBy: { position: "asc" } },
+    },
+    orderBy: { updatedAt: "desc" },
+    take: 100,
+  });
+
+  return sortProducts(filterProducts(specialRows, browse), browse.sort).map(toStorefrontProduct);
 }

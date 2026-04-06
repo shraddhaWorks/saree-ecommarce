@@ -15,24 +15,30 @@ export function MainNavigation() {
   return (
     <nav
       aria-label="Primary"
-      className="relative hidden w-full justify-center lg:flex"
+      className="relative hidden w-full justify-center overflow-visible lg:flex"
       onMouseLeave={() => setOpenLabel(null)}
     >
-      <ul className="flex w-full flex-wrap items-center justify-center gap-x-4 gap-y-2 xl:gap-x-7">
-        {navItemsWithChildren.map((item) => {
-          return (
-            <li key={item.href} className="relative" onMouseEnter={() => setOpenLabel(item.label)}>
-              <Link
-                href={item.href}
-                onClick={() => setOpenLabel(null)}
-                className="font-serif-royal text-center text-base font-semibold leading-snug tracking-[0.04em] text-[var(--announcement-maroon)] transition-colors hover:text-accent xl:text-lg"
+      <div className="w-full overflow-x-auto">
+        <ul className="flex min-w-max flex-nowrap items-center justify-center gap-x-4 px-6 xl:gap-x-7">
+          {navItemsWithChildren.map((item) => {
+            return (
+              <li
+                key={item.href}
+                className="relative shrink-0"
+                onMouseEnter={() => setOpenLabel(item.label)}
               >
-                {item.label}
-              </Link>
-            </li>
-          );
-        })}
-      </ul>
+                <Link
+                  href={item.href}
+                  onClick={() => setOpenLabel(null)}
+                  className="whitespace-nowrap font-serif-royal text-center text-[15px] font-semibold leading-snug tracking-[0.03em] text-[var(--announcement-maroon)] transition-colors hover:text-accent xl:text-[17px]"
+                >
+                  {item.label}
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
 
       {openLabel ? (
         <div className="absolute left-0 right-0 top-full z-50 mt-2 border-t border-[var(--announcement-sandal)]/25 bg-[var(--announcement-maroon)] shadow-2xl">
@@ -61,21 +67,24 @@ export function MainNavigation() {
                       key={preview.title}
                       href={resolveMegaPreviewHref(openItem, preview)}
                       onClick={() => setOpenLabel(null)}
-                      className="group relative block overflow-hidden rounded-xl border border-[var(--announcement-sandal)]/22 bg-[#6f1325]"
+                      className="group overflow-hidden rounded-xl border border-[var(--announcement-sandal)]/22 bg-[#6f1325]"
                     >
-                      <img
-                        src={preview.imageUrl}
-                        alt={preview.title}
-                        className="h-[250px] w-full object-cover"
-                        loading="lazy"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/5 to-transparent" />
-                      <div className="absolute bottom-5 left-5 right-5">
-                        <p className="font-serif-royal text-3xl text-[var(--announcement-sandal)] drop-shadow-sm">
+                      <div className="overflow-hidden">
+                        <img
+                          src={preview.imageUrl}
+                          alt={preview.title}
+                          className="h-[220px] w-full object-cover transition duration-500 group-hover:scale-[1.03]"
+                          loading="lazy"
+                        />
+                      </div>
+                      <div className="border-t border-[var(--announcement-sandal)]/18 px-5 py-4">
+                        <p className="font-serif-royal text-2xl leading-tight text-[var(--announcement-sandal)]">
                           {preview.title}
                         </p>
-                        <p className="mt-1 text-sm text-[var(--announcement-sandal)]/85">{preview.subtitle}</p>
-                        <span className="mt-3 inline-block rounded-sm bg-[var(--announcement-sandal)] px-6 py-2 text-sm font-semibold text-[var(--announcement-maroon)]">
+                        <p className="mt-1 text-sm leading-6 text-[var(--announcement-sandal)]/85">
+                          {preview.subtitle}
+                        </p>
+                        <span className="mt-3 inline-block rounded-sm bg-[var(--announcement-sandal)] px-5 py-2 text-sm font-semibold text-[var(--announcement-maroon)]">
                           Shop Now
                         </span>
                       </div>

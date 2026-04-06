@@ -109,6 +109,15 @@ export const staticNavCategories = {
   },
 } as const;
 
+export const STATIC_NAV_COLLECTIONS_BY_HANDLE = Object.fromEntries(
+  Object.values(staticNavCategories)
+    .filter((category) => category.href.startsWith("/collections/"))
+    .map((category) => [category.href.replace("/collections/", ""), category]),
+) as Record<
+  string,
+  (typeof staticNavCategories)[keyof typeof staticNavCategories]
+>;
+
 /** Same line filter + parent scope as nav “Venkatagiri Sarees” (Your Wedding Edit tile URL). */
 const vMeta = MEGA_MENU_SLUG_META["venkatagiri-sarees"];
 if (vMeta) {

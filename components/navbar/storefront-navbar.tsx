@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useMemo, useRef, useState, type FormEvent, type MouseEvent } from "react";
 
 import { getAccessToken, setAccessToken } from "@/lib/auth-client";
 import { getCart, getCartCount, type Cart } from "@/lib/cart";
@@ -22,9 +23,20 @@ import { MainNavigation } from "./main-navigation";
 
 type PanelKey = "bag" | "search" | "profile" | null;
 
-type SearchHit = { id: string; slug: string; name: string; mainImageUrl?: string | null };
+type SearchHit = {
+  id: string;
+  slug: string;
+  name: string;
+  priceInPaise?: number;
+  mainImageUrl?: string | null;
+  thumbnailUrl?: string | null;
+  images?: { url: string }[];
+  category?: { name?: string | null } | null;
+};
 
 export function StorefrontNavbar() {
+  const router = useRouter();
+  const pathname = usePathname();
   const [activePanel, setActivePanel] = useState<PanelKey>(null);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [mobileExpandedLabel, setMobileExpandedLabel] = useState<string | null>(null);
@@ -36,6 +48,7 @@ export function StorefrontNavbar() {
   const [searchResults, setSearchResults] = useState<SearchHit[]>([]);
   const [searchLoading, setSearchLoading] = useState(false);
   const [searchError, setSearchError] = useState<string | null>(null);
+  const searchAbortRef = useRef<AbortController | null>(null);
 
   const cartCount = useMemo(() => getCartCount(cart), [cart]);
 
@@ -106,20 +119,34 @@ export function StorefrontNavbar() {
     if (!mobileNavOpen) setMobileExpandedLabel(null);
   }, [mobileNavOpen]);
 
+  function closePanels() {
+    setActivePanel(null);
+    setMobileNavOpen(false);
+    setMobileExpandedLabel(null);
+  }
+
   async function runSearch(q: string) {
     const query = q.trim();
-    setSearchQuery(q);
 
     if (!query) {
+      searchAbortRef.current?.abort();
       setSearchResults([]);
       setSearchError(null);
+      setSearchLoading(false);
       return;
     }
+
+    searchAbortRef.current?.abort();
+    const controller = new AbortController();
+    searchAbortRef.current = controller;
 
     setSearchLoading(true);
     setSearchError(null);
     try {
-      const res = await fetch(`/api/products?search=${encodeURIComponent(query)}&limit=12`);
+      const res = await fetch(
+        `/api/products?search=${encodeURIComponent(query)}&limit=8&inStockOnly=1`,
+        { signal: controller.signal },
+      );
       const data = (await res.json()) as { items?: SearchHit[]; error?: string };
       if (!res.ok) {
         setSearchError(data.error ?? "Search failed");
@@ -127,7 +154,8 @@ export function StorefrontNavbar() {
         return;
       }
       setSearchResults(data.items ?? []);
-    } catch {
+    } catch (error) {
+      if (error instanceof DOMException && error.name === "AbortError") return;
       setSearchError("Network error");
       setSearchResults([]);
     } finally {
@@ -141,8 +169,28 @@ export function StorefrontNavbar() {
     setActivePanel(null);
   }
 
+  function handleLogoNavigate(event: MouseEvent<HTMLAnchorElement>) {
+    event.preventDefault();
+    closePanels();
+    if (pathname === "/") {
+      router.replace("/");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
+    router.push("/");
+  }
+
+  function submitSearch(event?: FormEvent<HTMLFormElement>) {
+    event?.preventDefault();
+    const query = searchQuery.trim();
+    if (!query) return;
+    closePanels();
+    router.push(`/collections/sarees?q=${encodeURIComponent(query)}`);
+  }
+
   const iconLinkClass =
     "flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-black/70 transition hover:bg-black/8 hover:text-accent sm:h-9 sm:w-9 lg:h-10 lg:w-10";
+  const hasSearchQuery = searchQuery.trim().length > 0;
 
   return (
     <>
@@ -153,6 +201,7 @@ export function StorefrontNavbar() {
         <div className="flex min-h-[40px] items-center justify-between px-2 py-1 sm:min-h-[44px] sm:px-3 sm:py-1.5 lg:hidden">
           <Link
             href="/"
+            onClick={handleLogoNavigate}
             className="inline-flex leading-none focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--navbar-sandal)]"
             aria-label="Rangam home"
           >
@@ -178,6 +227,7 @@ export function StorefrontNavbar() {
           <div className="col-start-2 flex justify-center justify-self-center px-1">
             <Link
               href="/"
+              onClick={handleLogoNavigate}
               className="rounded-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--navbar-sandal)]"
               aria-label="Rangam home"
             >
@@ -410,7 +460,7 @@ export function StorefrontNavbar() {
       </div>
 
       <div
-        className="h-[calc(2rem+56px)] sm:h-[calc(2rem+60px)] lg:h-[calc(2rem+108px)]"
+        className="h-[calc(2rem+56px)] sm:h-[calc(2rem+60px)] lg:h-[calc(2rem+120px)]"
         aria-hidden
       />
 
@@ -457,7 +507,10 @@ export function StorefrontNavbar() {
         onClose={() => setActivePanel(null)}
       >
         <div className="flex-1 overflow-auto px-8 pb-8">
-          <div className="rounded-3xl border border-black/10 bg-white p-4">
+          <form
+            onSubmit={submitSearch}
+            className="rounded-3xl border border-black/10 bg-white p-4"
+          >
             <input
               value={searchQuery}
               onChange={(e) => {
@@ -468,23 +521,55 @@ export function StorefrontNavbar() {
               placeholder="Search sarees..."
               className="w-full bg-transparent text-sm outline-none"
             />
-          </div>
+          </form>
 
           {searchLoading ? <p className="mt-3 text-sm text-black/55">Searching…</p> : null}
           {searchError ? <p className="mt-3 text-sm text-red-600">{searchError}</p> : null}
+          {!searchLoading && !searchError && hasSearchQuery && searchResults.length === 0 ? (
+            <p className="mt-3 text-sm text-black/55">No sarees found for “{searchQuery.trim()}”.</p>
+          ) : null}
 
           <div className="mt-4 grid gap-3">
             {searchResults.map((hit) => (
               <Link
                 key={hit.id}
                 href={`/products/${hit.slug}`}
-                onClick={() => setActivePanel(null)}
+                onClick={closePanels}
                 className="rounded-3xl border border-black/10 bg-white p-4 transition hover:border-[#9d2936]"
               >
-                <p className="text-sm font-semibold">{hit.name}</p>
+                <div className="flex items-center gap-3">
+                  <div className="h-16 w-16 shrink-0 overflow-hidden rounded-2xl bg-black/5">
+                    <img
+                      src={hit.images?.[0]?.url || hit.thumbnailUrl || hit.mainImageUrl || "/images/fallback-saree.png"}
+                      alt={hit.name}
+                      className="h-full w-full object-cover"
+                    />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-semibold">{hit.name}</p>
+                    {hit.category?.name ? (
+                      <p className="mt-1 text-xs text-black/50">{hit.category.name}</p>
+                    ) : null}
+                    {typeof hit.priceInPaise === "number" ? (
+                      <p className="mt-1 text-sm font-medium text-accent">
+                        Rs. {Math.round(hit.priceInPaise / 100).toLocaleString("en-IN")}.00
+                      </p>
+                    ) : null}
+                  </div>
+                </div>
               </Link>
             ))}
           </div>
+
+          {hasSearchQuery ? (
+            <button
+              type="button"
+              onClick={() => submitSearch()}
+              className="mt-4 w-full rounded-full bg-accent px-4 py-3 text-sm font-semibold text-white transition hover:opacity-90"
+            >
+              View all results
+            </button>
+          ) : null}
         </div>
       </Drawer>
 

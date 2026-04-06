@@ -8,25 +8,10 @@ type Slide = { imageUrl: string; altText: string; linkUrl: string };
 type GridRow = { title: string; imageUrl: string; linkUrl: string };
 
 const SECTION_KEYS = [
-  {
-    id: "WEDDING_EDIT",
-    label: "Your Wedding Edit (unused on home — 5 Pattu tiles are fixed in app + public/wedding-edit/)",
-  },
-  {
-    id: "SHOP_BY_PRICE",
-    label:
-      "Shop by Price (home tiles are fixed: public/shop-by-price/*.png — only the section title below is used)",
-  },
-  {
-    id: "CRAFTS",
-    label:
-      "Discover timeless crafts (home tiles are fixed: public/timeless-crafts/*.png — only the section title below is used)",
-  },
-  {
-    id: "SHOP_BY_OCCASION",
-    label:
-      "Shop by Occasion (home is fixed 2×2: public/shop-by-occasion/*.png — only the section title below is used)",
-  },
+  { id: "WEDDING_EDIT", label: "Your Wedding Edit" },
+  { id: "SHOP_BY_PRICE", label: "Shop by Price" },
+  { id: "CRAFTS", label: "Discover timeless crafts" },
+  { id: "SHOP_BY_OCCASION", label: "Shop by Occasion" },
 ] as const;
 
 export default function StorefrontEditor() {

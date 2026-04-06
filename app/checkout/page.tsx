@@ -9,6 +9,8 @@ import { StorefrontNavbar } from "@/components/navbar/storefront-navbar";
 import { authHeaders, getAccessToken } from "@/lib/auth-client";
 import { clearCart, getCart, type Cart } from "@/lib/cart";
 
+const CONTINUE_SHOPPING_HREF = "/collections/traditional-sarees";
+
 export default function CheckoutPage() {
   const router = useRouter();
 
@@ -114,7 +116,7 @@ export default function CheckoutPage() {
             <p className="mt-2 text-sm text-black/60">Add an item to continue shopping.</p>
             <div className="mt-8">
               <Link
-                href="/"
+                href={CONTINUE_SHOPPING_HREF}
                 className="inline-flex w-full justify-center rounded-full bg-accent px-4 py-3 text-sm font-semibold text-white transition hover:opacity-90"
               >
                 Continue Shopping
@@ -228,7 +230,7 @@ export default function CheckoutPage() {
                   {submitting ? "Placing order…" : "Place order"}
                 </button>
                 <Link
-                  href="/"
+                  href={CONTINUE_SHOPPING_HREF}
                   className="mt-3 block w-full rounded-full border border-black/15 bg-white px-4 py-3 text-center text-sm font-semibold text-black/80 transition hover:border-[#9d2936] hover:text-[#9d2936]"
                 >
                   Continue Shopping
