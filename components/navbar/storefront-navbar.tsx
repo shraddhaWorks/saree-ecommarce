@@ -454,7 +454,7 @@ export function StorefrontNavbar() {
       </div>
 
       <div
-        className="h-[calc(2rem+60px)] sm:h-[calc(2rem+64px)] lg:h-[calc(2rem+136px)]"
+        className="h-[calc(2rem+48px)] sm:h-[calc(2rem+52px)] lg:h-[calc(2rem+136px)]"
         aria-hidden
       />
 

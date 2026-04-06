@@ -51,7 +51,7 @@ export default async function Home({
   return (
     <main className="min-h-screen bg-[#f7f0e7] pt-0 text-[#201815]">
       <StorefrontNavbar />
-      <section className="relative z-0 m-0 w-full overflow-hidden bg-[#8f171f] p-0 leading-none">
+      <section className="relative z-0 m-0 w-full overflow-hidden bg-[#8f171f] py-0 leading-none">
         <HeroCarousel
           slides={[
             {
