@@ -45,6 +45,20 @@ function CheckIcon({ className }: { className?: string }) {
   );
 }
 
+function normalizeRange(minRaw: string, maxRaw: string) {
+  const parsedMin = minRaw.trim() ? parseInt(minRaw, 10) : null;
+  const parsedMax = maxRaw.trim() ? parseInt(maxRaw, 10) : null;
+
+  const min = Number.isFinite(parsedMin as number) ? parsedMin : null;
+  const max = Number.isFinite(parsedMax as number) ? parsedMax : null;
+
+  if (min != null && max != null && min > max) {
+    return { min: max, max: min };
+  }
+
+  return { min, max };
+}
+
 /** Mounts only while open so search query resets without effects. */
 function FacetDropdownOpenPanel({
   label,
@@ -283,21 +297,19 @@ function PriceSalePanels({
   );
 
   const applyPrice = () => {
-    const mn = priceMin.trim() ? parseInt(priceMin, 10) : null;
-    const mx = priceMax.trim() ? parseInt(priceMax, 10) : null;
+    const { min, max } = normalizeRange(priceMin, priceMax);
     patch({
-      priceMin: Number.isFinite(mn as number) ? mn : null,
-      priceMax: Number.isFinite(mx as number) ? mx : null,
+      priceMin: min,
+      priceMax: max,
     });
     setOpenKey(null);
   };
 
   const applySale = () => {
-    const mn = saleMin.trim() ? parseInt(saleMin, 10) : null;
-    const mx = saleMax.trim() ? parseInt(saleMax, 10) : null;
+    const { min, max } = normalizeRange(saleMin, saleMax);
     patch({
-      saleMin: Number.isFinite(mn as number) ? mn : null,
-      saleMax: Number.isFinite(mx as number) ? mx : null,
+      saleMin: min,
+      saleMax: max,
     });
     setOpenKey(null);
   };
@@ -456,10 +468,10 @@ export function ProductFilterBar({ facets, pathname, hideColour, className }: Pr
   const rootClass = className ?? "";
 
   return (
-    <div className={`flex flex-col gap-3 md:flex-row md:items-start md:justify-between md:gap-6 ${rootClass}`}>
-      <div className="min-w-0 flex-1 md:max-w-[min(100%,920px)]">
+    <div className={`flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between lg:gap-6 ${rootClass}`}>
+      <div className="min-w-0 flex-1 lg:max-w-[min(100%,980px)]">
         <div className="w-full pb-0.5 md:pb-1">
-          <div className="flex w-full max-w-full flex-wrap items-center gap-y-1 rounded-2xl border-2 border-black/85 bg-white px-1 py-1 shadow-sm md:inline-flex md:w-max md:max-w-full md:flex-nowrap md:gap-y-0 md:rounded-full md:px-1.5 md:py-1">
+          <div className="flex w-full max-w-full flex-wrap items-center gap-x-0.5 gap-y-1 rounded-2xl border-2 border-black/85 bg-white px-1 py-1 shadow-sm lg:inline-flex lg:w-max lg:max-w-full lg:flex-nowrap lg:gap-x-0 lg:gap-y-0 lg:rounded-full lg:px-1.5 lg:py-1">
             <FacetDropdown
               label="Fabric"
               options={facets.fabric}
@@ -526,7 +538,7 @@ export function ProductFilterBar({ facets, pathname, hideColour, className }: Pr
         </button>
       </div>
 
-      <div className="flex w-full shrink-0 flex-row flex-wrap items-center gap-2 md:w-auto md:max-w-[min(100%,320px)] md:flex-nowrap md:justify-end">
+      <div className="flex w-full shrink-0 flex-row flex-wrap items-center gap-2 lg:w-auto lg:max-w-[min(100%,320px)] lg:flex-nowrap lg:justify-end">
         <span className="shrink-0 text-[11px] font-semibold uppercase tracking-wide text-black/55">
           Sort By:
         </span>
@@ -536,7 +548,7 @@ export function ProductFilterBar({ facets, pathname, hideColour, className }: Pr
             patch({ sort: e.target.value });
           }}
           aria-label="Sort products"
-          className="min-h-11 min-w-0 flex-1 cursor-pointer rounded-full border-2 border-black/80 bg-white py-2 pl-3 pr-8 text-sm font-medium text-[#1a1512] shadow-sm touch-manipulation md:min-h-10 md:min-w-[10.5rem] md:flex-initial"
+          className="min-h-11 min-w-0 flex-1 cursor-pointer rounded-full border-2 border-black/80 bg-white py-2 pl-3 pr-8 text-sm font-medium text-[#1a1512] shadow-sm touch-manipulation lg:min-h-10 lg:min-w-[10.5rem] lg:flex-initial"
         >
           {sortOptions.map((o) => (
             <option key={o.value} value={o.value}>

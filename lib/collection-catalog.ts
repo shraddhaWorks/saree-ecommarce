@@ -10,7 +10,7 @@ import {
 } from "@/lib/collection-browse";
 import prisma from "@/lib/db";
 import { MEGA_LINE_SLUG_RULES } from "@/lib/mega-menu-line-match";
-import { MEGA_MENU_SLUG_META } from "@/lib/static-nav-data";
+import { MEGA_MENU_SLUG_META, STATIC_NAV_COLLECTIONS_BY_HANDLE } from "@/lib/static-nav-data";
 import { toStorefrontProduct, type ProductWithRelations } from "@/lib/storefront-map";
 import type { StorefrontProduct } from "@/types/storefront";
 
@@ -62,6 +62,7 @@ export async function getCollectionCatalog(
 
   const category = await prisma.category.findUnique({ where: { slug: handle } });
   const megaMeta = MEGA_MENU_SLUG_META[handle];
+  const staticNavCollection = !category ? STATIC_NAV_COLLECTIONS_BY_HANDLE[handle] : undefined;
 
   const parentCategory =
     !category && megaMeta
@@ -75,15 +76,12 @@ export async function getCollectionCatalog(
     ...(!category && parentCategory ? { categoryId: parentCategory.id } : {}),
   };
 
-  const allRows: ProductWithRelations[] =
-    category || parentCategory || !megaMeta
-      ? await prisma.product.findMany({
-          where: baseWhere,
-          include: { category: true, images: { orderBy: { position: "asc" } } },
-          orderBy: { updatedAt: "desc" },
-          take: 400,
-        })
-      : [];
+  const allRows: ProductWithRelations[] = await prisma.product.findMany({
+    where: baseWhere,
+    include: { category: true, images: { orderBy: { position: "asc" } } },
+    orderBy: { updatedAt: "desc" },
+    take: 400,
+  });
 
   function productMatchesLine(p: ProductWithRelations): boolean {
     if (!megaMeta) return true;
@@ -94,7 +92,20 @@ export async function getCollectionCatalog(
     return productMatchesMegaMenuLabel(p, megaMeta.label);
   }
 
-  const linePool = megaMeta ? allRows.filter(productMatchesLine) : allRows;
+  function productMatchesStaticNavCollection(p: ProductWithRelations): boolean {
+    if (!staticNavCollection) return true;
+    return staticNavCollection.items.some((item) => {
+      const childHandle = item.href.replace("/collections/", "");
+      const rule = MEGA_LINE_SLUG_RULES[childHandle];
+      return rule ? rule(p) || productMatchesMegaMenuLabel(p, item.label) : productMatchesMegaMenuLabel(p, item.label);
+    });
+  }
+
+  const linePool = megaMeta
+    ? allRows.filter(productMatchesLine)
+    : staticNavCollection
+      ? allRows.filter(productMatchesStaticNavCollection)
+      : allRows;
   const filtered = sortProducts(filterProducts(linePool, browse), browse.sort);
   const products = filtered.map(toStorefrontProduct);
   const facets = buildFacets(linePool);

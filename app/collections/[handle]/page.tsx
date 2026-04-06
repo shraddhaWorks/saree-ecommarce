@@ -6,8 +6,6 @@ import Footer from "@/components/footer/Footer";
 import { StorefrontProductGrid } from "@/components/product/StorefrontProductGrid";
 import { StorefrontNavbar } from "@/components/navbar/storefront-navbar";
 import { getCollectionCatalog } from "@/lib/collection-catalog";
-import { COLLECTION_SPOTLIGHT_ITEMS } from "@/lib/collection-spotlight";
-import { attachCatalogToSpotlights } from "@/lib/collection-spotlight-resolve";
 
 type SearchParams = Record<string, string | string[] | undefined>;
 
@@ -27,8 +25,6 @@ export default async function CollectionPage({
 
   const { browse, title, products, facets, megaMeta, parentCategory, category } =
     await getCollectionCatalog(handle, raw);
-
-  const spotlightWithCatalog = await attachCatalogToSpotlights(COLLECTION_SPOTLIGHT_ITEMS);
 
   return (
     <main className="min-h-screen bg-[#fbf7f0] text-[#201815]">
@@ -70,7 +66,6 @@ export default async function CollectionPage({
                 <StorefrontProductGrid
                   products={[]}
                   density="default"
-                  prependSpotlightItems={spotlightWithCatalog}
                 />
               </div>
               <p className="mt-6 rounded-2xl border border-black/10 bg-white p-8 text-center text-sm text-black/55">
@@ -86,7 +81,6 @@ export default async function CollectionPage({
               <StorefrontProductGrid
                 products={products}
                 density="default"
-                prependSpotlightItems={spotlightWithCatalog}
               />
             </div>
           )}

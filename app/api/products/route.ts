@@ -64,6 +64,10 @@ export async function GET(req: NextRequest) {
         OR: [
           { name: { contains: search, mode: "insensitive" } },
           { description: { contains: search, mode: "insensitive" } },
+          { slug: { contains: search.toLowerCase() } },
+          { color: { contains: search, mode: "insensitive" } },
+          { pattern: { contains: search, mode: "insensitive" } },
+          { category: { name: { contains: search, mode: "insensitive" } } },
         ],
       });
     }
