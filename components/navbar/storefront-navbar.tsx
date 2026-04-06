@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState, type FormEvent, type MouseEvent } from "react";
 
 import { getAccessToken, setAccessToken } from "@/lib/auth-client";
@@ -36,7 +36,6 @@ type SearchHit = {
 
 export function StorefrontNavbar() {
   const router = useRouter();
-  const pathname = usePathname();
   const [activePanel, setActivePanel] = useState<PanelKey>(null);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [mobileExpandedLabel, setMobileExpandedLabel] = useState<string | null>(null);
@@ -172,12 +171,7 @@ export function StorefrontNavbar() {
   function handleLogoNavigate(event: MouseEvent<HTMLAnchorElement>) {
     event.preventDefault();
     closePanels();
-    if (pathname === "/") {
-      router.replace("/");
-      window.scrollTo({ top: 0, behavior: "smooth" });
-      return;
-    }
-    router.push("/");
+    window.location.assign("/");
   }
 
   function submitSearch(event?: FormEvent<HTMLFormElement>) {
@@ -189,16 +183,16 @@ export function StorefrontNavbar() {
   }
 
   const iconLinkClass =
-    "flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-black/70 transition hover:bg-black/8 hover:text-accent sm:h-9 sm:w-9 lg:h-10 lg:w-10";
+    "flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-black/8 bg-white/60 text-black/70 shadow-[0_8px_24px_rgba(68,38,24,0.06)] transition hover:border-accent/25 hover:bg-white hover:text-accent sm:h-9 sm:w-9 lg:h-10 lg:w-10";
   const hasSearchQuery = searchQuery.trim().length > 0;
 
   return (
     <>
       <AnnouncementBar />
 
-      <header className="fixed left-0 right-0 top-8 z-40 w-full max-w-none border-b border-black/10 bg-[var(--navbar-sandal)]/95 shadow-sm backdrop-blur max-lg:border-b-0 max-lg:shadow-none">
+      <header className="fixed left-0 right-0 top-8 z-40 w-full max-w-none border-b border-black/10 bg-[var(--navbar-sandal)]/95 shadow-[0_12px_36px_rgba(84,45,28,0.08)] backdrop-blur max-lg:border-b-0 max-lg:shadow-none">
         {/* Mobile: logo left + burger right only — compact strip (~80% visual height vs prior) */}
-        <div className="flex min-h-[40px] items-center justify-between px-2 py-1 sm:min-h-[44px] sm:px-3 sm:py-1.5 lg:hidden">
+        <div className="flex min-h-[44px] items-center justify-between px-3 py-1.5 sm:min-h-[48px] sm:px-4 lg:hidden">
           <Link
             href="/"
             onClick={handleLogoNavigate}
@@ -214,14 +208,14 @@ export function StorefrontNavbar() {
             aria-controls="mobile-primary-nav"
             aria-label={mobileNavOpen ? "Close menu" : "Open menu"}
             onClick={() => setMobileNavOpen((o) => !o)}
-            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full leading-none text-black/70 transition hover:bg-black/8"
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-black/8 bg-white/60 leading-none text-black/70 transition hover:bg-white"
           >
             {mobileNavOpen ? <CloseIcon className="h-5 w-5" /> : <MenuIcon className="h-5 w-5" />}
           </button>
         </div>
 
         {/* Desktop/tablet: centered logo + utility icons */}
-        <div className="hidden min-h-[46px] w-full grid-cols-[1fr_auto_1fr] items-center gap-y-2 py-2 lg:grid">
+        <div className="hidden min-h-[56px] w-full grid-cols-[1fr_auto_1fr] items-center gap-y-2 py-3 lg:grid">
           <div className="min-w-0" aria-hidden="true" />
 
           <div className="col-start-2 flex justify-center justify-self-center px-1">
@@ -235,7 +229,7 @@ export function StorefrontNavbar() {
             </Link>
           </div>
 
-          <div className="flex min-w-0 flex-wrap items-center justify-end gap-1 pr-2">
+          <div className="flex min-w-0 items-center justify-end gap-2 pr-4">
             <IconButton label="Search" onClick={() => setActivePanel("search")}>
               <SearchIcon />
             </IconButton>
@@ -274,7 +268,7 @@ export function StorefrontNavbar() {
 
         <div className="hidden w-full border-t border-black/10 lg:block" />
 
-        <div className="hidden w-full px-3 pb-2 pt-2 sm:px-5 lg:block lg:px-8">
+        <div className="hidden w-full px-3 pb-3 pt-3 sm:px-5 lg:block lg:px-8">
           <MainNavigation />
         </div>
       </header>
@@ -319,7 +313,7 @@ export function StorefrontNavbar() {
                   setMobileNavOpen(false);
                   setActivePanel("search");
                 }}
-                className="flex flex-col items-center justify-center gap-1 rounded-xl border border-black/10 bg-white/40 px-2 py-2 text-[11px] font-medium text-black/75 transition hover:bg-white/70"
+                className="flex flex-col items-center justify-center gap-1 rounded-xl border border-black/10 bg-white/60 px-2 py-2 text-[11px] font-medium text-black/75 transition hover:bg-white"
               >
                 <SearchIcon />
                 Search
@@ -327,7 +321,7 @@ export function StorefrontNavbar() {
               <Link
                 href="/wishlist"
                 onClick={() => setMobileNavOpen(false)}
-                className="relative flex flex-col items-center justify-center gap-1 rounded-xl border border-black/10 bg-white/40 px-2 py-2 text-[11px] font-medium text-black/75 transition hover:bg-white/70"
+                className="relative flex flex-col items-center justify-center gap-1 rounded-xl border border-black/10 bg-white/60 px-2 py-2 text-[11px] font-medium text-black/75 transition hover:bg-white"
               >
                 <HeartIcon />
                 Wishlist
@@ -343,7 +337,7 @@ export function StorefrontNavbar() {
                   setMobileNavOpen(false);
                   setActivePanel("profile");
                 }}
-                className="flex flex-col items-center justify-center gap-1 rounded-xl border border-black/10 bg-white/40 px-2 py-2 text-[11px] font-medium text-black/75 transition hover:bg-white/70"
+                className="flex flex-col items-center justify-center gap-1 rounded-xl border border-black/10 bg-white/60 px-2 py-2 text-[11px] font-medium text-black/75 transition hover:bg-white"
               >
                 <UserIcon />
                 Account
@@ -354,7 +348,7 @@ export function StorefrontNavbar() {
                   setMobileNavOpen(false);
                   setActivePanel("bag");
                 }}
-                className="relative flex flex-col items-center justify-center gap-1 rounded-xl border border-black/10 bg-white/40 px-2 py-2 text-[11px] font-medium text-black/75 transition hover:bg-white/70"
+                className="relative flex flex-col items-center justify-center gap-1 rounded-xl border border-black/10 bg-white/60 px-2 py-2 text-[11px] font-medium text-black/75 transition hover:bg-white"
               >
                 <BagIcon />
                 Bag
@@ -460,7 +454,7 @@ export function StorefrontNavbar() {
       </div>
 
       <div
-        className="h-[calc(2rem+56px)] sm:h-[calc(2rem+60px)] lg:h-[calc(2rem+120px)]"
+        className="h-[calc(2rem+60px)] sm:h-[calc(2rem+64px)] lg:h-[calc(2rem+136px)]"
         aria-hidden
       />
 
@@ -507,26 +501,44 @@ export function StorefrontNavbar() {
         onClose={() => setActivePanel(null)}
       >
         <div className="flex-1 overflow-auto px-8 pb-8">
-          <form
-            onSubmit={submitSearch}
-            className="rounded-3xl border border-black/10 bg-white p-4"
-          >
-            <input
-              value={searchQuery}
-              onChange={(e) => {
-                const next = e.target.value;
-                setSearchQuery(next);
-                void runSearch(next);
-              }}
-              placeholder="Search sarees..."
-              className="w-full bg-transparent text-sm outline-none"
-            />
-          </form>
+          <div className="rounded-[28px] border border-black/10 bg-white px-5 py-4 shadow-[0_18px_40px_rgba(82,44,24,0.08)]">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-black/45">
+              Find your saree
+            </p>
+            <form
+              onSubmit={submitSearch}
+              className="mt-3 flex items-center gap-3 rounded-2xl border border-black/10 bg-[#fbf7f1] px-4 py-3"
+            >
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--navbar-sandal)] text-black/55">
+                <SearchIcon />
+              </span>
+              <input
+                value={searchQuery}
+                onChange={(e) => {
+                  const next = e.target.value;
+                  setSearchQuery(next);
+                  void runSearch(next);
+                }}
+                placeholder="Search by saree name, fabric, color or weave"
+                className="w-full bg-transparent text-sm text-black placeholder:text-black/35 outline-none"
+              />
+            </form>
+          </div>
 
-          {searchLoading ? <p className="mt-3 text-sm text-black/55">Searching…</p> : null}
-          {searchError ? <p className="mt-3 text-sm text-red-600">{searchError}</p> : null}
+          {searchLoading ? (
+            <div className="mt-4 rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm text-black/55">
+              Searching...
+            </div>
+          ) : null}
+          {searchError ? (
+            <div className="mt-4 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
+              {searchError}
+            </div>
+          ) : null}
           {!searchLoading && !searchError && hasSearchQuery && searchResults.length === 0 ? (
-            <p className="mt-3 text-sm text-black/55">No sarees found for “{searchQuery.trim()}”.</p>
+            <div className="mt-4 rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm text-black/55">
+              No sarees found for &quot;{searchQuery.trim()}&quot;.
+            </div>
           ) : null}
 
           <div className="mt-4 grid gap-3">
@@ -535,7 +547,7 @@ export function StorefrontNavbar() {
                 key={hit.id}
                 href={`/products/${hit.slug}`}
                 onClick={closePanels}
-                className="rounded-3xl border border-black/10 bg-white p-4 transition hover:border-[#9d2936]"
+                className="rounded-3xl border border-black/10 bg-white p-4 shadow-[0_14px_34px_rgba(82,44,24,0.06)] transition hover:border-[#9d2936]"
               >
                 <div className="flex items-center gap-3">
                   <div className="h-16 w-16 shrink-0 overflow-hidden rounded-2xl bg-black/5">
@@ -548,7 +560,9 @@ export function StorefrontNavbar() {
                   <div className="min-w-0">
                     <p className="truncate text-sm font-semibold">{hit.name}</p>
                     {hit.category?.name ? (
-                      <p className="mt-1 text-xs text-black/50">{hit.category.name}</p>
+                      <p className="mt-1 inline-flex rounded-full bg-[#f6eee4] px-2.5 py-1 text-[11px] font-medium text-black/55">
+                        {hit.category.name}
+                      </p>
                     ) : null}
                     {typeof hit.priceInPaise === "number" ? (
                       <p className="mt-1 text-sm font-medium text-accent">
@@ -565,14 +579,13 @@ export function StorefrontNavbar() {
             <button
               type="button"
               onClick={() => submitSearch()}
-              className="mt-4 w-full rounded-full bg-accent px-4 py-3 text-sm font-semibold text-white transition hover:opacity-90"
+              className="mt-5 w-full rounded-full bg-accent px-4 py-3 text-sm font-semibold text-white transition hover:opacity-90"
             >
               View all results
             </button>
           ) : null}
         </div>
       </Drawer>
-
       <Drawer
         isOpen={activePanel === "profile"}
         title="Account"

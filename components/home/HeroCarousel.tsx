@@ -30,21 +30,23 @@ export function HeroCarousel({ slides }: { slides: HeroSlideView[] }) {
     [slides, isLg],
   );
 
-  if (visibleSlides.length === 0) {
-    return (
-      <div className="relative flex h-[90dvh] min-h-[220px] w-full items-center justify-center bg-[#8f171f] text-center text-white lg:h-[700px] lg:min-h-0">
-        <p className="max-w-md px-6 text-sm sm:text-base">
-          No hero images yet. Add cover photos in{" "}
-          <strong>Admin → Storefront</strong>.
-        </p>
-      </div>
-    );
-  }
+  const slidesToRender =
+    visibleSlides.length > 0
+      ? visibleSlides
+      : [
+          {
+            id: "fallback-hero",
+            imageUrl: "",
+            altText: "Rangam Temple of Sarees",
+            linkUrl: null,
+          },
+        ];
 
-  const nodes = visibleSlides.map((s) => (
+  const nodes = slidesToRender.map((s) =>
+    s.imageUrl ? (
     <div
       key={s.id}
-      className="relative h-[90dvh] min-h-[220px] w-full touch-pan-x overflow-hidden bg-[#8f171f] lg:h-[700px] lg:min-h-0"
+      className="relative h-[72dvh] min-h-[220px] w-full touch-pan-x overflow-hidden bg-[#8f171f] lg:h-[700px] lg:min-h-0"
     >
       {s.linkUrl ? (
         <OutOrInLink
@@ -68,9 +70,29 @@ export function HeroCarousel({ slides }: { slides: HeroSlideView[] }) {
           loading="eager"
         />
       )}
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/5 via-black/0 to-black/25" />
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/10 via-black/0 to-black/20" />
     </div>
-  ));
+    ) : (
+      <div
+        key={s.id}
+        className="relative flex h-[64dvh] min-h-[320px] w-full items-center justify-center overflow-hidden bg-[radial-gradient(circle_at_top,#b1433c_0%,#8f171f_45%,#4a0f1b_100%)] text-center text-white lg:h-[700px] lg:min-h-0"
+      >
+        <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(255,255,255,0.06),transparent_45%,rgba(255,214,170,0.1))]" />
+        <div className="relative mx-auto max-w-2xl px-6">
+          <p className="text-xs font-semibold uppercase tracking-[0.3em] text-white/70">
+            Rangam Temple of Sarees
+          </p>
+          <h2 className="mt-4 font-serif-royal text-4xl leading-tight sm:text-5xl lg:text-6xl">
+            Handpicked sarees for every celebration
+          </h2>
+          <p className="mx-auto mt-4 max-w-xl text-sm leading-7 text-white/80 sm:text-base">
+            Explore signature weaves, festive drapes, and timeless silks curated for daily
+            elegance and grand occasions.
+          </p>
+        </div>
+      </div>
+    ),
+  );
 
   return (
     <Carousel
