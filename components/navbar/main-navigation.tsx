@@ -18,8 +18,8 @@ export function MainNavigation() {
       className="relative hidden w-full justify-center overflow-visible lg:flex"
       onMouseLeave={() => setOpenLabel(null)}
     >
-      <div className="w-full overflow-x-auto">
-        <ul className="flex min-w-max flex-nowrap items-center justify-center gap-x-4 px-6 xl:gap-x-7">
+      <div className="w-full overflow-visible">
+        <ul className="flex w-full flex-wrap items-center justify-center gap-x-6 gap-y-2 px-4 2xl:gap-x-8">
           {navItemsWithChildren.map((item) => {
             return (
               <li
@@ -30,7 +30,7 @@ export function MainNavigation() {
                 <Link
                   href={item.href}
                   onClick={() => setOpenLabel(null)}
-                  className="whitespace-nowrap font-serif-royal text-center text-[15px] font-semibold leading-snug tracking-[0.03em] text-[var(--announcement-maroon)] transition-colors hover:text-accent xl:text-[17px]"
+                  className="whitespace-nowrap font-serif-royal text-center text-[15px] font-semibold leading-snug tracking-[0.02em] text-[var(--announcement-maroon)] transition-colors hover:text-accent xl:text-[16px] 2xl:text-[17px]"
                 >
                   {item.label}
                 </Link>

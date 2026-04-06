@@ -15,7 +15,7 @@ export function SpecialProductsSection({ title, products }: Props) {
         {title}
       </h2>
       <p className="mb-8 text-center text-sm text-black/50">
-        Mark products as “Featured / special” in Admin → Products to show them here.
+        Curated standout sarees selected from the latest in-stock arrivals.
       </p>
       <div className="mx-auto grid max-w-6xl grid-cols-2 gap-4 sm:gap-6 md:grid-cols-3 lg:grid-cols-4">
         {products.map((p) => (

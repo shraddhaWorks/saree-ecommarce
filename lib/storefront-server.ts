@@ -24,7 +24,7 @@ async function ensureSiteConfig(): Promise<SiteConfig> {
 }
 
 export async function getStorefrontPayload(): Promise<StorefrontPayload> {
-  const [siteConfig, heroSlides, gridItems, specialRows] = await Promise.all([
+  const [siteConfig, heroSlidesRaw, gridItems, specialRows, fallbackHeroRows] = await Promise.all([
     ensureSiteConfig(),
     prisma.heroSlide.findMany({ orderBy: { sortOrder: "asc" } }),
     prisma.homeGridItem.findMany({ orderBy: [{ section: "asc" }, { sortOrder: "asc" }] }),
@@ -41,7 +41,36 @@ export async function getStorefrontPayload(): Promise<StorefrontPayload> {
       orderBy: { updatedAt: "desc" },
       take: 12,
     }),
+    prisma.product.findMany({
+      where: {
+        inStock: true,
+        stockQuantity: { gt: 0 },
+      },
+      include: {
+        category: true,
+        images: { orderBy: { position: "asc" } },
+      },
+      orderBy: { updatedAt: "desc" },
+      take: 6,
+    }),
   ]);
+
+  const heroSlides =
+    heroSlidesRaw.length > 0
+      ? heroSlidesRaw
+      : fallbackHeroRows.map((row, index) => {
+          const product = toStorefrontProduct(row);
+          const now = new Date();
+          return {
+            id: `fallback-${row.id}`,
+            imageUrl: product.images[0],
+            altText: product.name,
+            linkUrl: `/products/${product.slug}`,
+            sortOrder: index,
+            createdAt: now,
+            updatedAt: now,
+          };
+        });
 
   return {
     siteConfig,

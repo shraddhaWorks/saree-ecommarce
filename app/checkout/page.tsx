@@ -2,18 +2,15 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
 
 import Footer from "@/components/footer/Footer";
 import { StorefrontNavbar } from "@/components/navbar/storefront-navbar";
 import { authHeaders, getAccessToken } from "@/lib/auth-client";
 import { clearCart, getCart, type Cart } from "@/lib/cart";
 
-const CONTINUE_SHOPPING_HREF = "/collections/traditional-sarees";
+const CONTINUE_SHOPPING_HREF = "/";
 
 export default function CheckoutPage() {
-  const router = useRouter();
-
   const [cart, setCart] = useState<Cart>({ items: [] });
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -95,7 +92,7 @@ export default function CheckoutPage() {
       clearCart();
       setCart({ items: [] });
       window.dispatchEvent(new Event("cart:updated"));
-      router.push("/?ordered=1");
+      window.location.assign("/");
     } catch {
       setError("Network error. Try again.");
     } finally {
