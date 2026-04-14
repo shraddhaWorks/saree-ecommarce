@@ -6,6 +6,7 @@ import { useMemo, useState } from "react";
 import { resolveMenuItemHref } from "@/components/navbar/menu/resolve-menu-href";
 
 import { getNavMegaItems, resolveMegaPreviewHref } from "./nav-mega-items";
+import { ChevronDown } from "lucide-react";
 
 export function MainNavigation() {
   const [openLabel, setOpenLabel] = useState<string | null>(null);
@@ -16,7 +17,7 @@ export function MainNavigation() {
     <nav
       aria-label="Primary"
       className="relative hidden w-full justify-center overflow-visible lg:flex"
-      onMouseLeave={() => setOpenLabel(null)}
+      
     >
       <div className="w-full overflow-visible">
         <ul className="flex w-full flex-wrap items-center justify-center gap-x-6 gap-y-2 px-4 2xl:gap-x-8">
@@ -25,15 +26,34 @@ export function MainNavigation() {
               <li
                 key={item.href}
                 className="relative shrink-0"
-                onMouseEnter={() => setOpenLabel(item.label)}
+
               >
+
                 <Link
                   href={item.href}
-                  onClick={() => setOpenLabel(null)}
-                  className="whitespace-nowrap font-serif-royal text-center text-[15px] font-semibold leading-snug tracking-[0.02em] text-[var(--announcement-maroon)] transition-colors hover:text-accent xl:text-[16px] 2xl:text-[17px]"
+                  onClick={(e) => {
+                    if (item.children.length > 0) {
+                      e.preventDefault(); // stop navigation
+                      setOpenLabel((prev) =>
+                        prev === item.label ? null : item.label
+                      );
+                    } else {
+                      setOpenLabel(null);
+                    }
+                  }}
+                  className="whitespace-nowrap font-serif-royal text-center text-[15px] font-semibold leading-snug tracking-[0.02em] text-[var(--announcement-maroon)] transition-colors hover:text-accent xl:text-[16px] 2xl:text-[17px] py-0 flex items-center gap-1"
                 >
                   {item.label}
+
+                  {item.children.length > 0 && (
+                    <ChevronDown
+                      size={16}
+                      className={`transition-transform duration-200 ${openLabel === item.label ? "rotate-180" : ""
+                        }`}
+                    />
+                  )}
                 </Link>
+
               </li>
             );
           })}
