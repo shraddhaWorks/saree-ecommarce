@@ -9,25 +9,25 @@ export const SHOP_BY_OCCASION_HOME_TILES: PromoItem[] = [
   {
     id: "occasion-festive",
     title: "Festive",
-    imageUrl: "/shop-by-occasion/festive.png",
+    imageUrl: "/shop-by-occasion/img5.jpg",
     linkUrl: "/collections/festive-wear",
   },
   {
     id: "occasion-wedding",
     title: "Wedding",
-    imageUrl: "/shop-by-occasion/wedding.png",
+    imageUrl: "/shop-by-occasion/img4.jpg",
     linkUrl: "/collections/wedding-sarees",
   },
   {
     id: "occasion-casual",
     title: "Casual",
-    imageUrl: "/shop-by-occasion/casual.png",
+    imageUrl: "/shop-by-occasion/img1.jpg",
     linkUrl: "/collections/casual-workwear",
   },
   {
     id: "occasion-party",
     title: "Party",
-    imageUrl: "/shop-by-occasion/party.png",
+    imageUrl: "/shop-by-occasion/img3.jpg",
     linkUrl: "/collections/designer-party-wear",
   },
 ];
