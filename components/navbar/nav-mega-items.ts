@@ -15,12 +15,12 @@ const previewByLabel: Record<string, [MegaPreview, MegaPreview]> = {
     {
       title: "Kanchi Pattu Sarees",
       subtitle: "Handpicked heritage weaves",
-      imageUrl: "/mega-menu/kanchi-pattu.svg",
+      imageUrl: "/navImg/saree.webp",
     },
     {
       title: "Banaras Silk Sarees",
       subtitle: "Timeless zari craftsmanship",
-      imageUrl: "/mega-menu/banaras-silk.svg",
+      imageUrl: "/navImg/saree3.webp",
       href: "/collections/banaras-sarees",
     },
   ],
@@ -29,13 +29,13 @@ const previewByLabel: Record<string, [MegaPreview, MegaPreview]> = {
       title: "Bridal Sarees",
       subtitle: "Grand silhouettes for the big day",
       imageUrl:
-        "https://kalanjali.com/cdn/shop/files/11141457-04006-001_1_389badac-37f1-40f6-9db5-b1847ed618a5.jpg?v=1754119962&width=360",
+        "/navImg/kanchipattu.jpg",
     },
     {
       title: "Reception Sarees",
       subtitle: "Evening elegance in silk",
       imageUrl:
-        "https://kalanjali.com/cdn/shop/files/1412408754-VJ_1.jpg?v=1773820969&width=360",
+        "/navImg/kanchiaptt2.jpg",
     },
   ],
   "Designer & Party Wear Sarees": [
@@ -43,13 +43,13 @@ const previewByLabel: Record<string, [MegaPreview, MegaPreview]> = {
       title: "Organza Sarees",
       subtitle: "Statement looks for celebrations",
       imageUrl:
-        "https://kalanjali.com/cdn/shop/files/11157776-02002-001_1_5c9a943b-3d86-45bb-99f5-0f69a3f8fbb5.jpg?v=1766498343&width=360",
+        "/navImg/organzasaree.jpg",
     },
     {
       title: "Zari Kota & Semi Kota Sarees",
       subtitle: "Modern drapes with rich detailing",
       imageUrl:
-        "https://kalanjali.com/cdn/shop/files/1212566545-HH_1_e488734b-c769-4589-b9b6-fb8c5af7398e.jpg?v=1771828431&width=360",
+        "/navImg/semikota.jpg",
     },
   ],
   "Festive Wear Sarees": [
@@ -57,13 +57,13 @@ const previewByLabel: Record<string, [MegaPreview, MegaPreview]> = {
       title: "Ikkat Sarees",
       subtitle: "Bright tones and festive zari",
       imageUrl:
-        "https://kalanjali.com/cdn/shop/files/1412380055-VJ_1_92c3e3eb-d58a-4cc8-8837-d47d38c6db6b.jpg?v=1756894920&width=360",
+        "/navImg/ikkatsaree.jpg",
     },
     {
       title: "Bandini Sarees",
       subtitle: "Elegant silk for every function",
       imageUrl:
-        "https://kalanjali.com/cdn/shop/files/1412394001-VJ_1_c0d8536b-2ffb-4db2-8c1c-8ca81b059f62.jpg?v=1766378075&width=1512",
+        "/navImg/ikkata2.jpg",
     },
   ],
   "Casual & Workwear Sarees": [
@@ -71,13 +71,13 @@ const previewByLabel: Record<string, [MegaPreview, MegaPreview]> = {
       title: "Georgette, Crepe, Satin & Chiffon Silk Sarees",
       subtitle: "Lightweight everyday styles",
       imageUrl:
-        "https://kalanjali.com/cdn/shop/files/1412391973-VJ_1_9c21dfa0-ae9c-489f-9a2c-c27447b442ee.jpg?v=1764310117&width=360",
+        "/navImg/Work1.jpg",
     },
     {
       title: "Khadi, Jute, Bhagalpur & Printed Sarees",
       subtitle: "Minimal, graceful office picks",
       imageUrl:
-        "https://kalanjali.com/cdn/shop/files/1212510044-JH_1_54c01311-9ffc-4b70-a8d8-39459477aa0d.jpg?v=1763266754&width=360",
+        "/navImg/Work2.jpg",
     },
   ],
   "Dhoti & Kanduva": [

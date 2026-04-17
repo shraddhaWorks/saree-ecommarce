@@ -56,33 +56,27 @@ export default async function Home({
           slides={[
             {
               id: "rangam-silk-hero-laptop",
-              imageUrl: "/hero/rangam-silk-hero.png",
+              imageUrl: "/newhome/1.png",
               altText: "Rangam Silk Sarees — luxury silk sarees",
               linkUrl: "/collections/sarees",
             },
             {
               id: "hero-wedding-edit-laptop",
-              imageUrl: "/hero/hero-wedding-edit.png",
+              imageUrl: "/newhome/2.png",
               altText: "Wedding edit — bridesmaid grace and wedding weaves",
               linkUrl: "/collections/wedding-sarees",
             },
             {
               id: "hero-ethnics-elegance-laptop",
-              imageUrl: "/hero/hero-ethnics-elegance.png",
+              imageUrl:"/newhome/3.png",
               altText: "Find elegance in ethnics — shop ethnic wear",
               linkUrl: "/collections/sarees",
             },
             {
               id: "hero-celebration-palace-laptop",
-              imageUrl: "/hero/hero-celebration-palace.png",
+              imageUrl: "/newhome/4.png",
               altText: "Celebration sarees and festive elegance",
               linkUrl: "/collections/festive-wear",
-            },
-            {
-              id: "hero-garden-pastels-laptop",
-              imageUrl: "/hero/hero-garden-pastels.png",
-              altText: "Pastel silk sarees — new collection",
-              linkUrl: "/collections/traditional-sarees",
             },
           ]}
         />
