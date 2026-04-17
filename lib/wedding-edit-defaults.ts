@@ -16,27 +16,27 @@ const WEDDING_EDIT_TILES_BASE = [
   {
     id: "wedding-pattu-kanchi",
     title: "Kanchi pattu sarees",
-    imageUrl: "/wedding-edit/kanchi-pattu.png",
+    imageUrl: "/wedding-edit/kanchi-pattu.jpg",
   },
   {
     id: "wedding-pattu-gadwal",
     title: "Gadwal pattu sarees",
-    imageUrl: "/wedding-edit/gadwal-pattu.png",
+    imageUrl: "/wedding-edit/gadwal-saree1.jpg",
   },
   {
     id: "wedding-pattu-venkatagiri",
     title: "Venkatagiri silk sarees",
-    imageUrl: "/wedding-edit/venkatagiri-silk.png",
+    imageUrl: "/wedding-edit/venkatagiri-saree.jpg",
   },
   {
     id: "wedding-pattu-uppada",
     title: "Uppada Pattu sarees",
-    imageUrl: "/wedding-edit/uppada-pattu.png",
+    imageUrl: "/wedding-edit/uppada-saree.jpg",
   },
   {
     id: "wedding-pattu-dharmavaram",
     title: "Dharmavaram Pattu Sarees",
-    imageUrl: "/wedding-edit/dharmavaram-pattu.png",
+    imageUrl: "/wedding-edit/Dharmavaram-saree.jpg",
   },
 ] as const;
 

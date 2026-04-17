@@ -58,7 +58,7 @@ function OccasionTile({ item }: { item: PromoItem }) {
           src={item.imageUrl}
           alt={item.title}
           fill
-          className="object-cover object-center transition duration-500 ease-out group-hover:scale-[1.03]"
+          className="object-cover object-top transition duration-500 ease-out group-hover:scale-[1.03]"
           sizes="(max-width: 640px) 100vw, 50vw"
           quality={90}
         />
