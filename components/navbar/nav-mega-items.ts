@@ -71,13 +71,13 @@ const previewByLabel: Record<string, [MegaPreview, MegaPreview]> = {
       title: "Georgette, Crepe, Satin & Chiffon Silk Sarees",
       subtitle: "Lightweight everyday styles",
       imageUrl:
-        "/navImg/Work1.jpg",
+        "/navImg/work1.jpg",
     },
     {
       title: "Khadi, Jute, Bhagalpur & Printed Sarees",
       subtitle: "Minimal, graceful office picks",
       imageUrl:
-        "/navImg/Work2.jpg",
+        "/navImg/work2.jpg",
     },
   ],
   "Dhoti & Kanduva": [
