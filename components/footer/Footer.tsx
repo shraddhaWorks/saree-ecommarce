@@ -72,7 +72,7 @@ const Footer = () => {
               </h3>
               <ul className="space-y-4 text-sm">
                 <FooterLink href="/about">About Us</FooterLink>
-                <FooterLink href="/promoters">Our Promoters</FooterLink>
+                {/* <FooterLink href="/promoters">Our Promoters</FooterLink> */}
                 <FooterLink href="/stores">Our Stores</FooterLink>
                 <FooterLink href="/blog">Heritage Blog</FooterLink>
               </ul>
@@ -134,7 +134,7 @@ const Footer = () => {
             </div>
             <div>
               <p className="text-xs text-white/40 uppercase tracking-wider mb-1">Call Us</p>
-              <p className="text-sm font-medium text-white/80">+91-40-23231147</p>
+              <p className="text-sm font-medium text-white/80">+91 81069 62752</p>
             </div>
           </div>
           <div className="flex items-start gap-4">
@@ -143,7 +143,7 @@ const Footer = () => {
             </div>
             <div>
               <p className="text-xs text-white/40 uppercase tracking-wider mb-1">Email</p>
-              <p className="text-sm font-medium text-white/80">web@rangam.com</p>
+              <p className="text-sm font-medium text-white/80">rangam.venkatsai@gmail.com</p>
             </div>
           </div>
           <div className="flex items-start gap-4 sm:col-span-2 lg:col-span-1">
