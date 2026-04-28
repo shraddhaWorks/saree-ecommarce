@@ -2,17 +2,17 @@ import React from 'react';
 
 const ShippingInfo = () => {
   const shippingPoints = [
-    "We offer free standard shipping on all domestic orders across India.",
-    "Orders are typically processed and dispatched within 24 to 48 business hours.",
-    "Domestic deliveries usually take 5–7 business days depending on the location.",
-    "International shipping is available, with delivery timelines ranging from 10–15 business days.",
-    "Tracking details will be shared via Email and WhatsApp once the order is handed over to our courier partner.",
-    "We partner with reputed services like BlueDart, Delhivery, and DHL to ensure safe handling of your silks.",
-    "For international orders, any custom duties or import taxes levied by the destination country are to be borne by the customer.",
-    "Please ensure the shipping address and contact number are accurate to avoid delivery delays or RTO (Return to Origin).",
-    "In case of multiple items in one order, they may occasionally be shipped separately based on availability.",
-    "Delivery attempts are usually made thrice; failure to receive the parcel may result in the order being returned to our warehouse."
-  ];
+  "We ship all orders across India through DTDC.",
+  "Orders are processed within 1–3 business days after payment confirmation.",
+  "Delivery usually takes 3–7 business days depending on the location.",
+  "Tracking details will be shared once the order is shipped.",
+  "We are not responsible for delays caused by courier services or external factors.",
+  "Shipping charges (if applicable) will be displayed at checkout.",
+  "Customers must provide accurate shipping details to avoid delivery issues.",
+  "Orders will be processed only after full payment is received.",
+  "Delivery timelines may vary due to unforeseen circumstances.",
+  "Once shipped, the order cannot be modified or redirected."
+];
 
   return (
     <section className="max-w-4xl mx-auto px-6 py-16 animate-page-entrance">

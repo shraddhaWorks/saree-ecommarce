@@ -2,17 +2,17 @@ import React from 'react';
 
 const ReturnPolicy = () => {
   const points = [
-    "Returns are only accepted for damaged products or if the wrong item was dispatched.",
-    "Requests for returns must be raised within 48 hours of receiving the parcel.",
-    "A clear, unedited unboxing video (from start to finish) is mandatory for processing claims.",
-    "The product must be unused, unwashed, and returned in its original fold with all tags intact.",
-    "Minor variations in color or thread pulls are inherent to handloom and are not considered defects.",
-    "Once the return is approved, the item must be shipped back to us within 5 working days.",
-    "Refunds will be processed to the original payment method after a quality check at our warehouse.",
-    "Shipping charges paid at the time of purchase are non-refundable.",
-    "Customized products (e.g., sarees with stitched blouses) are not eligible for return or exchange.",
-    "Sale items are considered final sale and cannot be returned or exchanged."
-  ];
+  "Returns are accepted only for damaged or defective products.",
+  "A proper unboxing video is mandatory as proof for any return request.",
+  "The issue must be reported within 24 hours of delivery.",
+  "The unboxing video should clearly show the sealed package and product condition.",
+  "Returns will not be accepted without video proof or after 24 hours.",
+  "Products that are used, washed, or altered are not eligible for return.",
+  "We are not responsible for damages reported after delivery.",
+  "Once the return is approved, a replacement will be arranged (subject to availability).",
+  "All return requests will be verified before approval.",
+  "Rangam Adi Silk Sarees reserves the right to approve or reject any return request."
+];
 
   return (
     <section className="max-w-4xl mx-auto px-6 py-16 animate-page-entrance">
