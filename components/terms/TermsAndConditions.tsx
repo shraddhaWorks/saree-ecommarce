@@ -2,17 +2,17 @@ import React from 'react';
 
 const TermsAndConditions = () => {
   const terms = [
-    "By using this website, you agree to follow all terms and policies mentioned here.",
-    "All products listed are subject to availability.",
-    "Prices of products may change without prior notice.",
-    "We try to display product details and images accurately, but slight variations may occur.",
-    "Once an order is placed, it cannot be modified or cancelled after processing.",
-    "Payments must be made through the available payment methods on the website.",
-    "We are not responsible for delays caused by courier or external factors.",
-    "Users should not misuse the website or engage in any fraudulent activity.",
-    "All content on this website is the property of Rangam Adi Silks.",
-    "We reserve the right to update or change these terms at any time."
-  ];
+  "By using this website, you agree to follow the terms and policies of Rangam Adi Silk Sarees.",
+  "All products are subject to availability.",
+  "Product colors may slightly vary due to lighting and screen differences.",
+  "Prices may change without prior notice.",
+  "Orders will be processed only after successful payment confirmation (No Cash on Delivery available).",
+  "We reserve the right to cancel orders due to stock unavailability, pricing errors, or unforeseen issues.",
+  "Customers must provide accurate shipping details; we are not responsible for incorrect information.",
+  "Orders are processed within 1–3 business days and delivered within 3–7 business days.",
+  "Returns are accepted only for damaged or defective products with a valid unboxing video, reported within 24 hours.",
+  "Any misuse or fraudulent activity may lead to appropriate action."
+];
 
   return (
     <section className="max-w-4xl mx-auto px-6 py-16 animate-page-entrance">

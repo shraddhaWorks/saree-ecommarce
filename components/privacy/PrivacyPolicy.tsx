@@ -2,17 +2,17 @@ import React from 'react';
 
 const PrivacyPolicy = () => {
   const policies = [
-    "We collect personal information like name, email, and address only to process your orders.",
-    "Your payment details are encrypted and processed securely through verified gateways.",
-    "We do not sell, trade, or rent your personal information to any third parties.",
-    "Cookies are used to enhance your browsing experience and remember your preferences.",
-    "We may use your contact information to send updates about your order or promotional offers.",
-    "Users have the right to request access to or deletion of their personal data at any time.",
-    "Browser data is collected anonymously to help us improve our website performance.",
-    "Third-party services (like couriers) only receive the data necessary to complete delivery.",
-    "We implement industry-standard security measures to protect your data from unauthorized access.",
-    "Any changes to our privacy practices will be updated on this page immediately."
-  ];
+  "We collect basic customer details like name, phone number, email, and address to process orders.",
+  "Your personal information is kept secure and used only for order processing and delivery.",
+  "We do not sell or share your personal information with third parties.",
+  "Payment details are handled securely through trusted payment gateways.",
+  "We may use your contact details to send order updates and important notifications.",
+  "Your information may be shared with delivery partners only for shipping purposes.",
+  "We take reasonable measures to protect your data from unauthorized access.",
+  "We do not store sensitive payment information like card details on our servers.",
+  "By using our website, you agree to our privacy practices.",
+  "We may update this policy at any time, and changes will be reflected on this page."
+];
 
   return (
     <section className="max-w-4xl mx-auto px-6 py-16 animate-page-entrance">
