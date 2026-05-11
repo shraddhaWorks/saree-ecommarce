@@ -4,8 +4,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState, type FormEvent, type MouseEvent } from "react";
 
-import { getAccessToken, setAccessToken } from "@/lib/auth-client";
-import { getCart, getCartCount, type Cart } from "@/lib/cart";
+import { AUTH_CHANGED_EVENT, getAccessToken, setAccessToken } from "@/lib/auth-client";
+import { getCart, getCartCount, removeFromCart, type Cart } from "@/lib/cart";
 import {
   fetchWishlistCountRemote,
   getWishlistCachedCount,
@@ -42,6 +42,7 @@ export function StorefrontNavbar() {
   const [cart, setCart] = useState<Cart>({ items: [] });
 
   const [hasSession, setHasSession] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<SearchHit[]>([]);
@@ -59,11 +60,40 @@ export function StorefrontNavbar() {
     const sync = () => setCart(getCart());
     sync();
     window.addEventListener("cart:updated", sync);
-    return () => window.removeEventListener("cart:updated", sync);
+    window.addEventListener(AUTH_CHANGED_EVENT, sync);
+    return () => {
+      window.removeEventListener("cart:updated", sync);
+      window.removeEventListener(AUTH_CHANGED_EVENT, sync);
+    };
   }, []);
 
   useEffect(() => {
-    if (activePanel === "profile") setHasSession(!!getAccessToken());
+    if (activePanel !== "profile") return;
+    const token = getAccessToken();
+    setHasSession(!!token);
+    if (!token) {
+      setIsAdmin(false);
+      return;
+    }
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch("/api/me", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (!res.ok || cancelled) {
+          if (!cancelled) setIsAdmin(false);
+          return;
+        }
+        const me = (await res.json()) as { profile?: { role?: string } };
+        if (!cancelled) setIsAdmin(me.profile?.role === "ADMIN");
+      } catch {
+        if (!cancelled) setIsAdmin(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, [activePanel]);
 
   useEffect(() => {
@@ -165,6 +195,7 @@ export function StorefrontNavbar() {
   async function logout() {
     setAccessToken(null);
     setHasSession(false);
+    setIsAdmin(false);
     setActivePanel(null);
   }
 
@@ -480,6 +511,16 @@ export function StorefrontNavbar() {
                     </div>
                     <p className="shrink-0 text-sm font-semibold text-accent">Rs. {i.price * i.qty}</p>
                   </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      removeFromCart(i.productId);
+                      window.dispatchEvent(new Event("cart:updated"));
+                    }}
+                    className="mt-3 text-xs font-semibold text-black/55 underline hover:text-[#9d2936]"
+                  >
+                    Remove
+                  </button>
                 </div>
               ))}
 
@@ -595,13 +636,15 @@ export function StorefrontNavbar() {
           <div className="rounded-3xl border border-black/10 bg-white p-6">
             {hasSession ? (
               <div className="space-y-3">
-                <Link
-                  href="/admin"
-                  onClick={() => setActivePanel(null)}
-                  className="block rounded-2xl border border-black/10 px-4 py-3 text-sm font-semibold transition hover:border-[#9d2936] hover:text-[#9d2936]"
-                >
-                  Admin dashboard
-                </Link>
+                {isAdmin ? (
+                  <Link
+                    href="/admin"
+                    onClick={() => setActivePanel(null)}
+                    className="block rounded-2xl border border-black/10 px-4 py-3 text-sm font-semibold transition hover:border-[#9d2936] hover:text-[#9d2936]"
+                  >
+                    Admin dashboard
+                  </Link>
+                ) : null}
                 <button
                   type="button"
                   onClick={() => void logout()}

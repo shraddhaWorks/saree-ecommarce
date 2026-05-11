@@ -1,4 +1,5 @@
 const ACCESS_KEY = "saree_access_token";
+export const AUTH_CHANGED_EVENT = "auth:changed";
 
 export function getAccessToken(): string | null {
   if (typeof window === "undefined") return null;
@@ -9,6 +10,7 @@ export function setAccessToken(token: string | null) {
   if (typeof window === "undefined") return;
   if (token) window.localStorage.setItem(ACCESS_KEY, token);
   else window.localStorage.removeItem(ACCESS_KEY);
+  window.dispatchEvent(new Event(AUTH_CHANGED_EVENT));
 }
 
 export function authHeaders(): HeadersInit {

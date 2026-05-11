@@ -5,8 +5,8 @@ import { useEffect, useMemo, useState } from "react";
 
 import Footer from "@/components/footer/Footer";
 import { StorefrontNavbar } from "@/components/navbar/storefront-navbar";
-import { authHeaders, getAccessToken } from "@/lib/auth-client";
-import { clearCart, getCart, type Cart } from "@/lib/cart";
+import { AUTH_CHANGED_EVENT, authHeaders, getAccessToken } from "@/lib/auth-client";
+import { clearCart, getCart, removeFromCart, type Cart } from "@/lib/cart";
 
 const CONTINUE_SHOPPING_HREF = "/";
 
@@ -27,7 +27,11 @@ export default function CheckoutPage() {
     const sync = () => setCart(getCart());
     sync();
     window.addEventListener("cart:updated", sync);
-    return () => window.removeEventListener("cart:updated", sync);
+    window.addEventListener(AUTH_CHANGED_EVENT, sync);
+    return () => {
+      window.removeEventListener("cart:updated", sync);
+      window.removeEventListener(AUTH_CHANGED_EVENT, sync);
+    };
   }, []);
 
   useEffect(() => {
@@ -206,6 +210,16 @@ export default function CheckoutPage() {
                         Rs. {item.price * item.qty}
                       </p>
                     </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        removeFromCart(item.productId);
+                        window.dispatchEvent(new Event("cart:updated"));
+                      }}
+                      className="mt-4 text-sm font-semibold text-black/55 underline hover:text-[#9d2936]"
+                    >
+                      Remove
+                    </button>
                   </li>
                 ))}
               </ul>
