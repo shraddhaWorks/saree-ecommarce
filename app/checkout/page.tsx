@@ -10,6 +10,40 @@ import { clearCart, getCart, removeFromCart, type Cart } from "@/lib/cart";
 
 const CONTINUE_SHOPPING_HREF = "/";
 
+interface Address {
+  id: string;
+  name: string;
+  phone: string;
+  line1: string;
+  city: string;
+  state?: string | null;
+  postalCode?: string | null;
+  country: string;
+  isDefault: boolean;
+}
+
+function decodeTokenSubject(token: string): string | null {
+  try {
+    const parts = token.split(".");
+    if (parts.length < 2) return null;
+    const payload = parts[1].replace(/-/g, "+").replace(/_/g, "/");
+    const padded = payload.padEnd(Math.ceil(payload.length / 4) * 4, "=");
+    const decoded = atob(padded);
+    const parsed = JSON.parse(decoded) as { sub?: unknown };
+    if (typeof parsed.sub !== "string" || !parsed.sub.trim()) return null;
+    return parsed.sub;
+  } catch {
+    return null;
+  }
+}
+
+function getAddressStorageKey(): string {
+  if (typeof window === "undefined") return "user_addresses:guest";
+  const token = window.localStorage.getItem("saree_access_token");
+  const userId = token ? decodeTokenSubject(token) : null;
+  return `user_addresses:${userId ?? "guest"}`;
+}
+
 export default function CheckoutPage() {
   const [cart, setCart] = useState<Cart>({ items: [] });
   const [submitting, setSubmitting] = useState(false);
@@ -22,6 +56,8 @@ export default function CheckoutPage() {
   const [shippingCity, setShippingCity] = useState("");
   const [shippingState, setShippingState] = useState("");
   const [shippingPostal, setShippingPostal] = useState("");
+  const [savedAddresses, setSavedAddresses] = useState<Address[]>([]);
+  const [selectedAddressId, setSelectedAddressId] = useState<string>("");
 
   useEffect(() => {
     const sync = () => setCart(getCart());
@@ -35,20 +71,41 @@ export default function CheckoutPage() {
   }, []);
 
   useEffect(() => {
+    // Load saved addresses from localStorage for the current user
+    const stored = localStorage.getItem(getAddressStorageKey());
+    if (stored) {
+      try {
+        const addresses = JSON.parse(stored) as Address[];
+        setSavedAddresses(addresses);
+        const defaultAddr = addresses.find((a) => a.isDefault);
+        if (defaultAddr) {
+          setSelectedAddressId(defaultAddr.id);
+        }
+      } catch (err) {
+        console.error("Failed to parse addresses", err);
+      }
+    }
+  }, []);
+
+  useEffect(() => {
     let cancelled = false;
     (async () => {
       const token = getAccessToken();
       if (!token) return;
+
       try {
-        const res = await fetch("/api/me", {
+        const meRes = await fetch("/api/me", {
           headers: { Authorization: `Bearer ${token}` },
         });
-        if (!res.ok || cancelled) return;
-        const data = (await res.json()) as {
-          profile?: { name?: string | null; email?: string | null };
-        };
-        if (data.profile?.name) setGuestName((n) => n || data.profile!.name!);
-        if (data.profile?.email) setGuestEmail((e) => e || data.profile!.email!);
+
+        if (!cancelled && meRes.ok) {
+          const data = (await meRes.json()) as {
+            profile?: { name?: string | null; email?: string | null; phone?: string | null };
+          };
+          if (data.profile?.name) setGuestName((n) => n || data.profile!.name!);
+          if (data.profile?.email) setGuestEmail((e) => e || data.profile!.email!);
+          if (data.profile?.phone) setGuestPhone((p) => p || data.profile!.phone!);
+        }
       } catch {
         /* ignore */
       }
@@ -57,6 +114,18 @@ export default function CheckoutPage() {
       cancelled = true;
     };
   }, []);
+
+  useEffect(() => {
+    const address = savedAddresses.find((item) => item.id === selectedAddressId);
+    if (!address) return;
+
+    setGuestName((prev) => prev || address.name);
+    setGuestPhone((prev) => prev || address.phone);
+    setShippingLine1(address.line1);
+    setShippingCity(address.city);
+    setShippingState(address.state ?? "");
+    setShippingPostal(address.postalCode ?? "");
+  }, [selectedAddressId, savedAddresses]);
 
   const cartTotal = useMemo(
     () => cart.items.reduce((sum, item) => sum + item.qty * item.price, 0),
@@ -83,6 +152,7 @@ export default function CheckoutPage() {
           shippingCity,
           shippingState: shippingState || undefined,
           shippingPostal: shippingPostal || undefined,
+          shippingCountry: "India",
         }),
       });
 
@@ -128,6 +198,24 @@ export default function CheckoutPage() {
           <div className="mt-8 grid gap-8 lg:grid-cols-5">
             <div className="order-2 space-y-4 lg:col-span-2 lg:order-1">
               <h2 className="text-lg font-semibold">Shipping</h2>
+              {savedAddresses.length > 0 ? (
+                <label className="block text-sm">
+                  <span className="text-black/70">Use saved address</span>
+                  <select
+                    value={selectedAddressId}
+                    onChange={(e) => setSelectedAddressId(e.target.value)}
+                    className="mt-1 w-full rounded-xl border border-black/15 px-3 py-2"
+                  >
+                    <option value="">Choose a saved address</option>
+                    {savedAddresses.map((address) => (
+                      <option key={address.id} value={address.id}>
+                        {address.line1}, {address.city} {address.postalCode ? `(${address.postalCode})` : ""}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              ) : null}
+
               <label className="block text-sm">
                 <span className="text-black/70">Full name</span>
                 <input

@@ -48,16 +48,18 @@ export function SignUpForm() {
 
   return (
     <form className="space-y-5" onSubmit={onSubmit}>
-      <div>
+     <div>
         <p className="text-xs font-semibold uppercase tracking-[0.3em] text-black/45">Sign Up</p>
         <h2 className="mt-2 text-2xl font-semibold tracking-tight">Create your account</h2>
       </div>
+      {/*
       <SocialAuthButtons />
       <div className="flex items-center gap-3 text-xs uppercase tracking-[0.25em] text-black/35">
         <span className="h-px flex-1 bg-border-soft" />
         or
         <span className="h-px flex-1 bg-border-soft" />
       </div>
+      */} 
       {error ? <p className="text-sm text-red-600">{error}</p> : null}
       <div className="grid gap-4 md:grid-cols-2">
         <AuthField label="First name" name="firstName" placeholder="First name" />
