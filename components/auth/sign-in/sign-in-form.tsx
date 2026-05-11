@@ -53,12 +53,14 @@ export function SignInForm() {
         <p className="text-xs font-semibold uppercase tracking-[0.3em] text-black/45">Sign In</p>
         <h2 className="mt-2 text-2xl font-semibold tracking-tight">Access your account</h2>
       </div>
+      {/*
       <SocialAuthButtons />
       <div className="flex items-center gap-3 text-xs uppercase tracking-[0.25em] text-black/35">
         <span className="h-px flex-1 bg-border-soft" />
         or
         <span className="h-px flex-1 bg-border-soft" />
       </div>
+      */}
       {error ? <p className="text-sm text-red-600">{error}</p> : null}
       <AuthField label="Email address" type="email" name="email" placeholder="you@example.com" />
       <AuthField label="Password" type="password" name="password" placeholder="Enter your password" />
@@ -67,7 +69,7 @@ export function SignInForm() {
           <input type="checkbox" className="rounded border-border-soft" />
           Remember me
         </label>
-        <span className="font-medium text-accent">Forgot password?</span>
+       {/* <span className="font-medium text-accent">Forgot password?</span> */}
       </div>
       <button
         type="submit"

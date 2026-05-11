@@ -120,8 +120,17 @@ export function StorefrontNavbar() {
       }
       void sync();
     };
+
+    const onAuthChange = () => {
+      void sync();
+    };
+
     window.addEventListener(WISHLIST_UPDATED_EVENT, onWishlist);
-    return () => window.removeEventListener(WISHLIST_UPDATED_EVENT, onWishlist);
+    window.addEventListener(AUTH_CHANGED_EVENT, onAuthChange);
+    return () => {
+      window.removeEventListener(WISHLIST_UPDATED_EVENT, onWishlist);
+      window.removeEventListener(AUTH_CHANGED_EVENT, onAuthChange);
+    };
   }, []);
 
   useEffect(() => {
@@ -644,7 +653,15 @@ export function StorefrontNavbar() {
                   >
                     Admin dashboard
                   </Link>
-                ) : null}
+                ) : (
+                  <Link
+                    href="/dashboard"
+                    onClick={() => setActivePanel(null)}
+                    className="block rounded-2xl border border-black/10 px-4 py-3 text-sm font-semibold transition hover:border-[#9d2936] hover:text-[#9d2936]"
+                  >
+                    My Account
+                  </Link>
+                )}
                 <button
                   type="button"
                   onClick={() => void logout()}
