@@ -10,7 +10,30 @@ export type Cart = {
   items: CartLine[];
 };
 
-const CART_STORAGE_KEY = "cart_v1";
+const CART_STORAGE_KEY_PREFIX = "cart_v1";
+const LEGACY_CART_STORAGE_KEY = "cart_v1";
+
+function decodeTokenSubject(token: string): string | null {
+  try {
+    const parts = token.split(".");
+    if (parts.length < 2) return null;
+    const payload = parts[1].replace(/-/g, "+").replace(/_/g, "/");
+    const padded = payload.padEnd(Math.ceil(payload.length / 4) * 4, "=");
+    const decoded = atob(padded);
+    const parsed = JSON.parse(decoded) as { sub?: unknown };
+    if (typeof parsed.sub !== "string" || !parsed.sub.trim()) return null;
+    return parsed.sub;
+  } catch {
+    return null;
+  }
+}
+
+function getCartStorageKey(): string {
+  if (typeof window === "undefined") return `${CART_STORAGE_KEY_PREFIX}:guest`;
+  const token = window.localStorage.getItem("saree_access_token");
+  const userId = token ? decodeTokenSubject(token) : null;
+  return `${CART_STORAGE_KEY_PREFIX}:${userId ?? "guest"}`;
+}
 
 function emptyCart(): Cart {
   return { items: [] };
@@ -20,10 +43,21 @@ function readFromStorage(): Cart {
   if (typeof window === "undefined") return emptyCart();
 
   try {
-    const raw = window.localStorage.getItem(CART_STORAGE_KEY);
-    if (!raw) return emptyCart();
+    const activeKey = getCartStorageKey();
+    const raw = window.localStorage.getItem(activeKey);
+    if (!raw) {
+      const legacy = window.localStorage.getItem(LEGACY_CART_STORAGE_KEY);
+      if (legacy && activeKey.endsWith(":guest")) {
+        window.localStorage.setItem(activeKey, legacy);
+        window.localStorage.removeItem(LEGACY_CART_STORAGE_KEY);
+      } else {
+        return emptyCart();
+      }
+    }
+    const source = raw ?? window.localStorage.getItem(activeKey);
+    if (!source) return emptyCart();
 
-    const parsed = JSON.parse(raw) as unknown;
+    const parsed = JSON.parse(source) as unknown;
     if (!parsed || typeof parsed !== "object") return emptyCart();
 
     const cart = parsed as Partial<Cart>;
@@ -34,7 +68,7 @@ function readFromStorage(): Cart {
         (i) => typeof (i as { productId?: unknown }).productId === "number",
       )
     ) {
-      window.localStorage.removeItem(CART_STORAGE_KEY);
+      window.localStorage.removeItem(activeKey);
       return emptyCart();
     }
 
@@ -63,7 +97,7 @@ function readFromStorage(): Cart {
 
 function writeToStorage(cart: Cart) {
   if (typeof window === "undefined") return;
-  window.localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cart));
+  window.localStorage.setItem(getCartStorageKey(), JSON.stringify(cart));
 }
 
 export function getCart(): Cart {
@@ -101,5 +135,12 @@ export function addToCart(input: Omit<CartLine, "qty"> & { qty: number }): Cart 
 
 export function clearCart() {
   if (typeof window === "undefined") return;
-  window.localStorage.removeItem(CART_STORAGE_KEY);
+  window.localStorage.removeItem(getCartStorageKey());
+}
+
+export function removeFromCart(productId: string): Cart {
+  const existing = readFromStorage();
+  const cart = { items: existing.items.filter((i) => i.productId !== productId) };
+  writeToStorage(cart);
+  return cart;
 }

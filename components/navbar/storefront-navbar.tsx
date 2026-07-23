@@ -61,7 +61,11 @@ const hasSession = Boolean(session?.user);
     const sync = () => setCart(getCart());
     sync();
     window.addEventListener("cart:updated", sync);
-    return () => window.removeEventListener("cart:updated", sync);
+    window.addEventListener(AUTH_CHANGED_EVENT, sync);
+    return () => {
+      window.removeEventListener("cart:updated", sync);
+      window.removeEventListener(AUTH_CHANGED_EVENT, sync);
+    };
   }, []);
 
   
@@ -90,6 +94,11 @@ const hasSession = Boolean(session?.user);
       }
       void sync();
     };
+
+    const onAuthChange = () => {
+      void sync();
+    };
+
     window.addEventListener(WISHLIST_UPDATED_EVENT, onWishlist);
     return () => window.removeEventListener(WISHLIST_UPDATED_EVENT, onWishlist);
   }, [session]);
@@ -478,6 +487,16 @@ const hasSession = Boolean(session?.user);
                     </div>
                     <p className="shrink-0 text-sm font-semibold text-accent">Rs. {i.price * i.qty}</p>
                   </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      removeFromCart(i.productId);
+                      window.dispatchEvent(new Event("cart:updated"));
+                    }}
+                    className="mt-3 text-xs font-semibold text-black/55 underline hover:text-[#9d2936]"
+                  >
+                    Remove
+                  </button>
                 </div>
               ))}
 

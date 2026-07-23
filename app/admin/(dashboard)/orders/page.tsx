@@ -10,7 +10,11 @@ type OrderRow = {
   guestName: string | null;
   guestEmail: string | null;
   guestPhone: string | null;
+  shippingLine1: string;
   shippingCity: string;
+  shippingState: string | null;
+  shippingPostal: string | null;
+  shippingCountry: string;
   createdAt: string;
   items: { quantity: number; productName: string; priceInPaise: number }[];
 };
@@ -81,7 +85,10 @@ export default function AdminOrdersPage() {
                   {o.guestName ?? "Customer"} · {o.guestEmail}
                 </p>
                 <p className="text-zinc-500 mt-1">
-                  {o.guestPhone} · {o.shippingCity} ·{" "}
+                  {o.guestPhone} · {o.shippingLine1}, {o.shippingCity}
+                  {o.shippingState ? `, ${o.shippingState}` : ""}
+                  {o.shippingPostal ? `, ${o.shippingPostal}` : ""}
+                  {o.shippingCountry !== "India" ? `, ${o.shippingCountry}` : ""} ·{" "}
                   {new Date(o.createdAt).toLocaleString()}
                 </p>
                 <p className="mt-2 font-medium">

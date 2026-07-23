@@ -11,7 +11,29 @@ export const WISHLIST_UPDATED_EVENT = "wishlist:updated";
 
 export type WishlistUpdatedDetail = { count: number };
 
-const WISHLIST_STORAGE_KEY = "wishlist_v1";
+const WISHLIST_STORAGE_KEY_PREFIX = "wishlist_v1";
+
+function decodeTokenSubject(token: string): string | null {
+  try {
+    const parts = token.split(".");
+    if (parts.length < 2) return null;
+    const payload = parts[1].replace(/-/g, "+").replace(/_/g, "/");
+    const padded = payload.padEnd(Math.ceil(payload.length / 4) * 4, "=");
+    const decoded = atob(padded);
+    const parsed = JSON.parse(decoded) as { sub?: unknown };
+    if (typeof parsed.sub !== "string" || !parsed.sub.trim()) return null;
+    return parsed.sub;
+  } catch {
+    return null;
+  }
+}
+
+function getWishlistStorageKey(): string {
+  if (typeof window === "undefined") return `${WISHLIST_STORAGE_KEY_PREFIX}:guest`;
+  const token = window.localStorage.getItem("saree_access_token");
+  const userId = token ? decodeTokenSubject(token) : null;
+  return `${WISHLIST_STORAGE_KEY_PREFIX}:${userId ?? "guest"}`;
+}
 
 type CacheSlot = {
   lines: WishlistLine[] | null;
@@ -56,7 +78,11 @@ function emptyLines(): WishlistLine[] {
 export function readWishlistLocal(): WishlistLine[] {
   if (typeof window === "undefined") return emptyLines();
   try {
-    const raw = window.localStorage.getItem(WISHLIST_STORAGE_KEY);
+    const key = getWishlistStorageKey();
+    let raw = window.localStorage.getItem(key);
+    if (!raw && key.endsWith(":guest")) {
+      raw = window.localStorage.getItem(WISHLIST_STORAGE_KEY_PREFIX);
+    }
     if (!raw) return emptyLines();
     const parsed = JSON.parse(raw) as unknown;
     if (!parsed || typeof parsed !== "object") return emptyLines();
@@ -79,7 +105,7 @@ export function readWishlistLocal(): WishlistLine[] {
 
 function writeWishlistLocal(lines: WishlistLine[]) {
   if (typeof window === "undefined") return;
-  window.localStorage.setItem(WISHLIST_STORAGE_KEY, JSON.stringify({ items: lines }));
+  window.localStorage.setItem(getWishlistStorageKey(), JSON.stringify({ items: lines }));
 }
 
 export function isInWishlistLocal(productId: string): boolean {

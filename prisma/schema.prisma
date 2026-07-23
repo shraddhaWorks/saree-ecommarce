@@ -72,6 +72,23 @@ enum UserRole {
   ADMIN
 }
 
+model Address {
+  id          String  @id @default(uuid())
+  userId      String
+  user        User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name        String
+  phone       String
+  line1       String
+  city        String
+  state       String?
+  postalCode  String?
+  country     String  @default("India")
+  isDefault   Boolean @default(false)
+  createdAt   DateTime @default(now())
+
+  @@index([userId])
+}
+
 enum ClothType {
   SILK
   COTTON

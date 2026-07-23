@@ -6,6 +6,7 @@ type SignupBody = {
   email?: string;
   password?: string;
   name?: string;
+  phone?: string;
 };
 
 export async function POST(req: NextRequest) {
@@ -15,6 +16,7 @@ export async function POST(req: NextRequest) {
     const email = normalizeEmail(body.email);
     const password = body.password;
     const name = body.name?.trim();
+    const phone = body.phone?.trim();
 
     if (!email || !password) {
       return NextResponse.json(

@@ -52,6 +52,7 @@ export function SignInForm() {
         or
         <span className="h-px flex-1 bg-border-soft" />
       </div>
+      */}
       {error ? <p className="text-sm text-red-600">{error}</p> : null}
       <AuthField label="Email address" type="email" name="email" placeholder="you@example.com" />
       <AuthField label="Password" type="password" name="password" placeholder="Enter your password" />
@@ -60,7 +61,7 @@ export function SignInForm() {
           <input type="checkbox" className="rounded border-border-soft" />
           Remember me
         </label>
-        <span className="font-medium text-accent">Forgot password?</span>
+       {/* <span className="font-medium text-accent">Forgot password?</span> */}
       </div>
       <button
         type="submit"
