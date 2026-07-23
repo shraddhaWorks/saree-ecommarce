@@ -1,8 +1,7 @@
 import { createHmac, timingSafeEqual } from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
-import prisma from "@/lib/db";
-import { describeSupabaseConnectionFailure } from "@/lib/supabaseErrors";
-import { supabaseAdmin } from "@/lib/supabaseServer";
+import { Prisma } from "@/lib/generated/prisma/client";
+import { createLocalUser, normalizeEmail } from "@/lib/auth/registration";
 
 type Body = {
   email?: string;
@@ -10,6 +9,9 @@ type Body = {
   name?: string;
   adminSecret?: string;
 };
+
+const MIN_PASSWORD_LENGTH = 8;
+const MAX_NAME_LENGTH = 100;
 
 function safeEqualString(a: string, b: string): boolean {
   const key = "admin-signup";
@@ -31,17 +33,31 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const body = (await req.json()) as Body;
-    const email = body.email?.trim().toLowerCase();
-    const password = body.password;
-    const name = body.name?.trim();
-    const adminSecret = body.adminSecret?.trim() ?? "";
+    let body: Body;
+    try {
+      body = (await req.json()) as Body;
+    } catch {
+      return NextResponse.json({ error: "Request body must be valid JSON" }, { status: 400 });
+    }
 
-    if (!email || !password) {
+    const email = normalizeEmail(body.email);
+    const password = typeof body.password === "string" ? body.password : "";
+    const name = typeof body.name === "string" ? body.name.trim() : undefined;
+    const adminSecret = typeof body.adminSecret === "string" ? body.adminSecret.trim() : "";
+
+    if (!email) {
+      return NextResponse.json({ error: "A valid email address is required" }, { status: 400 });
+    }
+
+    if (!password || password.length < MIN_PASSWORD_LENGTH) {
       return NextResponse.json(
-        { error: "Email and password are required" },
+        { error: `Password must be at least ${MIN_PASSWORD_LENGTH} characters` },
         { status: 400 },
       );
+    }
+
+    if (name && name.length > MAX_NAME_LENGTH) {
+      return NextResponse.json({ error: "Name is too long" }, { status: 400 });
     }
 
     if (!safeEqualString(adminSecret, expected)) {
@@ -51,69 +67,23 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    let data: Awaited<
-      ReturnType<typeof supabaseAdmin.auth.admin.createUser>
-    >["data"];
-    let error: Awaited<
-      ReturnType<typeof supabaseAdmin.auth.admin.createUser>
-    >["error"];
-
-    try {
-      const res = await supabaseAdmin.auth.admin.createUser({
-        email,
-        password,
-        email_confirm: true,
-      });
-      data = res.data;
-      error = res.error;
-    } catch (e) {
-      const hint = describeSupabaseConnectionFailure(e);
-      if (hint) {
-        return NextResponse.json({ error: hint }, { status: 503 });
-      }
-      throw e;
-    }
-
-    if (error || !data.user) {
-      const hint = describeSupabaseConnectionFailure(error);
-      if (hint) {
-        return NextResponse.json({ error: hint }, { status: 503 });
-      }
-      return NextResponse.json(
-        { error: error?.message ?? "Failed to create user" },
-        { status: 400 },
-      );
-    }
-
-    const userId = data.user.id;
-
-    await prisma.user.upsert({
-      where: { id: userId },
-      update: {
-        email,
-        name,
-        role: "ADMIN",
-      },
-      create: {
-        id: userId,
-        email,
-        name,
-        role: "ADMIN",
-      },
-    });
+    const user = await createLocalUser({ email, password, name, role: "ADMIN" });
 
     return NextResponse.json(
       {
         user: {
-          id: userId,
-          email,
-          name,
-          role: "ADMIN",
+          ...user,
         },
       },
       { status: 201 },
     );
   } catch (err) {
+    if (err instanceof Error && err.message.startsWith("Password must")) {
+      return NextResponse.json({ error: err.message }, { status: 400 });
+    }
+    if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === "P2002") {
+      return NextResponse.json({ error: "An account with this email already exists" }, { status: 409 });
+    }
     console.error("Admin signup error", err);
     return NextResponse.json(
       { error: "Internal server error" },

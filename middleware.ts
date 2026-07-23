@@ -1,5 +1,6 @@
-import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
+import NextAuth from "next-auth";
+import { authConfig } from "@/auth.config";
 
 import {
   LEGACY_LINE_PARENT_SLUGS_SORTED,
@@ -11,7 +12,9 @@ import {
  * 308 → `/collections/kanchi-pattu-sarees` (same URL as Your Wedding Edit).
  * Also handles `/traditional-sarees` alone and short parents like `/designer-party-wear/organza-sarees`.
  */
-export function middleware(request: NextRequest) {
+const { auth } = NextAuth(authConfig);
+
+export const middleware = auth((request) => {
   const pathname = request.nextUrl.pathname.replace(/\/+$/, "") || "/";
 
   if (pathname !== "/") {
@@ -38,7 +41,7 @@ export function middleware(request: NextRequest) {
   }
 
   return NextResponse.next();
-}
+});
 
 export const config = {
   matcher: [
@@ -62,5 +65,9 @@ export const config = {
     "/casual-workwear/:path*",
     "/dhoti-kanduva",
     "/dhoti-kanduva/:path*",
+    "/admin",
+    "/admin/:path*",
+    "/dashboard",
+    "/dashboard/:path*",
   ],
 };

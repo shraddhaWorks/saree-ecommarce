@@ -3,10 +3,8 @@
 import type { MouseEvent } from "react";
 import { useCallback, useEffect, useState } from "react";
 
-import { getAccessToken } from "@/lib/auth-client";
 import {
   fetchWishlistLinesCompact,
-  readWishlistLocal,
   type WishlistLine,
   WISHLIST_UPDATED_EVENT,
   wishlistAdd,
@@ -23,11 +21,7 @@ export type WishlistItemMeta = {
 };
 
 async function loadLines(): Promise<WishlistLine[]> {
-  const token = getAccessToken();
-  if (token) {
-    return fetchWishlistLinesCompact(false);
-  }
-  return readWishlistLocal();
+  return fetchWishlistLinesCompact(false);
 }
 
 function isSavedInLines(

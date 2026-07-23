@@ -3,11 +3,9 @@
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 
-import { getAccessToken } from "@/lib/auth-client";
 import { FALLBACK_SAREE_IMAGE } from "@/lib/storefront-images";
 import {
   fetchWishlistLinesFull,
-  readWishlistLocal,
   WISHLIST_UPDATED_EVENT,
   wishlistRemove,
   type WishlistLine,
@@ -20,12 +18,7 @@ export function WishlistView() {
   const load = useCallback(async (opts?: { silent?: boolean }) => {
     if (!opts?.silent) setLoading(true);
     try {
-      const token = getAccessToken();
-      if (token) {
-        setItems(await fetchWishlistLinesFull(true));
-      } else {
-        setItems(readWishlistLocal());
-      }
+      setItems(await fetchWishlistLinesFull(true));
     } finally {
       if (!opts?.silent) setLoading(false);
     }

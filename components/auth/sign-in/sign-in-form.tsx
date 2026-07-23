@@ -1,10 +1,10 @@
 "use client";
 
+import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { AuthField } from "@/components/auth/shared/auth-field";
 import { SocialAuthButtons } from "@/components/auth/shared/social-auth-buttons";
-import { setAccessToken } from "@/lib/auth-client";
 
 export function SignInForm() {
   const router = useRouter();
@@ -23,22 +23,15 @@ export function SignInForm() {
     }
     setLoading(true);
     try {
-      const res = await fetch("/api/auth/signin", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
-      const data = (await res.json()) as {
-        error?: string;
-        accessToken?: string;
-      };
-      if (!res.ok) {
-        setError(data.error ?? "Sign in failed");
-        setLoading(false);
+      const result = await signIn("credentials", { email, password, redirect: false });
+      if (!result || result.error) {
+        setError("Invalid email or password");
         return;
       }
-      if (data.accessToken) setAccessToken(data.accessToken);
-      router.push("/");
+
+      const sessionResponse = await fetch("/api/auth/session");
+      const session = (await sessionResponse.json()) as { user?: { role?: string } };
+      router.push(session.user?.role === "ADMIN" ? "/admin" : "/dashboard");
       router.refresh();
     } catch {
       setError("Network error");
@@ -53,7 +46,7 @@ export function SignInForm() {
         <p className="text-xs font-semibold uppercase tracking-[0.3em] text-black/45">Sign In</p>
         <h2 className="mt-2 text-2xl font-semibold tracking-tight">Access your account</h2>
       </div>
-      <SocialAuthButtons />
+     
       <div className="flex items-center gap-3 text-xs uppercase tracking-[0.25em] text-black/35">
         <span className="h-px flex-1 bg-border-soft" />
         or

@@ -5,7 +5,6 @@ import { useEffect, useMemo, useState } from "react";
 
 import Footer from "@/components/footer/Footer";
 import { StorefrontNavbar } from "@/components/navbar/storefront-navbar";
-import { authHeaders, getAccessToken } from "@/lib/auth-client";
 import { clearCart, getCart, type Cart } from "@/lib/cart";
 
 const CONTINUE_SHOPPING_HREF = "/";
@@ -33,12 +32,8 @@ export default function CheckoutPage() {
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      const token = getAccessToken();
-      if (!token) return;
       try {
-        const res = await fetch("/api/me", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const res = await fetch("/api/me");
         if (!res.ok || cancelled) return;
         const data = (await res.json()) as {
           profile?: { name?: string | null; email?: string | null };
@@ -68,7 +63,6 @@ export default function CheckoutPage() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          ...authHeaders(),
         },
         body: JSON.stringify({
           items: cart.items.map((i) => ({ productId: i.productId, qty: i.qty })),

@@ -1,4 +1,3 @@
-import { getAccessToken, setAccessToken } from "@/lib/auth-client";
 
 export type WishlistLine = {
   productId: string;
@@ -30,7 +29,6 @@ function emitWishlistUpdated(count: number) {
 }
 
 function handleWishlistUnauthorized() {
-  setAccessToken(null);
   invalidateWishlistCache();
   const count = readWishlistLocal().length;
   emitWishlistUpdated(count);
@@ -104,9 +102,6 @@ async function loadRemoteIntoSlot(
   force: boolean,
 ): Promise<WishlistLine[]> {
   if (typeof window === "undefined") return [];
-  const token = getAccessToken();
-  if (!token) return readWishlistLocal();
-
   if (force) {
     slot.lines = null;
     slot.inflight = null;
@@ -118,7 +113,7 @@ async function loadRemoteIntoSlot(
   slot.inflight = (async () => {
     try {
       const r = await fetch(`/api/wishlist?mode=${mode}`, {
-        headers: { Authorization: `Bearer ${token}` },
+        credentials: "same-origin",
       });
       if (r.status === 401) {
         handleWishlistUnauthorized();
@@ -156,12 +151,8 @@ export async function fetchWishlistLinesFull(force = false): Promise<WishlistLin
 /** Navbar bootstrap — single COUNT query, no product join. */
 export async function fetchWishlistCountRemote(): Promise<number> {
   if (typeof window === "undefined") return 0;
-  const token = getAccessToken();
-  if (!token) return readWishlistLocal().length;
   try {
-    const r = await fetch("/api/wishlist?mode=count", {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    const r = await fetch("/api/wishlist?mode=count", { credentials: "same-origin" });
     if (r.status === 401) {
       handleWishlistUnauthorized();
       return readWishlistLocal().length;
@@ -234,14 +225,13 @@ export async function wishlistAdd(
 
   const line: WishlistLine = { productId, slug, name, price, image };
 
-  const token = getAccessToken();
-  if (token) {
+  {
     const r = await fetch("/api/wishlist", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
       },
+      credentials: "same-origin",
       body: JSON.stringify({ productId }),
     });
     const j = (await r.json().catch(() => ({}))) as { error?: string; count?: number };
@@ -270,11 +260,10 @@ export async function wishlistAdd(
 export async function wishlistRemove(
   productId: string,
 ): Promise<{ ok: boolean; count?: number; error?: string }> {
-  const token = getAccessToken();
-  if (token) {
+  {
     const r = await fetch(`/api/wishlist?productId=${encodeURIComponent(productId)}`, {
       method: "DELETE",
-      headers: { Authorization: `Bearer ${token}` },
+      credentials: "same-origin",
     });
     const j = (await r.json().catch(() => ({}))) as { error?: string; count?: number };
     if (r.status === 401) {
@@ -299,8 +288,6 @@ export async function wishlistRemove(
 }
 
 export async function fetchRemoteWishlist(): Promise<WishlistLine[] | null> {
-  const token = getAccessToken();
-  if (!token) return null;
   const lines = await fetchWishlistLinesCompact(false);
   return lines;
 }

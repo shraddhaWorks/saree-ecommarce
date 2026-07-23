@@ -13,9 +13,9 @@ Defined in `.env.local`:
 
 - **`DATABASE_URL`**: Supabase Postgres pooled URL (used by Prisma)
 - **`DIRECT_URL`**: Supabase Postgres direct URL (used by Prisma migrations)
-- **`NEXT_PUBLIC_SUPABASE_URL`**: Supabase project URL (public)
-- **`NEXT_PUBLIC_SUPABASE_ANON_KEY`**: Supabase anon key (public, used in browser)
-- **`SUPABASE_SERVICE_ROLE_KEY`**: Supabase service key (secret, server only)
+- **`AUTH_SECRET`**: cryptographically random Auth.js secret (required in production)
+- **`AUTH_URL`**: canonical application URL when required by the deployment platform
+- **`ADMIN_SIGNUP_SECRET`**: server-only invite secret for admin registration
 
 Run:
 
@@ -30,7 +30,7 @@ npm run dev
 
 #### `POST /api/auth/signup`
 
-- **Purpose**: Register a new customer account (Supabase Auth + local `User` row).
+- **Purpose**: Register a local Prisma user. Passwords are hashed with bcrypt.
 - **Body (JSON)**:
 
 ```json
@@ -46,16 +46,16 @@ npm run dev
 ```json
 {
   "user": {
-    "id": "supabase-user-id",
+    "id": "local-user-id",
     "email": "customer@example.com",
     "name": "Customer Name"
   }
 }
 ```
 
-#### `POST /api/auth/signin`
+#### Auth.js credentials sign-in
 
-- **Purpose**: Sign in and get access/refresh tokens.
+- **Purpose**: Sign in through Auth.js at `/api/auth/[...nextauth]`. The session is stored in a secure HTTP-only cookie.
 - **Body (JSON)**:
 
 ```json
@@ -65,42 +65,22 @@ npm run dev
 }
 ```
 
-- **Success (200)**:
-
-```json
-{
-  "accessToken": "jwt-access-token",
-  "refreshToken": "refresh-token",
-  "user": {
-    "id": "supabase-user-id",
-    "email": "customer@example.com"
-  }
-}
-```
-
-Store `accessToken` on the client (prefer HTTP‑only cookie) and send it as:
-
-```http
-Authorization: Bearer <accessToken>
-```
-
-for protected admin routes.
+Client components use `signIn("credentials", { email, password })`; server code uses `auth()`.
 
 #### `GET /api/me`
 
 - **Purpose**: Get current logged‑in user (used by “Buy Now” to check if account exists).
-- **Headers**:
-  - `Authorization: Bearer <accessToken>`
+- **Authentication**: Auth.js HTTP-only session cookie.
 - **Success (200)**:
 
 ```json
 {
   "user": {
-    "id": "supabase-user-id",
+    "id": "local-user-id",
     "email": "customer@example.com"
   },
   "profile": {
-    "id": "supabase-user-id",
+    "id": "local-user-id",
     "email": "customer@example.com",
     "name": "Customer Name",
     "role": "CUSTOMER",
