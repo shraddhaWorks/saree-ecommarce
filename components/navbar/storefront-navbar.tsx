@@ -57,17 +57,19 @@ const hasSession = Boolean(session?.user);
 
   const navMegaItems = useMemo(() => getNavMegaItems(), []);
 
-  useEffect(() => {
-    const sync = () => setCart(getCart());
-    sync();
-    window.addEventListener("cart:updated", sync);
-    window.addEventListener(AUTH_CHANGED_EVENT, sync);
-    return () => {
-      window.removeEventListener("cart:updated", sync);
-      window.removeEventListener(AUTH_CHANGED_EVENT, sync);
-    };
-  }, []);
+ useEffect(() => {
+  const sync = () => {
+    setCart(getCart());
+  };
 
+  sync();
+
+  window.addEventListener("cart:updated", sync);
+
+  return () => {
+    window.removeEventListener("cart:updated", sync);
+  };
+}, []);
   
 
   useEffect(() => {
@@ -192,6 +194,10 @@ const hasSession = Boolean(session?.user);
   const iconLinkClass =
     "flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-black/8 bg-white/60 text-black/70 shadow-[0_8px_24px_rgba(68,38,24,0.06)] transition hover:border-accent/25 hover:bg-white hover:text-accent sm:h-9 sm:w-9 lg:h-10 lg:w-10";
   const hasSearchQuery = searchQuery.trim().length > 0;
+
+  function removeFromCart(productId: string) {
+    throw new Error("Function not implemented.");
+  }
 
   return (
     <>
