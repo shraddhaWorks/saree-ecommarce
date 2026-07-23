@@ -5,8 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 
 import Footer from "@/components/footer/Footer";
 import { StorefrontNavbar } from "@/components/navbar/storefront-navbar";
-import { AUTH_CHANGED_EVENT, authHeaders, getAccessToken } from "@/lib/auth-client";
-import { clearCart, getCart, removeFromCart, type Cart } from "@/lib/cart";
+import { clearCart, getCart, type Cart } from "@/lib/cart";
 
 const CONTINUE_SHOPPING_HREF = "/";
 
@@ -90,22 +89,14 @@ export default function CheckoutPage() {
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      const token = getAccessToken();
-      if (!token) return;
-
       try {
-        const meRes = await fetch("/api/me", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-
-        if (!cancelled && meRes.ok) {
-          const data = (await meRes.json()) as {
-            profile?: { name?: string | null; email?: string | null; phone?: string | null };
-          };
-          if (data.profile?.name) setGuestName((n) => n || data.profile!.name!);
-          if (data.profile?.email) setGuestEmail((e) => e || data.profile!.email!);
-          if (data.profile?.phone) setGuestPhone((p) => p || data.profile!.phone!);
-        }
+        const res = await fetch("/api/me");
+        if (!res.ok || cancelled) return;
+        const data = (await res.json()) as {
+          profile?: { name?: string | null; email?: string | null };
+        };
+        if (data.profile?.name) setGuestName((n) => n || data.profile!.name!);
+        if (data.profile?.email) setGuestEmail((e) => e || data.profile!.email!);
       } catch {
         /* ignore */
       }
@@ -141,7 +132,6 @@ export default function CheckoutPage() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          ...authHeaders(),
         },
         body: JSON.stringify({
           items: cart.items.map((i) => ({ productId: i.productId, qty: i.qty })),

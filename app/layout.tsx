@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Cormorant_Garamond } from "next/font/google";
 import "./globals.css";
+import { AuthSessionProvider } from "@/components/auth/session-provider";
 
 const royalSerif = Cormorant_Garamond({
   subsets: ["latin"],
@@ -21,7 +22,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={royalSerif.variable}>
-      <body className="antialiased">{children}</body>
+      <body className="antialiased"><AuthSessionProvider>{children}</AuthSessionProvider></body>
     </html>
   );
 }

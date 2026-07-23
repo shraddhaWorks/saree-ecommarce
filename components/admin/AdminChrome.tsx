@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { getAccessToken, setAccessToken } from "@/lib/auth-client";
+import { signOut } from "next-auth/react";
 
 export default function AdminChrome({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -11,21 +11,13 @@ export default function AdminChrome({ children }: { children: React.ReactNode })
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    const token = getAccessToken();
-    if (!token) {
-      router.replace("/admin/login");
-      return;
-    }
     let cancelled = false;
     (async () => {
       try {
-        const res = await fetch("/api/me", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const res = await fetch("/api/me");
         const data = (await res.json()) as { profile?: { role?: string } };
         if (cancelled) return;
         if (!res.ok || data.profile?.role !== "ADMIN") {
-          setAccessToken(null);
           router.replace("/admin/login");
           return;
         }
@@ -71,8 +63,7 @@ export default function AdminChrome({ children }: { children: React.ReactNode })
           <button
             type="button"
             onClick={() => {
-              setAccessToken(null);
-              router.push("/admin/login");
+              void signOut({ callbackUrl: "/admin/login" });
             }}
             className="text-sm text-red-600 hover:text-red-800"
           >

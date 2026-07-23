@@ -1,11 +1,11 @@
 "use client";
 
 import Link from "next/link";
+import { signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState, type FormEvent, type MouseEvent } from "react";
 
-import { AUTH_CHANGED_EVENT, getAccessToken, setAccessToken } from "@/lib/auth-client";
-import { getCart, getCartCount, removeFromCart, type Cart } from "@/lib/cart";
+import { getCart, getCartCount, type Cart } from "@/lib/cart";
 import {
   fetchWishlistCountRemote,
   getWishlistCachedCount,
@@ -41,8 +41,9 @@ export function StorefrontNavbar() {
   const [mobileExpandedLabel, setMobileExpandedLabel] = useState<string | null>(null);
   const [cart, setCart] = useState<Cart>({ items: [] });
 
-  const [hasSession, setHasSession] = useState(false);
-  const [isAdmin, setIsAdmin] = useState(false);
+  const { data: session } = useSession();
+
+const hasSession = Boolean(session?.user);
 
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<SearchHit[]>([]);
@@ -67,38 +68,11 @@ export function StorefrontNavbar() {
     };
   }, []);
 
-  useEffect(() => {
-    if (activePanel !== "profile") return;
-    const token = getAccessToken();
-    setHasSession(!!token);
-    if (!token) {
-      setIsAdmin(false);
-      return;
-    }
-    let cancelled = false;
-    (async () => {
-      try {
-        const res = await fetch("/api/me", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        if (!res.ok || cancelled) {
-          if (!cancelled) setIsAdmin(false);
-          return;
-        }
-        const me = (await res.json()) as { profile?: { role?: string } };
-        if (!cancelled) setIsAdmin(me.profile?.role === "ADMIN");
-      } catch {
-        if (!cancelled) setIsAdmin(false);
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, [activePanel]);
+  
 
   useEffect(() => {
     const sync = async () => {
-      if (!getAccessToken()) {
+      if (!session?.user) {
         setWishlistCount(readWishlistLocal().length);
         return;
       }
@@ -126,12 +100,8 @@ export function StorefrontNavbar() {
     };
 
     window.addEventListener(WISHLIST_UPDATED_EVENT, onWishlist);
-    window.addEventListener(AUTH_CHANGED_EVENT, onAuthChange);
-    return () => {
-      window.removeEventListener(WISHLIST_UPDATED_EVENT, onWishlist);
-      window.removeEventListener(AUTH_CHANGED_EVENT, onAuthChange);
-    };
-  }, []);
+    return () => window.removeEventListener(WISHLIST_UPDATED_EVENT, onWishlist);
+  }, [session]);
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
@@ -202,12 +172,9 @@ export function StorefrontNavbar() {
   }
 
   async function logout() {
-    setAccessToken(null);
-    setHasSession(false);
-    setIsAdmin(false);
-    setActivePanel(null);
-  }
-
+  await signOut({ redirect: false });
+  setActivePanel(null);
+}
   function handleLogoNavigate(event: MouseEvent<HTMLAnchorElement>) {
     event.preventDefault();
     closePanels();
@@ -625,79 +592,76 @@ export function StorefrontNavbar() {
             ))}
           </div>
 
-          {hasSearchQuery ? (
-            <button
-              type="button"
-              onClick={() => submitSearch()}
-              className="mt-5 w-full rounded-full bg-accent px-4 py-3 text-sm font-semibold text-white transition hover:opacity-90"
+   
+        </div>
+      </Drawer>
+   <Drawer
+  isOpen={activePanel === "profile"}
+  title="Account"
+  onClose={() => setActivePanel(null)}
+>
+  <div className="flex-1 overflow-auto px-8 pb-8">
+    <div className="rounded-3xl border border-black/10 bg-white p-6">
+
+      {hasSession ? (
+        <div className="space-y-3">
+
+          {session?.user.role === "ADMIN" && (
+            <Link
+              href="/admin"
+              onClick={() => setActivePanel(null)}
+              className="block rounded-2xl border border-black/10 px-4 py-3 text-sm font-semibold transition hover:border-[#9d2936] hover:text-[#9d2936]"
             >
-              View all results
-            </button>
-          ) : null}
+              Admin Dashboard
+            </Link>
+          )}
+
+          {session?.user.role === "CUSTOMER" && (
+            <Link
+              href="/dashboard"
+              onClick={() => setActivePanel(null)}
+              className="block rounded-2xl border border-black/10 px-4 py-3 text-sm font-semibold transition hover:border-[#9d2936] hover:text-[#9d2936]"
+            >
+              My Dashboard
+            </Link>
+          )}
+
+          <button
+            type="button"
+            onClick={() => void logout()}
+            className="w-full rounded-2xl bg-black px-4 py-3 text-sm font-semibold text-white transition hover:opacity-90"
+          >
+            Logout
+          </button>
+
         </div>
-      </Drawer>
-      <Drawer
-        isOpen={activePanel === "profile"}
-        title="Account"
-        onClose={() => setActivePanel(null)}
-      >
-        <div className="flex-1 overflow-auto px-8 pb-8">
-          <div className="rounded-3xl border border-black/10 bg-white p-6">
-            {hasSession ? (
-              <div className="space-y-3">
-                {isAdmin ? (
-                  <Link
-                    href="/admin"
-                    onClick={() => setActivePanel(null)}
-                    className="block rounded-2xl border border-black/10 px-4 py-3 text-sm font-semibold transition hover:border-[#9d2936] hover:text-[#9d2936]"
-                  >
-                    Admin dashboard
-                  </Link>
-                ) : (
-                  <Link
-                    href="/dashboard"
-                    onClick={() => setActivePanel(null)}
-                    className="block rounded-2xl border border-black/10 px-4 py-3 text-sm font-semibold transition hover:border-[#9d2936] hover:text-[#9d2936]"
-                  >
-                    My Account
-                  </Link>
-                )}
-                <button
-                  type="button"
-                  onClick={() => void logout()}
-                  className="w-full rounded-2xl bg-black px-4 py-3 text-sm font-semibold text-white transition hover:opacity-90"
-                >
-                  Logout
-                </button>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                <Link
-                  href="/sign-in"
-                  onClick={() => setActivePanel(null)}
-                  className="block rounded-2xl bg-black px-4 py-3 text-center text-sm font-semibold text-white transition hover:opacity-90"
-                >
-                  Sign in
-                </Link>
-                <Link
-                  href="/sign-up"
-                  onClick={() => setActivePanel(null)}
-                  className="block rounded-2xl border border-black/10 px-4 py-3 text-center text-sm font-semibold transition hover:border-[#9d2936] hover:text-[#9d2936]"
-                >
-                  Create account
-                </Link>
-                <Link
-                  href="/admin/login"
-                  onClick={() => setActivePanel(null)}
-                  className="block text-center text-sm text-black/60 underline"
-                >
-                  Admin login
-                </Link>
-              </div>
-            )}
-          </div>
+      ) : (
+
+        <div className="space-y-3">
+
+          <Link
+            href="/signin"
+            onClick={() => setActivePanel(null)}
+            className="block rounded-2xl bg-black px-4 py-3 text-center text-sm font-semibold text-white transition hover:opacity-90"
+          >
+            Sign in
+          </Link>
+
+         <Link
+  href="/sign-up"
+  onClick={() => setActivePanel(null)}
+  className="block rounded-2xl border border-black/10 px-4 py-3 text-center text-sm font-semibold transition hover:border-[#9d2936] hover:text-[#9d2936]"
+>
+  Create account
+</Link>
+
         </div>
-      </Drawer>
+
+      )}
+
+    </div>
+  </div>
+</Drawer>
     </>
   );
 }

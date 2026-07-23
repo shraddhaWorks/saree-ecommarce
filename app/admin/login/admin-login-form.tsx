@@ -1,9 +1,9 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
+import { signIn } from "next-auth/react";
 import { useState } from "react";
 import Link from "next/link";
-import { setAccessToken } from "@/lib/auth-client";
 
 export default function AdminLoginForm() {
   const router = useRouter();
@@ -19,35 +19,17 @@ export default function AdminLoginForm() {
     setError(null);
     setLoading(true);
     try {
-      const signRes = await fetch("/api/auth/signin", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: email.trim().toLowerCase(), password }),
+      const result = await signIn("credentials", {
+        email: email.trim().toLowerCase(),
+        password,
+        redirect: false,
       });
-      const signData = (await signRes.json()) as {
-        error?: string;
-        accessToken?: string;
-      };
-      if (!signRes.ok || !signData.accessToken) {
-        setError(signData.error ?? "Invalid credentials");
+      if (!result || result.error) {
+        setError("Invalid credentials");
         setLoading(false);
         return;
       }
-
-      const meRes = await fetch("/api/me", {
-        headers: { Authorization: `Bearer ${signData.accessToken}` },
-      });
-      const me = (await meRes.json()) as { profile?: { role?: string } };
-      if (me.profile?.role !== "ADMIN") {
-        setError(
-          "This account is not an admin. Use admin sign up or set role in the database.",
-        );
-        setLoading(false);
-        return;
-      }
-
-      setAccessToken(signData.accessToken);
-      router.push("/admin/products");
+      router.push("/admin");
       router.refresh();
     } catch {
       setError("Network error");

@@ -1,9 +1,9 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { signIn } from "next-auth/react";
 import { useState } from "react";
 import Link from "next/link";
-import { setAccessToken } from "@/lib/auth-client";
 
 export default function AdminSignUpPage() {
   const router = useRouter();
@@ -37,27 +37,18 @@ export default function AdminSignUpPage() {
         return;
       }
 
-      const signRes = await fetch("/api/auth/signin", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email: email.trim().toLowerCase(),
-          password,
-        }),
+      const result = await signIn("credentials", {
+        email: email.trim().toLowerCase(),
+        password,
+        redirect: false,
       });
-      const signData = (await signRes.json()) as {
-        error?: string;
-        accessToken?: string;
-      };
-
-      if (!signRes.ok || !signData.accessToken) {
+      if (!result || result.error) {
         setLoading(false);
         router.push("/admin/login?registered=1");
         return;
       }
 
-      setAccessToken(signData.accessToken);
-      router.push("/admin/products");
+      router.push("/admin");
       router.refresh();
     } catch {
       setError("Network error");
