@@ -20,6 +20,7 @@ export default async function OrdersPage() {
       createdAt: "desc",
     },
   });
+  console.log("orders", orders);
 
   return (
     <main className="min-h-screen bg-[#fbf8f3] px-5 py-10">
@@ -43,7 +44,7 @@ export default async function OrdersPage() {
             </p>
 
             <Link
-              href="/collections"
+              href="/"
               className="mt-6 inline-block rounded-lg bg-black px-6 py-3 text-white transition hover:bg-zinc-800"
             >
               Continue Shopping
@@ -98,7 +99,7 @@ export default async function OrdersPage() {
                       <div className="flex items-center gap-4">
                         <img
                           src={
-                            item.product.thumbnailUrl ??
+                            item.product.mainImageUrl ??
                             "/images/product-placeholder.png"
                           }
                           alt={item.productName}

@@ -102,7 +102,7 @@ export function SignUpForm() {
         </h2>
       </div>
 
-      <SocialAuthButtons />
+      
 
       <div className="flex items-center gap-3 text-xs uppercase tracking-[0.25em] text-black/35">
         <span className="h-px flex-1 bg-border-soft" />
