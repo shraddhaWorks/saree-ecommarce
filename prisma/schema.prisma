@@ -27,6 +27,7 @@ model User {
   sessions      Session[]
   orders        Order[]
   wishlistItems WishlistItem[]
+  addresses     Address[] 
 }
 
 model Account {
