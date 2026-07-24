@@ -5,8 +5,10 @@ import { useEffect, useMemo, useState } from "react";
 
 import Footer from "@/components/footer/Footer";
 import { StorefrontNavbar } from "@/components/navbar/storefront-navbar";
-import {
+
 import BackButton from "@/components/common/BackButton";
+
+import {
   clearCart,
   getCart,
   removeFromCart,
@@ -73,11 +75,9 @@ export default function CheckoutPage() {
 
   window.addEventListener("cart:updated", sync);
 
-  return (
-) => {
-  <BackButton />
-    window.removeEventListener("cart:updated", sync);
-  };
+  return () => {
+  window.removeEventListener("cart:updated", sync);
+};
 }, []);
 
   useEffect(() => {
@@ -178,7 +178,11 @@ export default function CheckoutPage() {
   
   return (
     <main className="min-h-screen bg-[#f7f0e7] text-[#201815]">
-      <StorefrontNavbar />
+  <StorefrontNavbar />
+
+  <div className="mx-auto max-w-5xl px-6 pt-4">
+    <BackButton />
+  </div>
 
       <section className="mx-auto max-w-5xl px-6 pb-12 pt-6">
         <h1 className="text-4xl font-semibold tracking-tight">Checkout</h1>
