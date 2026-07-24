@@ -55,6 +55,9 @@ export default function AdminChrome({ children }: { children: React.ReactNode })
           <Link href="/admin/orders" className="text-zinc-600 hover:text-zinc-900">
             Orders
           </Link>
+          <Link href="/admin/categories" className="text-zinc-600 hover:text-zinc-900">
+            Categories
+           </Link>
         </nav>
         <div className="ml-auto flex items-center gap-3">
           <Link href="/" className="text-sm text-zinc-500 hover:text-zinc-800">
