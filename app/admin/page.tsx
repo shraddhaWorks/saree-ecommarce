@@ -21,7 +21,7 @@ export default async function AdminIndexPage() {
               <Link className="rounded-lg px-3 py-2 hover:bg-zinc-100" href="/admin/products">Products</Link>
               <Link className="rounded-lg px-3 py-2 hover:bg-zinc-100" href="/admin/categories">Categories</Link>
               <Link className="rounded-lg px-3 py-2 hover:bg-zinc-100" href="/admin/orders">Orders</Link>
-              <Link className="rounded-lg px-3 py-2 hover:bg-zinc-100" href="/admin/users">Users</Link>
+             
               <Link className="rounded-lg px-3 py-2 hover:bg-zinc-100" href="/admin/storefront">Homepage content</Link>
             </nav>
           </aside>
