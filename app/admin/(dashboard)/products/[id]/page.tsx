@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import ProductForm from "@/components/admin/ProductForm";
 import prisma from "@/lib/db";
+import BackButton from "@/components/common/BackButton";
 
 export default async function AdminEditProductPage({
   params,
@@ -36,9 +37,12 @@ export default async function AdminEditProductPage({
   };
 
   return (
+
     <div>
+      <BackButton />
       <h1 className="text-2xl font-semibold mb-6">Edit product</h1>
       <ProductForm mode="edit" initial={initial} />
     </div>
-  );
+
+    );
 }

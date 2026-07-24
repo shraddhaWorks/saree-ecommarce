@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { authHeaders } from "@/lib/auth-client";
+import BackButton from "@/components/common/BackButton";
 
 type OrderRow = {
   id: string;
@@ -43,8 +44,8 @@ export default function AdminOrdersPage() {
       }
     })();
     return () => {
-      cancelled = true;
-    };
+  cancelled = true;
+};
   }, []);
 
   async function updateStatus(id: string, status: string) {
@@ -68,9 +69,11 @@ export default function AdminOrdersPage() {
     }
   }
 
-  return (
-    <div>
-      <h1 className="text-2xl font-semibold mb-6">Orders</h1>
+ return (
+  <div>
+    <BackButton />
+
+    <h1 className="text-2xl font-semibold mb-6">Orders</h1>
       {error ? <p className="text-red-600 text-sm mb-4">{error}</p> : null}
 
       <div className="space-y-6">
@@ -128,5 +131,5 @@ export default function AdminOrdersPage() {
         <p className="text-zinc-500 text-sm">No orders yet.</p>
       ) : null}
     </div>
-  );
+);
 }

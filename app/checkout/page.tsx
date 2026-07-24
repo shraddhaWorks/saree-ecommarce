@@ -6,6 +6,7 @@ import { useEffect, useMemo, useState } from "react";
 import Footer from "@/components/footer/Footer";
 import { StorefrontNavbar } from "@/components/navbar/storefront-navbar";
 import {
+import BackButton from "@/components/common/BackButton";
   clearCart,
   getCart,
   removeFromCart,
@@ -72,7 +73,9 @@ export default function CheckoutPage() {
 
   window.addEventListener("cart:updated", sync);
 
-  return () => {
+  return (
+) => {
+  <BackButton />
     window.removeEventListener("cart:updated", sync);
   };
 }, []);
@@ -129,7 +132,7 @@ export default function CheckoutPage() {
   const cartTotal = useMemo(
     () => cart.items.reduce((sum, item) => sum + item.qty * item.price, 0),
     [cart.items],
-  );
+);
 
   const handlePlaceOrder = async () => {
     if (cart.items.length === 0) return;

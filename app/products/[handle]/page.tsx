@@ -5,6 +5,7 @@ import { StorefrontNavbar } from "@/components/navbar/storefront-navbar";
 import ProductDetails from "@/components/product/ProductDetails";
 import prisma from "@/lib/db";
 import { toStorefrontProduct } from "@/lib/storefront-map";
+import BackButton from "@/components/common/BackButton";
 
 export default async function ProductPage({
   params,
@@ -32,7 +33,9 @@ export default async function ProductPage({
   });
 
   return (
+
     <div className="min-h-screen bg-[#f7f0e7] text-[#201815]">
+      <BackButton />
       <StorefrontNavbar />
       <ProductDetails
         product={toStorefrontProduct(row)}
@@ -40,6 +43,7 @@ export default async function ProductPage({
       />
       <Footer />
     </div>
-  );
+
+    );
 }
 

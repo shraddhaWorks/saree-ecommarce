@@ -1,6 +1,7 @@
 import Link from "next/link";
 import prisma from "@/lib/db";
 import { requireCustomer } from "@/lib/auth/permissions";
+import BackButton from "@/components/common/BackButton";
 
 export default async function OrdersPage() {
   const session = await requireCustomer();
@@ -23,7 +24,9 @@ export default async function OrdersPage() {
   console.log("orders", orders);
 
   return (
+
     <main className="min-h-screen bg-[#fbf8f3] px-5 py-10">
+      <BackButton />
       <div className="mx-auto max-w-6xl">
         <h1 className="text-3xl font-bold text-zinc-900">
           My Orders
@@ -151,5 +154,6 @@ export default async function OrdersPage() {
         )}
       </div>
     </main>
-  );
+
+    );
 }

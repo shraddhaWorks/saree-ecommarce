@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { requireAdmin } from "@/lib/auth/permissions";
 import prisma from "@/lib/db";
+import BackButton from "@/components/common/BackButton";
 
 export default async function AdminIndexPage() {
   const session = await requireAdmin();
@@ -11,7 +12,9 @@ export default async function AdminIndexPage() {
   ]);
 
   return (
+
     <main className="min-h-screen bg-zinc-50 p-6 text-zinc-900 md:p-10">
+      <BackButton />
       <div className="mx-auto max-w-7xl">
         <div className="flex flex-col gap-6 lg:flex-row">
           <aside className="w-full rounded-2xl border border-zinc-200 bg-white p-5 lg:w-60">
@@ -37,7 +40,8 @@ export default async function AdminIndexPage() {
         </div>
       </div>
     </main>
-  );
+
+    );
 }
 
 function Metric({ label, value }: { label: string; value: number }) {

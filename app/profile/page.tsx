@@ -1,6 +1,7 @@
 import { User } from "lucide-react";
 import { requireCustomer } from "@/lib/auth/permissions";
 import prisma from "@/lib/db";
+import BackButton from "@/components/common/BackButton";
 
 export default async function ProfilePage() {
   const session = await requireCustomer();
@@ -19,17 +20,21 @@ export default async function ProfilePage() {
 
   if (!user) {
     return (
+
       <main className="min-h-screen bg-[#fbf8f3] p-8">
+        <BackButton />
         <h1 className="text-2xl font-bold">User not found</h1>
       </main>
-    );
+
+      );
   }
 
   return (
-    <main className="min-h-screen bg-[#fbf8f3] px-5 py-10">
-      <div className="mx-auto max-w-4xl">
+     <main className="min-h-screen bg-[#fbf8f3] px-5 py-10">
+    <div className="mx-auto max-w-4xl">
+      <BackButton />
 
-        <div className="rounded-2xl border border-zinc-200 bg-white p-8 shadow-sm">
+      <div className="rounded-2xl border border-zinc-200 bg-white p-8 shadow-sm">
 
           <div className="mb-8 flex items-center gap-3">
             <div className="rounded-full bg-[#9d2936]/10 p-3">

@@ -1,9 +1,14 @@
 import { AuthShell } from "@/components/auth/shared/auth-shell";
 import { SignUpForm } from "@/components/auth/sign-up/sign-up-form";
+import BackButton from "@/components/common/BackButton";
 
 export default function SignUpPage() {
   return (
-    <AuthShell
+
+    <>,
+
+      <BackButton />
+<AuthShell
       eyebrow="Create account"
       title="Sign up for a new account"
       description="Save your favorite styles, manage your orders, and make checkout easier across devices."
@@ -13,5 +18,8 @@ export default function SignUpPage() {
     >
       <SignUpForm />
     </AuthShell>
-  );
+
+    </>
+
+    );
 }
