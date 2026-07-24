@@ -1,9 +1,14 @@
 import { AuthShell } from "@/components/auth/shared/auth-shell";
 import { SignInForm } from "@/components/auth/sign-in/sign-in-form";
+import BackButton from "@/components/common/BackButton";
 
 export default function SignInPage() {
   return (
-    <AuthShell
+
+    <>,
+
+      <BackButton />
+<AuthShell
       eyebrow="Welcome back"
       title="Sign in to your account"
       description="Access your wishlist, saved addresses, orders, and a faster checkout experience."
@@ -13,5 +18,8 @@ export default function SignInPage() {
     >
       <SignInForm />
     </AuthShell>
-  );
+
+    </>
+
+    );
 }

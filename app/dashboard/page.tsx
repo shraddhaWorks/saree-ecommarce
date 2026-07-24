@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { requireCustomer } from "@/lib/auth/permissions";
 import prisma from "@/lib/db";
+import BackButton from "@/components/common/BackButton";
 
 export default async function CustomerDashboardPage() {
   const session = await requireCustomer();
@@ -11,7 +12,9 @@ export default async function CustomerDashboardPage() {
   ]);
 
   return (
+
     <main className="min-h-screen bg-[#fbf8f3] px-5 py-12 text-zinc-900 md:px-10">
+      <BackButton />
       <div className="mx-auto max-w-6xl">
         <p className="text-xs font-semibold uppercase tracking-[0.25em] text-zinc-500">My account</p>
         <h1 className="mt-3 text-4xl font-semibold tracking-tight">Welcome, {profile?.name ?? "there"}</h1>
@@ -24,7 +27,8 @@ export default async function CustomerDashboardPage() {
        
       </div>
     </main>
-  );
+
+    );
 }
 
 function DashboardCard({ href, title, value, description }: { href: string; title: string; value: string; description: string }) {

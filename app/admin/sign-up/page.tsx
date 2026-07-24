@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { useState } from "react";
 import Link from "next/link";
+import BackButton from "@/components/common/BackButton";
 
 export default function AdminSignUpPage() {
   const router = useRouter();
@@ -58,7 +59,9 @@ export default function AdminSignUpPage() {
   }
 
   return (
+
     <div className="w-full max-w-md rounded-2xl border border-zinc-200 bg-white p-8 shadow-sm">
+      <BackButton />
       <h1 className="text-2xl font-semibold text-zinc-900">Admin sign up</h1>
       <p className="mt-2 text-sm text-zinc-500">
         Create an admin account. You need the invite code from{" "}
@@ -133,5 +136,6 @@ export default function AdminSignUpPage() {
         Back to store
       </Link>
     </div>
-  );
+
+    );
 }

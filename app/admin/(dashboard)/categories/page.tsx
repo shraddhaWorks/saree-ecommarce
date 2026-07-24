@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { authHeaders } from "@/lib/auth-client";
+import BackButton from "@/components/common/BackButton";
 
 type Category = {
   id: string;
@@ -140,7 +141,9 @@ export default function CategoriesPage() {
   }
 
   return (
+
     <main className="space-y-8">
+      <BackButton />
 
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold">
@@ -318,5 +321,6 @@ export default function CategoriesPage() {
       </div>
 
     </main>
-  );
+
+    );
 }

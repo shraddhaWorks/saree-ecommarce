@@ -6,6 +6,7 @@ import Footer from "@/components/footer/Footer";
 import { StorefrontProductGrid } from "@/components/product/StorefrontProductGrid";
 import { StorefrontNavbar } from "@/components/navbar/storefront-navbar";
 import { getCollectionCatalog } from "@/lib/collection-catalog";
+import BackButton from "@/components/common/BackButton";
 
 type SearchParams = Record<string, string | string[] | undefined>;
 
@@ -27,7 +28,9 @@ export default async function CollectionPage({
     await getCollectionCatalog(handle, raw);
 
   return (
+
     <main className="min-h-screen bg-[#fbf7f0] text-[#201815]">
+      <BackButton />
       <StorefrontNavbar />
       <section className="pb-16 pt-5 md:pt-8">
         <div className="mx-auto max-w-[1680px] px-3 sm:px-4 md:px-6 lg:px-8">
@@ -88,5 +91,6 @@ export default async function CollectionPage({
       </section>
       <Footer />
     </main>
-  );
+
+    );
 }

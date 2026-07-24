@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import BackButton from "@/components/common/BackButton";
 
 type Row = {
   id: string;
@@ -34,7 +35,9 @@ export default function AdminProductsPage() {
   }, []);
 
   return (
+
     <div>
+      <BackButton />
       <div className="flex items-center justify-between gap-4 mb-8">
         <h1 className="text-2xl font-semibold">Products</h1>
         <Link
@@ -93,5 +96,6 @@ export default function AdminProductsPage() {
         ) : null}
       </div>
     </div>
-  );
+
+    );
 }
