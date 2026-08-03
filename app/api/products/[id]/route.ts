@@ -165,15 +165,16 @@ export async function DELETE(
     }
 
     const { id } = await params;
-    await prisma.productImage.deleteMany({
-      where: { productId: id },
-    });
 
-    await prisma.product.delete({
+    await prisma.product.update({
       where: { id },
+      data: {
+        inStock: false,
+        stockQuantity: 0,
+      },
     });
 
-    return NextResponse.json({ success: true }, { status: 200 });
+    return NextResponse.json({ success: true, inactive: true }, { status: 200 });
   } catch (err) {
     console.error("DELETE /api/products/[id] error", err);
     return NextResponse.json(

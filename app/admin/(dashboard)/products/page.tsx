@@ -40,37 +40,77 @@ export default function AdminProductsPage() {
     })();
   }, []);
 
-  async function handleDelete(id: string) {
-    const confirmDelete = confirm(
-      "Delete this product permanently?"
+  async function handleDeactivate(id: string) {
+    const confirmDeactivate = confirm(
+      "Make this product inactive?"
     );
 
-    if (!confirmDelete) return;
+    if (!confirmDeactivate) return;
 
     try {
       const res = await fetch(`/api/products/${id}`, {
         method: "DELETE",
         headers: authHeaders(),
-         credentials: "include",
+        credentials: "include",
       });
 
       const text = await res.text();
-
-console.log("DELETE STATUS:", res.status);
-console.log("DELETE RESPONSE:", text);
-
-const data = text ? JSON.parse(text) : {};
+      const data = text ? JSON.parse(text) : {};
 
       if (!res.ok) {
-        console.error("Delete failed:", data);
-        setError(data.error ?? "Failed to delete product");
+        console.error("Deactivate failed:", data);
+        setError(data.error ?? "Failed to make product inactive");
         return;
       }
 
       setItems((prev) =>
-        prev.filter((item) => item.id !== id)
+        prev.map((item) =>
+          item.id === id ? { ...item, inStock: false, stockQuantity: 0 } : item,
+        ),
       );
+      setError(null);
+    } catch (error) {
+      console.error(error);
+      setError("Network error");
+    }
+  }
 
+  async function handleActivate(id: string) {
+    const confirmActivate = confirm(
+      "Make this product active again?"
+    );
+
+    if (!confirmActivate) return;
+
+    try {
+      const res = await fetch(`/api/products/${id}`, {
+        method: "PUT",
+        headers: {
+          ...authHeaders(),
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          inStock: true,
+          stockQuantity: 1,
+        }),
+      });
+
+      const text = await res.text();
+      const data = text ? JSON.parse(text) : {};
+
+      if (!res.ok) {
+        console.error("Activate failed:", data);
+        setError(data.error ?? "Failed to make product active");
+        return;
+      }
+
+      setItems((prev) =>
+        prev.map((item) =>
+          item.id === id ? { ...item, inStock: true, stockQuantity: 1 } : item,
+        ),
+      );
+      setError(null);
     } catch (error) {
       console.error(error);
       setError("Network error");
@@ -168,10 +208,10 @@ const data = text ? JSON.parse(text) : {};
                     </Link>
 
                     <button
-                      onClick={() => handleDelete(p.id)}
-                      className="font-medium text-red-600 hover:underline"
+                      onClick={() => (p.inStock ? handleDeactivate(p.id) : handleActivate(p.id))}
+                      className={`font-medium ${p.inStock ? "text-red-600 hover:underline" : "text-green-600 hover:underline"}`}
                     >
-                      Delete
+                      {p.inStock ? "Deactivate" : "Activate"}
                     </button>
                   </div>
                 </td>
