@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import BackButton from "@/components/common/BackButton";
 import { authHeaders } from "@/lib/auth-client";
+import ConfirmDialog from "@/components/common/ConfirmDialog";
 
 type Row = {
   id: string;
@@ -14,11 +15,10 @@ type Row = {
   stockQuantity: number;
   mainImageUrl?: string | null;
 };
-
 export default function AdminProductsPage() {
   const [items, setItems] = useState<Row[]>([]);
   const [error, setError] = useState<string | null>(null);
-
+  const [deleteId, setDeleteId] = useState<string | null>(null);
   useEffect(() => {
     (async () => {
       try {
@@ -40,13 +40,7 @@ export default function AdminProductsPage() {
     })();
   }, []);
 
-  async function handleDeactivate(id: string) {
-    const confirmDeactivate = confirm(
-      "Make this product inactive?"
-    );
-
-    if (!confirmDeactivate) return;
-
+  async function handleDelete(id: string) {
     try {
       const res = await fetch(`/api/products/${id}`, {
         method: "DELETE",
@@ -58,23 +52,18 @@ export default function AdminProductsPage() {
       const data = text ? JSON.parse(text) : {};
 
       if (!res.ok) {
-        console.error("Deactivate failed:", data);
-        setError(data.error ?? "Failed to make product inactive");
+        console.error("Delete failed:", data);
+        setError(data.error ?? "Failed to remove product");
         return;
       }
 
-      setItems((prev) =>
-        prev.map((item) =>
-          item.id === id ? { ...item, inStock: false, stockQuantity: 0 } : item,
-        ),
-      );
+      setItems((prev) => prev.filter((item) => item.id !== id));
       setError(null);
     } catch (error) {
       console.error(error);
       setError("Network error");
     }
   }
-
   async function handleActivate(id: string) {
     const confirmActivate = confirm(
       "Make this product active again?"
@@ -189,13 +178,7 @@ export default function AdminProductsPage() {
                 </td>
 
                 <td className="px-4 py-3">
-                  {p.stockQuantity}
-
-                  {!p.inStock && (
-                    <span className="ml-1 text-red-500">
-                      (out)
-                    </span>
-                  )}
+                  {p.inStock && p.stockQuantity > 0 ? p.stockQuantity : "Out of stock"}
                 </td>
 
                 <td className="px-4 py-3">
@@ -207,12 +190,23 @@ export default function AdminProductsPage() {
                       Edit
                     </Link>
 
-                    <button
-                      onClick={() => (p.inStock ? handleDeactivate(p.id) : handleActivate(p.id))}
-                      className={`font-medium ${p.inStock ? "text-red-600 hover:underline" : "text-green-600 hover:underline"}`}
-                    >
-                      {p.inStock ? "Deactivate" : "Activate"}
-                    </button>
+                    {p.inStock && p.stockQuantity > 0 ? (
+                      <button
+                        type="button"
+                        onClick={() => setDeleteId(p.id)}
+                        className="font-medium text-red-600 hover:underline"
+                      >
+                        Remove
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => void handleActivate(p.id)}
+                        className="font-medium text-emerald-700 hover:underline"
+                      >
+                        Activate
+                      </button>
+                    )}
                   </div>
                 </td>
               </tr>
@@ -226,6 +220,23 @@ export default function AdminProductsPage() {
           </p>
         ) : null}
       </div>
+      <ConfirmDialog
+        open={deleteId !== null}
+        title="Remove product?"
+        message="Remove this product permanently. This will delete the product from the database and cannot be undone."
+        okText="Remove"
+        cancelText="Cancel"
+        onCancel={() => setDeleteId(null)}
+        onOk={() => {
+          if (!deleteId) return;
+
+          const id = deleteId;
+
+          setDeleteId(null);
+
+          void handleDelete(id);
+        }}
+      />
     </div>
   );
 }
