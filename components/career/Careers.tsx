@@ -40,7 +40,7 @@ export default function CareersPage() {
         </h1>
         <div className="h-1 w-24 bg-accent-soft mx-auto rounded-full" />
         <p className="mt-8 text-foreground/70 max-w-2xl mx-auto leading-relaxed">
-          At Rangam Adi Silks, we don't just sell sarees; we preserve a thousand-year-old 
+          At Rangam Adi Silks, we do not just sell sarees; we preserve a thousand-year-old 
           tradition. We are looking for passionate individuals to help us weave the 
           future of Indian heritage.
         </p>
@@ -65,7 +65,7 @@ export default function CareersPage() {
       <div className="space-y-6">
         <h2 className="font-serif-royal text-3xl text-foreground mb-8 text-center">Openings</h2>
         <p className="text-foreground/70 max-w-2xl mx-auto">
-          Update soon with our current openings. We are always looking for passionate individuals to join our team and help us preserve the rich heritage of Indian weaving. If you have a love for textiles, fashion, and culture, we encourage you to reach out to us even if there isn't a current opening that fits your profile.
+          Update soon with our current openings. We are always looking for passionate individuals to join our team and help us preserve the rich heritage of Indian weaving. If you have a love for textiles, fashion, and culture, we encourage you to reach out to us even if there is not a current opening that fits your profile.
         </p>
        {/**  {openings.map((job, index) => (
           <div 

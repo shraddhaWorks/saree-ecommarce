@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Phone, Mail, MapPin, Clock, ArrowLeft } from 'lucide-react';
+import { Phone, Mail} from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 const Contact = () => {
@@ -83,7 +83,7 @@ const Contact = () => {
       <div className="mt-16 text-center">
         <div className="bg-surface border border-border-soft rounded-2xl p-8">
           <p className="font-serif-royal text-2xl text-foreground italic">
-            "Every thread tells a story. We'd love to hear yours."
+            “Every thread tells a story. We would love to hear yours.”
           </p>
           <p className="mt-4 text-sm text-foreground/60">
             © {new Date().getFullYear()} Rangam Adi Silks. All Rights Reserved.
