@@ -43,7 +43,7 @@ export default async function OrdersPage() {
             </h2>
 
             <p className="mt-3 text-zinc-500">
-              You haven't placed any orders yet.
+              You have not placed any orders yet.
             </p>
 
             <Link
