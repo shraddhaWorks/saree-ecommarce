@@ -4,6 +4,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { useState } from "react";
 import Link from "next/link";
+import ConfirmDialog from "@/components/common/ConfirmDialog";
 
 export default function AdminLoginForm() {
   const router = useRouter();
@@ -13,6 +14,7 @@ export default function AdminLoginForm() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [toastOpen, setToastOpen] = useState(false);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -29,8 +31,12 @@ export default function AdminLoginForm() {
         setLoading(false);
         return;
       }
-      router.push("/admin");
-      router.refresh();
+      setToastOpen(true);
+      window.setTimeout(() => {
+        setToastOpen(false);
+        router.push("/admin");
+        router.refresh();
+      }, 1500);
     } catch {
       setError("Network error");
     } finally {
@@ -39,6 +45,15 @@ export default function AdminLoginForm() {
   }
 
   return (
+    <>
+    <ConfirmDialog
+      open={toastOpen}
+      title=""
+      message="Admin signed in"
+      showButtons={false}
+      onOk={() => {}}
+      onCancel={() => setToastOpen(false)}
+    />
     <div className="w-full max-w-md rounded-2xl border border-zinc-200 bg-white p-8 shadow-sm">
       <h1 className="text-2xl font-semibold text-zinc-900">Admin sign in</h1>
       <p className="mt-2 text-sm text-zinc-500">
@@ -89,5 +104,6 @@ export default function AdminLoginForm() {
         Back to store
       </Link>
     </div>
+    </>
   );
 }

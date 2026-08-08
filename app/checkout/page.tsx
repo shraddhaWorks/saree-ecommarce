@@ -7,6 +7,7 @@ import Footer from "@/components/footer/Footer";
 import { StorefrontNavbar } from "@/components/navbar/storefront-navbar";
 
 import BackButton from "@/components/common/BackButton";
+import ConfirmDialog from "@/components/common/ConfirmDialog";
 
 import {
   clearCart,
@@ -65,6 +66,7 @@ export default function CheckoutPage() {
   const [shippingPostal, setShippingPostal] = useState("");
   const [savedAddresses, setSavedAddresses] = useState<Address[]>([]);
   const [selectedAddressId, setSelectedAddressId] = useState<string>("");
+  const [orderPlacedOpen, setOrderPlacedOpen] = useState(false);
 
   useEffect(() => {
   const sync = () => {
@@ -167,7 +169,11 @@ export default function CheckoutPage() {
       clearCart();
       setCart({ items: [] });
       window.dispatchEvent(new Event("cart:updated"));
-      window.location.assign("/");
+      setOrderPlacedOpen(true);
+      window.setTimeout(() => {
+        setOrderPlacedOpen(false);
+        window.location.assign("/");
+      }, 1500);
     } catch {
       setError("Network error. Try again.");
     } finally {
@@ -177,6 +183,15 @@ export default function CheckoutPage() {
 
   
   return (
+    <>
+    <ConfirmDialog
+      open={orderPlacedOpen}
+      title=""
+      message="Order placed"
+      showButtons={false}
+      onOk={() => {}}
+      onCancel={() => setOrderPlacedOpen(false)}
+    />
     <main className="min-h-screen bg-[#f7f0e7] text-[#201815]">
   <StorefrontNavbar />
 
@@ -349,6 +364,7 @@ export default function CheckoutPage() {
 
       <Footer />
     </main>
+    </>
   );
 }
 

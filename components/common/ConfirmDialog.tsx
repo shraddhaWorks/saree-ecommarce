@@ -8,6 +8,7 @@ type ConfirmDialogProps = {
   message: string;
   okText?: string;
   cancelText?: string;
+  showButtons?: boolean;
   onOk: () => void;
   onCancel: () => void;
 };
@@ -18,6 +19,7 @@ export default function ConfirmDialog({
   message,
   okText = "OK",
   cancelText = "Cancel",
+  showButtons = true,
   onOk,
   onCancel,
 }: ConfirmDialogProps) {
@@ -46,7 +48,7 @@ export default function ConfirmDialog({
       role="presentation"
     >
       <div
-        className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl"
+        className={`${showButtons ? "w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl" : "w-full max-w-sm rounded-2xl bg-[#201815] px-8 py-4 shadow-2xl"}`}
         role="dialog"
         aria-modal="true"
         aria-labelledby="confirm-dialog-title"
@@ -55,35 +57,37 @@ export default function ConfirmDialog({
       >
         <h2
           id="confirm-dialog-title"
-          className="text-lg font-semibold text-zinc-900"
+          className={`${showButtons ? "text-lg font-semibold text-zinc-900" : "sr-only"}`}
         >
           {title}
         </h2>
 
         <p
           id="confirm-dialog-message"
-          className="mt-3 text-sm leading-6 text-zinc-600"
+          className={`${showButtons ? "mt-3 text-ms leading-6 text-zinc-600" : "text-center text-sm font-semibold leading-6 text-white"}`}
         >
           {message}
         </p>
 
-        <div className="mt-6 flex justify-end gap-3">
-          <button
-            type="button"
-            onClick={onCancel}
-            className="rounded-lg border border-zinc-300 px-4 py-2 text-sm font-medium text-zinc-700 transition hover:bg-zinc-100"
-          >
-            {cancelText}
-          </button>
+        {showButtons ? (
+          <div className="mt-6 flex justify-end gap-3">
+            <button
+              type="button"
+              onClick={onCancel}
+              className="rounded-lg border border-zinc-300 px-4 py-2 text-sm font-medium text-zinc-700 transition hover:bg-zinc-100"
+            >
+              {cancelText}
+            </button>
 
-          <button
-            type="button"
-            onClick={onOk}
-            className="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-red-700"
-          >
-            {okText}
-          </button>
-        </div>
+            <button
+              type="button"
+              onClick={onOk}
+              className="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-red-700"
+            >
+              {okText}
+            </button>
+          </div>
+        ) : null}
       </div>
     </div>
   );
