@@ -4,12 +4,14 @@ import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { AuthField } from "@/components/auth/shared/auth-field";
+import ConfirmDialog from "@/components/common/ConfirmDialog";
 import { SocialAuthButtons } from "@/components/auth/shared/social-auth-buttons";
 
 export function SignInForm() {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [toastOpen, setToastOpen] = useState(false);
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -31,8 +33,13 @@ export function SignInForm() {
 
       const sessionResponse = await fetch("/api/auth/session");
       const session = (await sessionResponse.json()) as { user?: { role?: string } };
-      router.push(session.user?.role === "ADMIN" ? "/admin" : "/dashboard");
-      router.refresh();
+      const destination = session.user?.role === "ADMIN" ? "/admin" : "/";
+      setToastOpen(true);
+      window.setTimeout(() => {
+        setToastOpen(false);
+        router.push(destination);
+        router.refresh();
+      }, 1500);
     } catch {
       setError("Network error");
     } finally {
@@ -41,6 +48,15 @@ export function SignInForm() {
   }
 
   return (
+    <>
+    <ConfirmDialog
+      open={toastOpen}
+      title=""
+      message="Welcome back"
+      showButtons={false}
+      onOk={() => {}}
+      onCancel={() => setToastOpen(false)}
+    />
     <form className="space-y-5" onSubmit={onSubmit}>
       <div>
         <p className="text-xs font-semibold uppercase tracking-[0.3em] text-black/45">Sign In</p>
@@ -71,5 +87,6 @@ export function SignInForm() {
         {loading ? "Signing in…" : "Sign in"}
       </button>
     </form>
+    </>
   );
 }

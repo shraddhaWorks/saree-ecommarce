@@ -25,6 +25,7 @@ import { resolveMenuItemHref } from "@/components/navbar/menu/resolve-menu-href"
 import { getNavMegaItems, resolveMegaPreviewHref } from "./nav-mega-items";
 import { Drawer, IconButton, RangamLogo } from "./ui";
 import { MainNavigation } from "./main-navigation";
+import ConfirmDialog from "@/components/common/ConfirmDialog";
 
 type PanelKey = "bag" | "search" | "profile" | null;
 
@@ -54,6 +55,7 @@ const hasSession = Boolean(session?.user);
   const [searchResults, setSearchResults] = useState<SearchHit[]>([]);
   const [searchLoading, setSearchLoading] = useState(false);
   const [searchError, setSearchError] = useState<string | null>(null);
+  const [logoutDialogOpen, setLogoutDialogOpen] = useState(false);
   const searchAbortRef = useRef<AbortController | null>(null);
 
   const cartCount = useMemo(() => getCartCount(cart), [cart]);
@@ -179,9 +181,14 @@ const hasSession = Boolean(session?.user);
   }
 
   async function logout() {
-  await signOut({ redirect: false });
-  setActivePanel(null);
-}
+    await signOut({ redirect: false });
+    setActivePanel(null);
+    setLogoutDialogOpen(true);
+    window.setTimeout(() => {
+      setLogoutDialogOpen(false);
+      window.location.assign("/");
+    }, 1500);
+  }
   function handleLogoNavigate(event: MouseEvent<HTMLAnchorElement>) {
     event.preventDefault();
     closePanels();
@@ -204,6 +211,14 @@ const hasSession = Boolean(session?.user);
 
   return (
     <>
+      <ConfirmDialog
+        open={logoutDialogOpen}
+        title=""
+        message="Logged out"
+        showButtons={false}
+        onOk={() => {}}
+        onCancel={() => setLogoutDialogOpen(false)}
+      />
       <AnnouncementBar />
 
       <header className="fixed left-0 right-0 top-8 z-40 w-full max-w-none border-b border-black/10 bg-[var(--navbar-sandal)]/95 shadow-[0_12px_36px_rgba(84,45,28,0.08)] backdrop-blur max-lg:border-b-0 max-lg:shadow-none">

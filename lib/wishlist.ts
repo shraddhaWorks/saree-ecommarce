@@ -50,6 +50,12 @@ function emitWishlistUpdated(count: number) {
   );
 }
 
+function isWishlistAuthed(): boolean {
+  if (typeof window === "undefined") return false;
+  const token = window.localStorage.getItem("saree_access_token");
+  return Boolean(token && token.trim().length > 0);
+}
+
 function handleWishlistUnauthorized() {
   invalidateWishlistCache();
   const count = readWishlistLocal().length;
@@ -128,6 +134,13 @@ async function loadRemoteIntoSlot(
   force: boolean,
 ): Promise<WishlistLine[]> {
   if (typeof window === "undefined") return [];
+
+  if (!isWishlistAuthed()) {
+    slot.lines = [];
+    slot.inflight = null;
+    return readWishlistLocal();
+  }
+
   if (force) {
     slot.lines = null;
     slot.inflight = null;
@@ -143,10 +156,12 @@ async function loadRemoteIntoSlot(
       });
       if (r.status === 401) {
         handleWishlistUnauthorized();
+        slot.lines = [];
         slot.inflight = null;
         return readWishlistLocal();
       }
       if (!r.ok) {
+        slot.lines = [];
         slot.inflight = null;
         return [];
       }
@@ -156,6 +171,7 @@ async function loadRemoteIntoSlot(
       slot.inflight = null;
       return items;
     } catch {
+      slot.lines = [];
       slot.inflight = null;
       return [];
     }
@@ -177,6 +193,13 @@ export async function fetchWishlistLinesFull(force = false): Promise<WishlistLin
 /** Navbar bootstrap — single COUNT query, no product join. */
 export async function fetchWishlistCountRemote(): Promise<number> {
   if (typeof window === "undefined") return 0;
+
+  if (!isWishlistAuthed()) {
+    const localCount = readWishlistLocal().length;
+    emitWishlistUpdated(localCount);
+    return localCount;
+  }
+
   try {
     const r = await fetch("/api/wishlist?mode=count", { credentials: "same-origin" });
     if (r.status === 401) {
