@@ -16,6 +16,7 @@ export type ProductListProps = {
    */
   maxProducts?: number;
   rawSearchParams?: Record<string, string | string[] | undefined>;
+  
 };
 
 export default async function ProductList({
@@ -25,7 +26,7 @@ export default async function ProductList({
   const take =
     maxProducts != null ? Math.min(PRODUCT_LIST_FULL_PAGE_TAKE, Math.max(maxProducts * 10, 48)) : PRODUCT_LIST_FULL_PAGE_TAKE;
   const browse: CollectionBrowseState = parseCollectionBrowse(rawSearchParams ?? {});
-
+   
   const rows = await prisma.product.findMany({
     where: {
       inStock: true,
@@ -40,7 +41,7 @@ export default async function ProductList({
   });
 
   let products = sortProducts(filterProducts(rows, browse), browse.sort).map(toStorefrontProduct);
-
+  console.log(products);
   if (maxProducts != null) {
     products = products.slice(0, Math.max(0, maxProducts));
   }
