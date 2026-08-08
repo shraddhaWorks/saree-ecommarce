@@ -5,7 +5,12 @@ import { signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState, type FormEvent, type MouseEvent } from "react";
 
-import { getCart, getCartCount, type Cart } from "@/lib/cart";
+import {
+  getCart,
+  getCartCount,
+  removeFromCart,
+  type Cart,
+} from "@/lib/cart";
 import {
   fetchWishlistCountRemote,
   getWishlistCachedCount,
@@ -195,9 +200,7 @@ const hasSession = Boolean(session?.user);
     "flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-black/8 bg-white/60 text-black/70 shadow-[0_8px_24px_rgba(68,38,24,0.06)] transition hover:border-accent/25 hover:bg-white hover:text-accent sm:h-9 sm:w-9 lg:h-10 lg:w-10";
   const hasSearchQuery = searchQuery.trim().length > 0;
 
-  function removeFromCart(productId: string) {
-    throw new Error("Function not implemented.");
-  }
+  
 
   return (
     <>
@@ -206,26 +209,30 @@ const hasSession = Boolean(session?.user);
       <header className="fixed left-0 right-0 top-8 z-40 w-full max-w-none border-b border-black/10 bg-[var(--navbar-sandal)]/95 shadow-[0_12px_36px_rgba(84,45,28,0.08)] backdrop-blur max-lg:border-b-0 max-lg:shadow-none">
         {/* Mobile: logo left + burger right only — compact strip (~80% visual height vs prior) */}
         <div className="flex min-h-[44px] items-center justify-between px-3 py-1.5 sm:min-h-[48px] sm:px-4 lg:hidden">
-          <Link
-            href="/"
-            onClick={handleLogoNavigate}
-            className="inline-flex leading-none focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--navbar-sandal)]"
-            aria-label="Rangam home"
-          >
-            <RangamLogo />
-          </Link>
+  <Link
+    href="/"
+    onClick={handleLogoNavigate}
+    className="inline-flex leading-none focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--navbar-sandal)]"
+    aria-label="Rangam home"
+  >
+    <RangamLogo />
+  </Link>
 
-          <button
-            type="button"
-            aria-expanded={mobileNavOpen}
-            aria-controls="mobile-primary-nav"
-            aria-label={mobileNavOpen ? "Close menu" : "Open menu"}
-            onClick={() => setMobileNavOpen((o) => !o)}
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-black/8 bg-white/60 leading-none text-black/70 transition hover:bg-white"
-          >
-            {mobileNavOpen ? <CloseIcon className="h-5 w-5" /> : <MenuIcon className="h-5 w-5" />}
-          </button>
-        </div>
+  <button
+    type="button"
+    aria-expanded={mobileNavOpen}
+    aria-controls="mobile-primary-nav"
+    aria-label={mobileNavOpen ? "Close menu" : "Open menu"}
+    onClick={() => setMobileNavOpen((o) => !o)}
+    className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-black/8 bg-white/60 leading-none text-black/70 transition hover:bg-white"
+  >
+    {mobileNavOpen ? (
+      <CloseIcon className="h-5 w-5" />
+    ) : (
+      <MenuIcon className="h-5 w-5" />
+    )}
+  </button>
+</div>
 
         {/* Desktop/tablet: centered logo + utility icons */}
         <div className="hidden min-h-[56px] w-full grid-cols-[1fr_auto_1fr] items-center gap-y-2 py-3 lg:grid">
